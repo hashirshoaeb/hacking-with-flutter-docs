@@ -1,0 +1,462 @@
+---
+title: Day 2 - Understanding State Management Fundamentals
+description: Learn the key concepts of state management in Flutter, including streams, events, and how to build a basic state management solution using Dart.
+---
+
+## Understanding State Management Fundamentals
+
+Hey there! If you’re like most developers, you probably first encountered a state management library through a YouTube tutorial—maybe it was during a late-night coding session, chasing quick fixes for your project. You learned to use it in that specific example, but when it came to implementing it in your project, you struggled. Sound familiar? The problem is often not knowing what’s happening under the hood.
+
+Let’s fix that! First, we need to understand why state management is important, what it aims to solve, and how it works. This will help you know when to use a `StatefulWidget` and when a state management library is the better choice.
+
+## Why Use a State Management Library?
+
+Good software design follows the principle of **low coupling and high cohesion** ([geeksforgeeks explanation](https://www.geeksforgeeks.org/software-engineering-coupling-and-cohesion/)). The purpose of state management is to **decouple** the state from the UI. By doing this, the state and UI become independent and reusable.
+
+Let me break it down with an example:
+
+Imagine you have some data points (state) and filters (actions) that modify the data. In your UI, you have two charts: a bar graph and a pie chart. Without state management, the state and UI are tightly coupled, making it hard to reuse. With a state management solution, the state is independent, so both charts can use the same data and filters seamlessly.
+
+The ultimate goal is to have **low coupling** between state and UI. Ready to build your own state management solution? Let’s dive in!
+
+## Key Concepts: Streams and Events
+
+Imagine you’re standing by a river with a friend. The river flows from a mountain (where you are) to a lake (where your friend is). You decide to send paper boats downstream. Each boat is numbered, and when your friend catches one, they shout the number back to you.
+
+In Dart, this river is like a **Stream**. The boats are **data events** (or state), and your friend is the **listener** (the UI component). Here’s how we can model this activity in Dart:
+
+```dart:example.dart
+import 'dart:async';
+
+class RiverActivity {
+  // creating a river for activity
+  final StreamController<int> _streamController = StreamController<int>();
+
+  // stream of river you can listen to at lake side
+  Stream<int> get stream => _streamController.stream;
+
+  // Let you sail/sink your boat into the stream of river from top hill
+  void sendBoat(int boatNumber) {
+    _streamController.sink.add(boatNumber);
+  }
+
+  // close the river
+  void closeActivity() {
+    _streamController.close();
+  }
+}
+
+void main() {
+  final riverActivity = RiverActivity();
+
+  // your friend listening at lake
+  final subscription = riverActivity.stream.listen((boatNumber) {
+    print('Shout out loud: I received boat $boatNumber');
+  });
+
+  // you sending boat 1 by 1 after every second from top
+  int boatLabel = 1;
+  Timer.periodic(Duration(seconds: 1), (t) {
+    riverActivity.sendBoat(boatLabel);
+    if (boatLabel == 10) {
+      t.cancel();
+      riverActivity.closeActivity();
+      return;
+    }
+    boatLabel++;
+  });
+}
+```
+
+[Run this code on dart pad here.](https://dartpad.dev/?id=3d604f2bdf1601a0cb4b754cecd8ed6b)
+
+See how the listener (your friend) responds whenever a new event (boat) arrives? That’s how streams and listeners work in Dart.
+
+## Building a Counter App Without StatefulWidget
+
+Now, let’s apply this concept. What if we wanted to build a simple counter app using only `StatelessWidget`? Here’s the challenge:
+
+```dart
+class CounterWidget extends StatelessWidget {
+  CounterWidget({super.key});
+  int _counter = 0;
+
+  void _incrementCounter() {
+    _counter++;
+    print(_counter);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      spacing: 12.0,
+      children: [
+        Text('$_counter'),
+        OutlinedButton(
+          onPressed: _incrementCounter,
+          child: const Icon(Icons.add),
+        ),
+      ],
+    );
+  }
+}
+```
+
+[Run this code on dart pad here.](https://dartpad.dev/?id=fbc0b058d883a1bae2acabb80442b146)
+
+Try running this code. You’ll see the `_counter` variable updating in the console, but the UI doesn’t change. Why? Because the UI isn’t **listening** to the state changes.
+
+## Using Streams for State Management
+
+Let’s fix this by applying our river activity theory:
+
+```dart
+class CounterActivity {
+  // creating a river for activity
+  final StreamController<int> _streamController = StreamController<int>();
+
+  // stream of river you can listen to at lake side
+  Stream<int> get stream => _streamController.stream;
+
+  // Let you sail/sink your boat into the stream of river from top hill
+  void updateCounter(int count) {
+    _streamController.sink.add(count);
+  }
+
+  // close the river
+  void closeActivity() {
+    _streamController.close();
+  }
+}
+
+class CounterWidget extends StatelessWidget {
+  CounterWidget({super.key});
+  int _counter = 0;
+  final counterActivity = CounterActivity();
+
+  void _incrementCounter() {
+    _counter++;
+    counterActivity.updateCounter(_counter);
+    print(_counter);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      spacing: 12.0,
+      children: [
+        StreamBuilder<int>(
+          initialData: _counter,
+          stream: counterActivity.stream,
+          builder: (context, snapshot) {
+            return Text('${snapshot.data}');
+          },
+        ),
+        OutlinedButton(
+          onPressed: _incrementCounter,
+          child: const Icon(Icons.add),
+        ),
+      ],
+    );
+  }
+}
+
+```
+
+[Run this code on dart pad here.](https://dartpad.dev/?id=837333814c83be4ad3154507f44aa4a0)
+
+[StreamBuilder](https://api.flutter.dev/flutter/widgets/StreamBuilder-class.html) is a widget that rebuilds itself whenever there is new event data by re-running its builder function.
+
+So, we have created a stream of counter events, where on pressing the button, the counter data is sent downstream, like a paper boat being put into the river at the top of the hill. The `StreamBuilder`, which listens to the stream at the lakeside, rebuilds the `Text` widget with the data it receives.
+
+Congratulations! You have successfully decoupled state and UI on your own without using any third-party state management library.
+
+## Refining the Solution
+
+You might notice a warning about `CounterWidget` being immutable but having mutable fields. To fix this, move all mutable state logic into `CounterActivity`:
+
+```dart
+class CounterActivity {
+  // creating a river for activity
+  final StreamController<int> _streamController = StreamController<int>();
+
+  // stream of river you can listen to at lake side
+  Stream<int> get stream => _streamController.stream;
+
+  int _counter = 0;
+
+  // Let you sail/sink your boat into the stream of river from top hill
+  void incrementCounter() {
+    _counter++;
+    _streamController.sink.add(_counter);
+    print(_counter);
+  }
+
+  // close the river
+  void closeActivity() {
+    _streamController.close();
+  }
+}
+
+class CounterWidget extends StatelessWidget {
+  CounterWidget({super.key});
+
+  final counterActivity = CounterActivity();
+
+  void _incrementCounter() {
+    counterActivity.incrementCounter();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      spacing: 12.0,
+      children: [
+        StreamBuilder<int>(
+          initialData: 0,
+          stream: counterActivity.stream,
+          builder: (context, snapshot) {
+            return Text('${snapshot.data}');
+          },
+        ),
+        OutlinedButton(
+          onPressed: _incrementCounter,
+          child: const Icon(Icons.add),
+        ),
+      ],
+    );
+  }
+}
+
+```
+
+[Run this code on dart pad here.](https://dartpad.dev/?id=4e8db6d82d869e7595268d8a4c5d9916)
+
+Now the `CounterWidget` remains truly immutable, and all the logic resides within `CounterActivity`.
+
+## Final Thoughts
+
+You’ve just built a basic state management solution using Dart streams. This approach helps you understand the principles behind state management libraries and makes it easier to decide when and why to use them. Keep exploring, and you’ll master state management in no time!
+
+---
+
+## We Accidentally Created a Bloc Library! 🤯
+
+Okay, hear me out. Without even realizing it, we’ve basically built our own state management library. And guess what? It looks a lot like `bloc`!
+
+Let’s break this down and see how we got here.
+
+## Spotting the Repetition 👀
+
+Take a look at these two classes: `CounterActivity` and `RiverActivity`. At first glance, they seem different, but if you look closely, there's a _lot_ of duplicated code.
+
+```dart
+class CounterActivity {
+  // creating a river for activity
+  final StreamController<int> _streamController = StreamController<int>();
+
+  // stream of river you can listen to at lake side
+  Stream<int> get stream => _streamController.stream;
+
+  CounterActivity(this.counter);
+
+  int counter;
+
+  // Let you sail/sink your boat into the stream of river from top hill
+  void incrementCounter() {
+    counter++;
+    _streamController.sink.add(counter);
+    print(counter);
+  }
+
+  // close the river
+  void closeActivity() {
+    _streamController.close();
+  }
+}
+
+```
+
+```dart
+class RiverActivity {
+  // creating a river for activity
+  final StreamController<int> _streamController = StreamController<int>();
+
+  // stream of river you can listen to at lake side
+  Stream<int> get stream => _streamController.stream;
+
+  // Let you sail/sink your boat into the stream of river from top hill
+  void sendBoat(int boatNumber) {
+    _streamController.sink.add(boatNumber);
+  }
+
+  // close the river
+  void closeActivity() {
+    _streamController.close();
+  }
+}
+
+```
+
+Do you see it? Both classes:
+
+- Create a `StreamController`
+- Expose a `stream`
+- Have a function that adds data to the stream (`incrementCounter` vs `sendBoat`)
+- Provide a method to close the stream
+
+That’s a lot of repeated logic. As good developers, we know what to do next—**refactor!**
+
+## Extracting the Common Logic 🔄
+
+Instead of repeating ourselves, let’s use **Object-Oriented Programming (OOP)** to extract all the shared logic into a base class.
+
+```dart
+abstract class Activity<T> {
+  Activity(this.state);
+  T state;
+
+  // creating a river for activity
+  final StreamController<T> _streamController = StreamController<T>();
+
+  // stream of river you can listen to at lake side
+  Stream<T> get stream => _streamController.stream;
+
+  // Let you sail/sink your boat into the stream of river from top hill
+  void emit(T state) {
+    _streamController.sink.add(state);
+  }
+
+  // close the river
+  void close() {
+    _streamController.close();
+  }
+}
+
+```
+
+Now, both `CounterActivity` and `RiverActivity` can simply extend this base class.
+
+```dart
+class CounterActivity extends Activity<int> {
+  CounterActivity(super.state);
+
+  void incrementCounter() {
+    state++;
+    emit(state);
+    print(state);
+  }
+}
+
+```
+
+Cleaner, right? But we’re not stopping here.
+
+## Making Life Even Easier 😌
+
+Let’s say we often use `StreamBuilder` to listen to our streams. Wouldn’t it be nice if we had a **custom widget** that automatically does this for any `Activity` class? Well, let’s build it! 🚀
+
+```dart
+class ActivityBuilder<B extends Activity<S>, S> extends StatelessWidget {
+  final Widget Function(BuildContext context, S state) builder;
+  final B activity;
+
+  const ActivityBuilder({
+    super.key,
+    required this.builder,
+    required this.activity,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<S>(
+      stream: activity.stream,
+      builder: (context, snapshot) {
+        return builder(context, snapshot.data ?? activity.state);
+      },
+    );
+  }
+}
+
+```
+
+Now, instead of using `StreamBuilder` manually, we can simply do this:
+
+```dart
+ActivityBuilder<CounterActivity, int>(
+  activity: counterActivity,
+  builder: (context, state) {
+    return Text('$state');
+  },
+),
+
+```
+
+[Run this code on dart pad here.](https://dartpad.dev/?id=9d47d54a714d2b3af12d0a4c65582089)
+
+Looks familiar? It should! This is exactly how `BlocBuilder` works in the `bloc` package. But wait—what if we rename `Activity` to `Cubit` and `ActivityBuilder` to `BlocBuilder`?
+
+## _Boom!_ We Just Built Bloc 🎉
+
+```dart
+abstract class Cubit<T> {
+  Cubit(this.state);
+  T state;
+
+  final StreamController<T> _streamController = StreamController<T>();
+
+  Stream<T> get stream => _streamController.stream;
+
+  void emit(T state) {
+    _streamController.sink.add(state);
+  }
+
+  void close() {
+    _streamController.close();
+  }
+}
+
+```
+
+```dart
+class BlocBuilder<B extends Cubit<S>, S> extends StatelessWidget {
+  final Widget Function(BuildContext context, S state) builder;
+  final B bloc;
+
+  const BlocBuilder({
+    super.key,
+    required this.builder,
+    required this.bloc,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<S>(
+      stream: bloc.stream,
+      builder: (context, snapshot) {
+        return builder(context, snapshot.data ?? bloc.state);
+      },
+    );
+  }
+}
+
+```
+
+[Run this code on dart pad here.](https://dartpad.dev/?id=61d3d3d5fefbd4365e33a5fc772c10c8)
+
+## Mind. Blown. 🤯
+
+With just a little bit of refactoring, we unintentionally built a lightweight state management solution that looks a _lot_ like the `bloc` package. We now have:
+
+- `Cubit` for managing state
+- `BlocBuilder` for listening to state changes
+- A clean, reusable pattern for handling streams
+
+This proves that `bloc` isn’t some magic framework—it’s just **good programming principles** applied correctly.
+
+So, congratulations! 🎉 You now have your own state management solution. And if you ever wondered _how_ bloc works under the hood—well, now you know. 😉
+
+Happy coding! 🚀

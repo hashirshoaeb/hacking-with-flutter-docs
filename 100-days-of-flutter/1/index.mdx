@@ -1,0 +1,248 @@
+---
+title: "Day 1: Getting Started with Flutter"
+description: "Begin your Flutter journey by setting up your development environment and learning the basics of Dart programming language."
+---
+
+{/* # Day 1: Getting Started with Flutter */}
+
+Welcome to Day 1 of the "Hundred Days of Flutter" course! Today, we'll set up your development environment and introduce you to the basics of Dart, the programming language used for Flutter development.
+
+## Course Introduction
+
+"Hundred Days of Flutter" is designed to take you from a beginner to a competent Flutter developer in 100 days, spending just 2 hours per day. By the end of this course, you'll be able to:
+
+- Build cross-platform mobile applications for iOS and Android
+- Implement complex UI designs with Flutter's widget system
+- Manage app state effectively
+- Integrate with backend services and databases
+- Deploy your applications to app stores
+
+The course is structured into five phases:
+
+1. Flutter Fundamentals (Days 1-20)
+2. Architecture & State Management (Days 21-40)
+3. Data & Backend Integration (Days 41-60)
+4. Advanced UI & UX (Days 61-80)
+5. Deployment & Advanced Topics (Days 81-100)
+
+Each day builds upon the previous, so it's important to follow the course in order.
+
+## Setting Up Your Development Environment
+
+Let's start by setting up everything you need to build Flutter apps.
+
+### Installing Flutter SDK
+
+1. Go to the [Flutter installation page](https://flutter.dev/docs/get-started/install)
+2. Select your operating system and follow the instructions
+
+### Setting Up an IDE
+
+You can use either Visual Studio Code or Android Studio. Both are excellent choices for Flutter development.
+
+#### Visual Studio Code Setup
+
+1. Download and install [VS Code](https://code.visualstudio.com/)
+2. Install the Flutter and Dart extensions:
+   - Open VS Code
+   - Go to Extensions (Ctrl+Shift+X or Cmd+Shift+X)
+   - Search for "Flutter" and install the Flutter extension (this will also install the Dart extension)
+
+#### Android Studio Setup
+
+1. Download and install [Android Studio](https://developer.android.com/studio)
+2. Install the Flutter and Dart plugins:
+   - Open Android Studio
+   - Go to Preferences/Settings > Plugins
+   - Search for "Flutter" and install the Flutter plugin (this will also install the Dart plugin)
+   - Restart Android Studio
+
+### Setting Up Emulators/Simulators
+
+Testing your apps requires either a physical device or an emulator/simulator.
+
+#### Android Emulator
+
+1. Open Android Studio
+2. Go to Tools > AVD Manager
+3. Click "Create Virtual Device"
+4. Select a device (e.g., Pixel 4) and click "Next"
+5. Select a system image (e.g., Android 11) and click "Next"
+6. Name your AVD and click "Finish"
+
+#### iOS Simulator (macOS only)
+
+1. Install Xcode from the App Store
+2. Open Xcode and accept the license agreement
+3. Install additional components if prompted
+4. Open Simulator from Xcode > Open Developer Tool > Simulator
+
+### Verifying Installation
+
+Let's make sure everything is set up correctly:
+
+1. Open a terminal/command prompt
+2. Run `flutter doctor`
+3. Address any issues reported by the doctor
+
+The output should look something like this:
+
+```
+Doctor summary (to see all details, run flutter doctor -v):
+[✓] Flutter (Channel stable, 3.10.6, on macOS 13.5.1)
+[✓] Android toolchain - develop for Android devices
+[✓] Xcode - develop for iOS and macOS
+[✓] Chrome - develop for the web
+[✓] Android Studio (version 2022.2)
+[✓] VS Code (version 1.81.1)
+[✓] Connected device (2 available)
+[✓] Network resources
+```
+
+## Introduction to Dart
+
+Flutter uses Dart as its programming language. Let's explore the basics of Dart.
+
+### What is Dart?
+
+Dart is a client-optimized language developed by Google for building apps on multiple platforms. It's the language behind Flutter and is designed to be fast, object-oriented, and easy to learn.
+
+### Basic Syntax and Variables
+
+Let's write our first Dart code:
+
+```dart
+void main() {
+  // This is a comment
+  print('Hello, Dart!');
+
+  // Variables
+  String name = 'Flutter Developer';
+  int daysInCourse = 100;
+  double hoursPerDay = 2.0;
+  bool isExcited = true;
+
+  // String interpolation
+  print('Welcome, $name!');
+  print('You will spend ${daysInCourse * hoursPerDay} hours in this course.');
+
+  // var - type inferred by the compiler
+  var age = 25; // int
+  var price = 19.99; // double
+
+  // final - value cannot be changed after initialization
+  final String courseName = 'Hundred Days of Flutter';
+
+  // const - compile-time constant
+  const int weeksInCourse = 14;
+}
+```
+
+### Variable Types in Dart
+
+Dart is a statically typed language, which means variable types are known at compile time. Here are the basic types:
+
+- `int`: Integer values
+- `double`: Floating-point numbers
+- `bool`: Boolean values (true/false)
+- `String`: Text values
+- `List`: Ordered group of items
+- `Map`: Key-value pairs
+- `Set`: Unordered collection of unique items
+
+### Creating Your First Flutter App
+
+Now, let's create our first Flutter application:
+
+1. Open a terminal and run:
+
+```
+flutter create my_first_app
+cd my_first_app
+```
+
+2. Open the project in your IDE
+
+3. Run the app:
+
+```
+flutter run
+```
+
+You should see the default counter app that Flutter creates. Congratulations! You've just run your first Flutter app.
+
+### Exploring the Default App
+
+Let's take a quick look at the structure of the default Flutter app:
+
+- `lib/main.dart`: The main entry point for your app
+- `pubspec.yaml`: Manages dependencies and assets
+- `android/` and `ios/`: Platform-specific code
+- `test/`: Contains test files
+
+Open `lib/main.dart` to see the code for the default counter app. Don't worry if you don't understand everything yet—we'll explore this in detail over the coming days.
+
+## Knowledge Check
+
+Let's test your understanding of today's concepts:
+
+<MCQ
+  question="Which language is used to develop Flutter applications?"
+  options={[
+    { text: "JavaScript", hint: "Used for web development and React Native" },
+    { text: "Kotlin", hint: "Used for native Android development" },
+    {
+      text: "Dart",
+      hint: "Created by Google specifically for client applications",
+    },
+    { text: "Swift", hint: "Used for native iOS development" },
+  ]}
+  correctOption={2}
+/>
+
+<MCQ
+  question="Which keyword is used to declare a variable that can't be changed after initialization?"
+  options={[
+    { text: "var", hint: "This is for type inference" },
+    { text: "final", hint: "Value is set at runtime and cannot be changed" },
+    { text: "const", hint: "Value is determined at compile time" },
+    { text: "static", hint: "Related to class-level properties" },
+  ]}
+  correctOption={1}
+/>
+
+<MCQ
+  question="What is the primary command to check if your Flutter installation is correct?"
+  options={[
+    { text: "flutter check", hint: "Not a standard Flutter command" },
+    { text: "flutter run", hint: "Used to run a Flutter app" },
+    {
+      text: "flutter doctor",
+      hint: "Diagnoses issues with your Flutter installation",
+    },
+    { text: "flutter verify", hint: "Not a standard Flutter command" },
+  ]}
+  correctOption={2}
+/>
+
+## Mini-Challenge: Personalize Your First App
+
+Modify the default counter app to display your name instead of "Flutter Demo Home Page".
+
+Here's how:
+
+1. Open `lib/main.dart`
+2. Find the line with `title: 'Flutter Demo'`
+3. Change it to `title: 'Your Name's App'`
+4. Find the `MyHomePage` class and modify its title parameter
+5. Run the app to see your changes
+
+## Key Takeaways
+
+- Flutter is a framework for building cross-platform mobile apps
+- Dart is the programming language used for Flutter development
+- Setting up your development environment requires installing the Flutter SDK, an IDE, and emulators
+- Dart has various variable types and syntax features similar to other programming languages
+- Flutter apps have a specific structure with the main code in `lib/main.dart`
+
+Tomorrow, we'll dive deeper into Dart's control flow structures, functions, and more advanced language features.

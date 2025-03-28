@@ -1,0 +1,396 @@
+---
+title: "Day 2: Dart Basics"
+description: "Learn essential Dart programming concepts including control flow, functions, and type safety to build a solid foundation for Flutter development."
+---
+
+{/* # Day 2: Dart Basics */}
+
+Welcome to Day 2 of "Hundred Days of Flutter"! Today, we'll build on your Dart knowledge by exploring control flow, functions, and Dart's type system. These fundamentals will serve as building blocks for your Flutter journey.
+
+## Control Flow in Dart
+
+Control flow structures determine the execution path of your program based on certain conditions.
+
+### Conditional Statements
+
+#### If-Else Statements
+
+```dart
+void main() {
+  int score = 85;
+
+  if (score >= 90) {
+    print('Excellent!');
+  } else if (score >= 80) {
+    print('Good job!');
+  } else if (score >= 70) {
+    print('Not bad.');
+  } else {
+    print('You need to study more.');
+  }
+}
+```
+
+#### Ternary Operator
+
+The ternary operator is a shorthand for simple if-else statements:
+
+```dart
+String status = score >= 60 ? 'Pass' : 'Fail';
+```
+
+#### Switch Statements
+
+```dart
+String grade = 'B';
+
+switch (grade) {
+  case 'A':
+    print('Excellent!');
+    break;
+  case 'B':
+    print('Good job!');
+    break;
+  case 'C':
+    print('Fair.');
+    break;
+  default:
+    print('Invalid grade.');
+}
+```
+
+### Loops
+
+#### For Loop
+
+```dart
+// Standard for loop
+for (int i = 0; i < 5; i++) {
+  print(i); // Prints 0, 1, 2, 3, 4
+}
+
+// For-in loop (for iterables)
+List<String> fruits = ['apple', 'banana', 'orange'];
+for (String fruit in fruits) {
+  print(fruit);
+}
+```
+
+#### While and Do-While Loops
+
+```dart
+// While loop
+int count = 0;
+while (count < 5) {
+  print(count);
+  count++;
+}
+
+// Do-while loop (executes at least once)
+int number = 0;
+do {
+  print(number);
+  number++;
+} while (number < 5);
+```
+
+#### Break and Continue
+
+- `break`: Exits the loop entirely
+- `continue`: Skips the current iteration and proceeds to the next
+
+```dart
+for (int i = 0; i < 10; i++) {
+  if (i == 3) continue; // Skip 3
+  if (i == 8) break;    // Stop at 8
+  print(i);             // Prints 0, 1, 2, 4, 5, 6, 7
+}
+```
+
+## Functions in Dart
+
+Functions encapsulate code that can be reused throughout your application.
+
+### Function Declaration
+
+```dart
+// Basic function
+void greet() {
+  print('Hello!');
+}
+
+// Function with parameters
+void greetPerson(String name) {
+  print('Hello, $name!');
+}
+
+// Function with return value
+int add(int a, int b) {
+  return a + b;
+}
+
+// Using the functions
+void main() {
+  greet();            // Prints: Hello!
+  greetPerson('Alex'); // Prints: Hello, Alex!
+  int sum = add(5, 3); // sum = 8
+  print(sum);
+}
+```
+
+### Optional Parameters
+
+Dart supports both optional positional and named parameters:
+
+```dart
+// Optional positional parameters (using square brackets)
+String buildGreeting(String name, [String title = '']) {
+  if (title.isEmpty) {
+    return 'Hello, $name!';
+  }
+  return 'Hello, $title $name!';
+}
+
+// Optional named parameters (using curly braces)
+void printUserInfo({String? name, int age = 0, String country = 'Unknown'}) {
+  print('Name: ${name ?? 'Anonymous'}, Age: $age, Country: $country');
+}
+
+// Using the functions
+void main() {
+  print(buildGreeting('John'));         // Hello, John!
+  print(buildGreeting('John', 'Dr.'));  // Hello, Dr. John!
+
+  printUserInfo(name: 'Jane', age: 30);  // Name: Jane, Age: 30, Country: Unknown
+  printUserInfo(country: 'Canada');      // Name: Anonymous, Age: 0, Country: Canada
+}
+```
+
+### Arrow Functions
+
+For functions with a single expression, you can use the arrow syntax:
+
+```dart
+int multiply(int a, int b) => a * b;
+
+bool isEven(int number) => number % 2 == 0;
+```
+
+### Anonymous Functions
+
+Anonymous functions (also called lambda functions) don't have a name:
+
+```dart
+var fruits = ['apple', 'banana', 'orange'];
+
+// Using an anonymous function with forEach
+fruits.forEach((fruit) {
+  print('I like $fruit');
+});
+
+// Shorter version using arrow syntax
+fruits.forEach((fruit) => print('I like $fruit'));
+
+// Even shorter using shorthand syntax
+fruits.forEach(print);
+```
+
+## Type Safety in Dart
+
+Dart is a statically typed language, meaning types are checked at compile-time. This helps catch errors early.
+
+### Strong Typing
+
+```dart
+String name = 'John';
+int age = 30;
+
+// This would cause a compile-time error
+// name = 50;  // Error: A value of type 'int' can't be assigned to a variable of type 'String'
+```
+
+### Type Inference
+
+Dart can infer types when you use `var`:
+
+```dart
+var name = 'John';     // Inferred as String
+var age = 30;          // Inferred as int
+var height = 1.85;     // Inferred as double
+var isActive = true;   // Inferred as bool
+```
+
+### Dynamic Type
+
+If you want to opt out of static typing, you can use `dynamic`:
+
+```dart
+dynamic value = 'Hello';
+value = 42;      // Valid: dynamic can change types
+value = true;    // Valid: dynamic can change types
+```
+
+However, using `dynamic` loses the benefits of static type checking.
+
+### Nullable Types
+
+Dart's null safety feature requires you to explicitly declare if a variable can be null:
+
+```dart
+// Non-nullable - must have a value
+String name = 'John';
+
+// Nullable - can be null
+String? nullableName = null;
+
+// Using nullable types safely
+if (nullableName != null) {
+  print(nullableName.length);  // Safe
+}
+
+// Or use the null-aware operator
+print(nullableName?.length);   // Safe, prints null if nullableName is null
+
+// Null assertion operator (use with caution)
+// print(nullableName!.length);  // Throws exception if nullableName is null
+```
+
+## Knowledge Check
+
+Let's test your understanding of today's concepts:
+
+<MCQ
+  question="What will be the output of the following code? 
+  
+  ```dart
+  var x = 10;
+  if (x > 5) {
+    print('A');
+  } else if (x > 8) {
+    print('B');
+  } else {
+    print('C');
+  }
+  ```"
+  options={[
+    { text: "A", hint: "First condition that evaluates to true" },
+    {
+      text: "B",
+      hint: "This condition is also true, but comes after another true condition",
+    },
+    {
+      text: "C",
+      hint: "This would execute if no previous conditions were true",
+    },
+    {
+      text: "A and B",
+      hint: "Only one branch of an if-else statement executes",
+    },
+  ]}
+  correctOption={0}
+/>
+
+<MCQ
+  question="What is the difference between `final` and `const` in Dart?"
+  options={[
+    {
+      text: "They are identical in functionality",
+      hint: "They have different use cases",
+    },
+    {
+      text: "`final` is runtime constant while `const` is compile-time constant",
+      hint: "Think about when their values are determined",
+    },
+    {
+      text: "`const` can be modified after initialization but `final` cannot",
+      hint: "Neither can be modified after initialization",
+    },
+    {
+      text: "`final` is only for primitive types, `const` is for objects",
+      hint: "Both can be used with any type",
+    },
+  ]}
+  correctOption={1}
+/>
+
+<MCQ
+  question="Which of the following correctly defines a function with optional named parameters in Dart?"
+  options={[
+    {
+      text: "void printInfo([String name, int age]) { }",
+      hint: "These are optional positional parameters",
+    },
+    {
+      text: "void printInfo({String name, int age}) { }",
+      hint: "Close, but missing something for null safety",
+    },
+    {
+      text: "void printInfo({String? name, int? age}) { }",
+      hint: "Correctly uses nullable types with named parameters",
+    },
+    {
+      text: "void printInfo(String name?, int age?) { }",
+      hint: "Incorrect syntax for nullable parameters",
+    },
+  ]}
+  correctOption={2}
+/>
+
+## Mini-Challenge: Prime Number Checker
+
+Create a function that determines if a number is prime (only divisible by 1 and itself).
+
+Here's a solution:
+
+```dart
+bool isPrime(int number) {
+  // 0 and 1 are not prime numbers
+  if (number <= 1) {
+    return false;
+  }
+
+  // 2 and 3 are prime numbers
+  if (number <= 3) {
+    return true;
+  }
+
+  // Numbers divisible by 2 or 3 are not prime
+  if (number % 2 == 0 || number % 3 == 0) {
+    return false;
+  }
+
+  // Check divisibility by numbers of form 6k ± 1
+  int i = 5;
+  while (i * i <= number) {
+    if (number % i == 0 || number % (i + 2) == 0) {
+      return false;
+    }
+    i += 6;
+  }
+
+  return true;
+}
+
+void main() {
+  // Test the function
+  List<int> numbersToCheck = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 17, 20, 23];
+
+  for (int number in numbersToCheck) {
+    if (isPrime(number)) {
+      print('$number is a prime number');
+    } else {
+      print('$number is not a prime number');
+    }
+  }
+}
+```
+
+## Key Takeaways
+
+- Control flow structures like if-else statements, loops, and switch statements control the execution path of your program
+- Functions are reusable blocks of code that can take parameters and return values
+- Dart supports different types of parameters: required, optional positional, and optional named
+- Dart is a statically typed language with strong type safety features
+- Null safety in Dart requires explicit declaration of nullable types with the `?` suffix
+
+Tomorrow, we'll explore Dart collections (Lists, Maps, Sets) and dive deeper into functions with higher-order functions and closures.

@@ -1,0 +1,515 @@
+---
+title: "Day 3: Dart Collections & Functions"
+description: "Master Dart collections (Lists, Maps, Sets) and advanced function concepts like higher-order functions and closures for more powerful Flutter applications."
+---
+
+# Day 3: Dart Collections & Functions
+
+Welcome to Day 3 of "Hundred Days of Flutter"! Today, we'll explore Dart collections - essential data structures for organizing and manipulating data - and dive deeper into advanced function concepts. These tools are fundamental for building efficient Flutter applications.
+
+## Dart Collections
+
+Collections allow you to store and organize multiple values. Dart provides several collection types, each with specific use cases.
+
+### Lists
+
+Lists are ordered collections of objects. Think of them as arrays in other programming languages.
+
+#### Creating Lists
+
+```dart
+// Creating lists
+List<String> fruits = ['Apple', 'Banana', 'Orange'];
+var numbers = <int>[1, 2, 3, 4, 5];
+List<dynamic> mixed = [1, 'two', true, 4.5];
+
+// Empty list with type
+List<String> emptyList = [];
+
+// Using List constructor
+List<int> filledList = List.filled(3, 0); // [0, 0, 0]
+List<int> generatedList = List.generate(5, (index) => index * 2); // [0, 2, 4, 6, 8]
+```
+
+#### Accessing and Modifying Lists
+
+```dart
+void main() {
+  List<String> fruits = ['Apple', 'Banana', 'Orange', 'Mango', 'Strawberry'];
+
+  // Accessing elements
+  print(fruits[0]);  // Apple
+  print(fruits[2]);  // Orange
+
+  // Modifying elements
+  fruits[1] = 'Blueberry';
+  print(fruits);  // [Apple, Blueberry, Orange, Mango, Strawberry]
+
+  // List properties
+  print(fruits.length);    // 5
+  print(fruits.isEmpty);   // false
+  print(fruits.isNotEmpty); // true
+  print(fruits.first);     // Apple
+  print(fruits.last);      // Strawberry
+
+  // Adding elements
+  fruits.add('Pineapple');
+  print(fruits);  // [Apple, Blueberry, Orange, Mango, Strawberry, Pineapple]
+
+  fruits.addAll(['Grape', 'Kiwi']);
+  print(fruits);  // [Apple, Blueberry, Orange, Mango, Strawberry, Pineapple, Grape, Kiwi]
+
+  fruits.insert(1, 'Cherry');
+  print(fruits);  // [Apple, Cherry, Blueberry, Orange, Mango, Strawberry, Pineapple, Grape, Kiwi]
+
+  // Removing elements
+  fruits.remove('Mango');
+  print(fruits);  // [Apple, Cherry, Blueberry, Orange, Strawberry, Pineapple, Grape, Kiwi]
+
+  fruits.removeAt(4);
+  print(fruits);  // [Apple, Cherry, Blueberry, Orange, Pineapple, Grape, Kiwi]
+
+  // Checking containment
+  print(fruits.contains('Cherry'));  // true
+  print(fruits.indexOf('Grape'));    // 5
+}
+```
+
+#### List Operations
+
+```dart
+void main() {
+  List<int> numbers = [1, 2, 3, 4, 5];
+
+  // Creating a new list from slicing
+  List<int> subList = numbers.sublist(1, 4);
+  print(subList);  // [2, 3, 4]
+
+  // Creating a reversed view (lazy evaluation)
+  Iterable<int> reversed = numbers.reversed;
+  print(reversed);  // (5, 4, 3, 2, 1)
+
+  // Sorting
+  List<String> words = ['banana', 'apple', 'orange'];
+  words.sort();
+  print(words);  // [apple, banana, orange]
+
+  // Custom sorting
+  List<int> values = [4, 1, 3, 2, 5];
+  values.sort((a, b) => b.compareTo(a));  // Descending order
+  print(values);  // [5, 4, 3, 2, 1]
+
+  // Joining elements
+  String joined = words.join(', ');
+  print(joined);  // apple, banana, orange
+}
+```
+
+### Maps
+
+Maps are collections of key-value pairs, similar to dictionaries in Python or objects in JavaScript.
+
+#### Creating Maps
+
+```dart
+// Different ways to create maps
+Map<String, int> ages = {
+  'Alice': 30,
+  'Bob': 25,
+  'Charlie': 35,
+};
+
+var scores = <String, double>{
+  'Math': 95.5,
+  'Science': 88.0,
+  'History': 92.0,
+};
+
+// Empty map
+Map<String, dynamic> emptyMap = {};
+
+// Using Map constructor
+Map<String, bool> status = Map.fromEntries([
+  MapEntry('task1', true),
+  MapEntry('task2', false),
+]);
+```
+
+#### Working with Maps
+
+```dart
+void main() {
+  Map<String, int> ages = {
+    'Alice': 30,
+    'Bob': 25,
+    'Charlie': 35,
+  };
+
+  // Accessing values
+  print(ages['Alice']);  // 30
+  print(ages['David']);  // null (key doesn't exist)
+
+  // Adding or updating entries
+  ages['David'] = 40;
+  ages['Bob'] = 26;
+
+  // Properties
+  print(ages.length);      // 4
+  print(ages.keys);        // (Alice, Bob, Charlie, David)
+  print(ages.values);      // (30, 26, 35, 40)
+  print(ages.entries);     // (MapEntry(Alice: 30), MapEntry(Bob: 26), ...)
+
+  // Checking if a key exists
+  print(ages.containsKey('Alice'));  // true
+  print(ages.containsValue(50));     // false
+
+  // Removing entries
+  ages.remove('Charlie');
+  print(ages);  // {Alice: 30, Bob: 26, David: 40}
+
+  // Get value with a default
+  int edwardAge = ages['Edward'] ?? 0;
+  print(edwardAge);  // 0
+
+  // forEach on a map
+  ages.forEach((key, value) {
+    print('$key is $value years old');
+  });
+}
+```
+
+### Sets
+
+Sets are unordered collections of unique items.
+
+#### Creating Sets
+
+```dart
+// Creating sets
+Set<int> numbers = {1, 2, 3, 4, 5};
+var letters = <String>{'a', 'b', 'c'};
+
+// Empty set
+Set<double> emptySet = {};
+
+// From an iterable
+Set<String> uniqueWords = Set.from(['hello', 'world', 'hello', 'dart']);
+print(uniqueWords);  // {hello, world, dart}
+```
+
+#### Working with Sets
+
+```dart
+void main() {
+  Set<String> fruits = {'apple', 'banana', 'orange'};
+
+  // Adding items
+  fruits.add('mango');
+  fruits.addAll(['grape', 'apple']);  // 'apple' is ignored as sets only contain unique values
+
+  print(fruits);  // {apple, banana, orange, mango, grape}
+
+  // Removing items
+  fruits.remove('banana');
+  print(fruits);  // {apple, orange, mango, grape}
+
+  // Checking membership
+  print(fruits.contains('apple'));  // true
+
+  // Set operations
+  Set<String> tropicalFruits = {'mango', 'pineapple', 'papaya'};
+
+  // Union
+  Set<String> allFruits = fruits.union(tropicalFruits);
+  print(allFruits);  // {apple, orange, mango, grape, pineapple, papaya}
+
+  // Intersection
+  Set<String> commonFruits = fruits.intersection(tropicalFruits);
+  print(commonFruits);  // {mango}
+
+  // Difference
+  Set<String> nonTropicalFruits = fruits.difference(tropicalFruits);
+  print(nonTropicalFruits);  // {apple, orange, grape}
+}
+```
+
+## Collection Processing
+
+Dart provides powerful methods for processing collections, often using higher-order functions.
+
+### Map, Where, and Reduce
+
+```dart
+void main() {
+  List<int> numbers = [1, 2, 3, 4, 5];
+
+  // map: transforms each element
+  List<int> squared = numbers.map((n) => n * n).toList();
+  print(squared);  // [1, 4, 9, 16, 25]
+
+  // where: filters elements
+  List<int> evenNumbers = numbers.where((n) => n % 2 == 0).toList();
+  print(evenNumbers);  // [2, 4]
+
+  // reduce: combines elements
+  int sum = numbers.reduce((value, element) => value + element);
+  print(sum);  // 15
+
+  // fold: like reduce but with an initial value
+  int sumPlus10 = numbers.fold(10, (total, element) => total + element);
+  print(sumPlus10);  // 25
+}
+```
+
+### Chaining Operations
+
+```dart
+void main() {
+  List<Map<String, dynamic>> people = [
+    {'name': 'Alice', 'age': 30, 'role': 'Developer'},
+    {'name': 'Bob', 'age': 25, 'role': 'Designer'},
+    {'name': 'Charlie', 'age': 35, 'role': 'Manager'},
+    {'name': 'David', 'age': 28, 'role': 'Developer'},
+  ];
+
+  // Find names of developers older than 25
+  List<String> experiencedDevs = people
+      .where((person) => person['role'] == 'Developer')
+      .where((person) => person['age'] > 25)
+      .map((person) => person['name'] as String)
+      .toList();
+
+  print(experiencedDevs);  // [Alice]
+}
+```
+
+## Advanced Function Concepts
+
+Now let's explore some more advanced function features in Dart.
+
+### Higher-Order Functions
+
+Higher-order functions are functions that take other functions as parameters or return functions.
+
+```dart
+// A function that takes another function as a parameter
+void processNumbers(List<int> numbers, bool Function(int) criterion) {
+  for (var number in numbers) {
+    if (criterion(number)) {
+      print('$number passes the test');
+    }
+  }
+}
+
+// A function that returns another function
+Function multiplyBy(int factor) {
+  return (int number) => number * factor;
+}
+
+void main() {
+  List<int> numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+  // Using a higher-order function with an anonymous function
+  processNumbers(numbers, (number) => number % 2 == 0);
+  // Prints: 2 passes the test, 4 passes the test, etc.
+
+  // Using a function that returns a function
+  var triple = multiplyBy(3);
+  print(triple(5));  // 15
+
+  // We can also use it directly
+  print(multiplyBy(4)(5));  // 20
+}
+```
+
+### Closures
+
+A closure is a function that has access to variables in its lexical scope, even when the function is used outside that scope.
+
+```dart
+Function counterFactory() {
+  int count = 0;
+
+  return () {
+    count++;
+    return count;
+  };
+}
+
+void main() {
+  var counter1 = counterFactory();
+  var counter2 = counterFactory();
+
+  print(counter1());  // 1
+  print(counter1());  // 2
+  print(counter1());  // 3
+
+  print(counter2());  // 1 - separate counter
+
+  print(counter1());  // 4 - continues from previous value
+}
+```
+
+In this example, `counterFactory` returns a function that "remembers" the `count` variable.
+
+### Function Types and Typedef
+
+You can define function types to make your code more readable:
+
+```dart
+// Using typedef to create a function type
+typedef IntPredicate = bool Function(int number);
+
+bool isEven(int number) => number % 2 == 0;
+bool isPositive(int number) => number > 0;
+
+void filterNumbers(List<int> numbers, IntPredicate predicate) {
+  numbers.where(predicate).forEach(print);
+}
+
+void main() {
+  List<int> numbers = [-2, -1, 0, 1, 2, 3, 4];
+
+  print('Even numbers:');
+  filterNumbers(numbers, isEven);
+
+  print('Positive numbers:');
+  filterNumbers(numbers, isPositive);
+}
+```
+
+## Knowledge Check
+
+<MCQ
+  question="Which Dart collection type would be most appropriate for storing a list of unique items where order doesn't matter?"
+  options={[
+    { text: "List", hint: "Lists maintain order but allow duplicates" },
+    { text: "Map", hint: "Maps store key-value pairs" },
+    { text: "Set", hint: "Sets store unique items with no inherent order" },
+    { text: "Queue", hint: "Queues are ordered collections with FIFO access" },
+  ]}
+  correctOption={2}
+/>
+
+<MCQ
+  question="What will be the output of the following code?
+  ```dart
+  var numbers = [1, 2, 3, 4, 5];
+  var result = numbers.map((n) => n * 2).where((n) => n > 5).toList();
+  print(result);
+  ```"
+  options={[
+    {
+      text: "[2, 4, 6, 8, 10]",
+      hint: "This would be the result of only applying map",
+    },
+    { text: "[6, 8, 10]", hint: "This is after applying map and then where" },
+    {
+      text: "[3, 4, 5]",
+      hint: "This would be the result if we filtered first, then multiplied",
+    },
+    {
+      text: "[]",
+      hint: "This would happen if no elements matched the condition",
+    },
+  ]}
+  correctOption={1}
+/>
+
+<MCQ
+  question="What's a closure in Dart?"
+  options={[
+    {
+      text: "A way to close a connection to a database",
+      hint: "This is not related to closures",
+    },
+    {
+      text: "A function that cannot be modified after creation",
+      hint: "This describes constants, not closures",
+    },
+    {
+      text: "A function bundled with its lexical environment",
+      hint: "Closures 'remember' variables from their surrounding scope",
+    },
+    {
+      text: "A type of collection that can only be accessed once",
+      hint: "This is not a feature in Dart",
+    },
+  ]}
+  correctOption={2}
+/>
+
+## Mini-Challenge: Contact List Processor
+
+Create a function that takes a list of contact records (represented as maps) and returns a map where the keys are the first letters of names and the values are lists of contacts starting with that letter.
+
+```dart
+Map<String, List<Map<String, String>>> organizeContacts(List<Map<String, String>> contacts) {
+  Map<String, List<Map<String, String>>> organizedContacts = {};
+
+  for (var contact in contacts) {
+    // Skip contacts without a name
+    if (!contact.containsKey('name') || contact['name']!.isEmpty) {
+      continue;
+    }
+
+    // Get the first letter and convert to uppercase
+    String firstLetter = contact['name']![0].toUpperCase();
+
+    // Initialize the list for this letter if it doesn't exist
+    organizedContacts[firstLetter] ??= [];
+
+    // Add the contact to the appropriate list
+    organizedContacts[firstLetter]!.add(contact);
+  }
+
+  return organizedContacts;
+}
+
+void main() {
+  List<Map<String, String>> contacts = [
+    {'name': 'Alice', 'phone': '123-456-7890'},
+    {'name': 'Bob', 'phone': '234-567-8901'},
+    {'name': 'Charlie', 'phone': '345-678-9012'},
+    {'name': 'Amanda', 'phone': '456-789-0123'},
+    {'name': 'David', 'phone': '567-890-1234'},
+    {'name': 'Barry', 'phone': '678-901-2345'},
+  ];
+
+  Map<String, List<Map<String, String>>> result = organizeContacts(contacts);
+
+  // Print the result
+  result.forEach((letter, contactsList) {
+    print('$letter:');
+    for (var contact in contactsList) {
+      print('  ${contact['name']} - ${contact['phone']}');
+    }
+  });
+}
+```
+
+Output:
+
+```
+A:
+  Alice - 123-456-7890
+  Amanda - 456-789-0123
+B:
+  Bob - 234-567-8901
+  Barry - 678-901-2345
+C:
+  Charlie - 345-678-9012
+D:
+  David - 567-890-1234
+```
+
+## Key Takeaways
+
+- Dart provides three main collection types: Lists (ordered, indexed), Maps (key-value pairs), and Sets (unique values)
+- Collections can be manipulated using powerful methods like `map`, `where`, and `reduce`
+- Higher-order functions can take functions as parameters or return functions
+- Closures in Dart allow functions to "remember" their surrounding scope
+- Collection processing methods can be chained together for complex data transformations
+- The `typedef` keyword allows you to create aliases for function types
+
+Tomorrow, we'll explore Object-Oriented Programming in Dart, covering classes, objects, and constructors.
