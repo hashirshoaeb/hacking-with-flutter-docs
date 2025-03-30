@@ -1,0 +1,420 @@
+---
+title: "Day 7: Layout Widgets - Part 1"
+description: "Master Flutter's layout widgets including Row, Column, Expanded, and Flexible to create responsive and well-structured user interfaces."
+---
+
+Welcome to Day 7 of the "Hundred Days of Flutter" course! Today, we'll dive deep into Flutter's layout widgets, focusing on how to create responsive and well-structured user interfaces using Row, Column, Expanded, and Flexible widgets.
+
+## Row Widget
+
+The Row widget arranges its children horizontally in a line. It's one of the most commonly used layout widgets in Flutter.
+
+### Basic Row
+
+```dart
+Row(
+  children: [
+    Icon(Icons.star),
+    Text('Rating: 4.5'),
+    Icon(Icons.thumb_up),
+  ],
+)
+```
+
+### Row with MainAxisAlignment
+
+```dart
+Row(
+  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  children: [
+    Text('Left'),
+    Text('Center'),
+    Text('Right'),
+  ],
+)
+```
+
+### Row with CrossAxisAlignment
+
+```dart
+Row(
+  crossAxisAlignment: CrossAxisAlignment.center,
+  children: [
+    Container(
+      height: 50,
+      width: 50,
+      color: Colors.red,
+    ),
+    Container(
+      height: 100,
+      width: 50,
+      color: Colors.blue,
+    ),
+  ],
+)
+```
+
+## Column Widget
+
+The Column widget arranges its children vertically in a line.
+
+### Basic Column
+
+```dart
+Column(
+  children: [
+    Text('First'),
+    Text('Second'),
+    Text('Third'),
+  ],
+)
+```
+
+### Column with MainAxisAlignment
+
+```dart
+Column(
+  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  children: [
+    Text('Top'),
+    Text('Middle'),
+    Text('Bottom'),
+  ],
+)
+```
+
+### Column with CrossAxisAlignment
+
+```dart
+Column(
+  crossAxisAlignment: CrossAxisAlignment.stretch,
+  children: [
+    Container(
+      height: 50,
+      color: Colors.red,
+    ),
+    Container(
+      height: 50,
+      color: Colors.blue,
+    ),
+  ],
+)
+```
+
+## Expanded Widget
+
+The Expanded widget allows a child of a Row or Column to expand to fill the available space.
+
+### Basic Expanded
+
+```dart
+Row(
+  children: [
+    Container(
+      width: 50,
+      color: Colors.red,
+    ),
+    Expanded(
+      child: Container(
+        color: Colors.blue,
+      ),
+    ),
+    Container(
+      width: 50,
+      color: Colors.green,
+    ),
+  ],
+)
+```
+
+### Multiple Expanded Widgets
+
+```dart
+Row(
+  children: [
+    Expanded(
+      flex: 1,
+      child: Container(
+        color: Colors.red,
+      ),
+    ),
+    Expanded(
+      flex: 2,
+      child: Container(
+        color: Colors.blue,
+      ),
+    ),
+    Expanded(
+      flex: 1,
+      child: Container(
+        color: Colors.green,
+      ),
+    ),
+  ],
+)
+```
+
+## Flexible Widget
+
+The Flexible widget is similar to Expanded but allows its child to be smaller than the available space.
+
+### Basic Flexible
+
+```dart
+Row(
+  children: [
+    Flexible(
+      child: Container(
+        color: Colors.red,
+      ),
+    ),
+    Container(
+      width: 100,
+      color: Colors.blue,
+    ),
+    Flexible(
+      child: Container(
+        color: Colors.green,
+      ),
+    ),
+  ],
+)
+```
+
+### Flexible with fit Property
+
+```dart
+Row(
+  children: [
+    Flexible(
+      fit: FlexFit.loose,
+      child: Container(
+        width: 50,
+        color: Colors.red,
+      ),
+    ),
+    Flexible(
+      fit: FlexFit.tight,
+      child: Container(
+        color: Colors.blue,
+      ),
+    ),
+  ],
+)
+```
+
+## Common Layout Patterns
+
+### Card with Header and Content
+
+```dart
+Card(
+  child: Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Container(
+        padding: const EdgeInsets.all(16),
+        color: Colors.blue,
+        child: Row(
+          children: [
+            Icon(Icons.title, color: Colors.white),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Card Title',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.all(16),
+        child: Text('Card content goes here'),
+      ),
+    ],
+  ),
+)
+```
+
+### Responsive Layout
+
+```dart
+LayoutBuilder(
+  builder: (context, constraints) {
+    if (constraints.maxWidth > 600) {
+      return Row(
+        children: [
+          Expanded(
+            child: Container(
+              color: Colors.red,
+              child: Text('Left Panel'),
+            ),
+          ),
+          Expanded(
+            child: Container(
+              color: Colors.blue,
+              child: Text('Right Panel'),
+            ),
+          ),
+        ],
+      );
+    } else {
+      return Column(
+        children: [
+          Container(
+            color: Colors.red,
+            child: Text('Top Panel'),
+          ),
+          Container(
+            color: Colors.blue,
+            child: Text('Bottom Panel'),
+          ),
+        ],
+      );
+    }
+  },
+)
+```
+
+## Knowledge Check
+
+Let's test your understanding of today's concepts:
+
+<MCQ
+  question="What is the main difference between Expanded and Flexible widgets?"
+  options={[
+    { text: "Expanded is for rows, Flexible is for columns", hint: "Both can be used in rows and columns" },
+    { text: "Expanded forces its child to fill available space, Flexible doesn't", hint: "This is the correct definition" },
+    { text: "Expanded is more performant", hint: "Performance is not the main difference" },
+    { text: "Flexible is newer", hint: "Both widgets have been available since Flutter's inception" },
+  ]}
+  correctOption={1}
+/>
+
+<MCQ
+  question="Which property in Row and Column determines how children are aligned along the main axis?"
+  options={[
+    { text: "crossAxisAlignment", hint: "This aligns children along the cross axis" },
+    { text: "mainAxisAlignment", hint: "This is the correct answer" },
+    { text: "mainAxisSize", hint: "This determines the size of the main axis" },
+    { text: "children", hint: "This is the list of child widgets" },
+  ]}
+  correctOption={1}
+/>
+
+<MCQ
+  question="What happens when you use multiple Expanded widgets with different flex values?"
+  options={[
+    { text: "Only the highest flex value is considered", hint: "All flex values are considered" },
+    { text: "The space is divided proportionally according to flex values", hint: "This is the correct answer" },
+    { text: "The widgets take equal space", hint: "This happens when flex values are equal" },
+    { text: "An error occurs", hint: "Different flex values are valid" },
+  ]}
+  correctOption={1}
+/>
+
+## Mini-Challenge: Responsive Navigation Bar
+
+Create a responsive navigation bar that:
+1. Shows items horizontally on wide screens
+2. Shows items vertically on narrow screens
+3. Uses Expanded/Flexible appropriately
+4. Includes icons and labels
+5. Adapts to different screen sizes
+
+Here's a starting point:
+
+```dart
+class ResponsiveNavBar extends StatelessWidget {
+  const ResponsiveNavBar({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth > 600) {
+          return Row(
+            children: [
+              Expanded(
+                child: NavBarItem(
+                  icon: Icons.home,
+                  label: 'Home',
+                ),
+              ),
+              Expanded(
+                child: NavBarItem(
+                  icon: Icons.search,
+                  label: 'Search',
+                ),
+              ),
+              Expanded(
+                child: NavBarItem(
+                  icon: Icons.person,
+                  label: 'Profile',
+                ),
+              ),
+            ],
+          );
+        } else {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              NavBarItem(
+                icon: Icons.home,
+                label: 'Home',
+              ),
+              NavBarItem(
+                icon: Icons.search,
+                label: 'Search',
+              ),
+              NavBarItem(
+                icon: Icons.person,
+                label: 'Profile',
+              ),
+            ],
+          );
+        }
+      },
+    );
+  }
+}
+
+class NavBarItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+
+  const NavBarItem({
+    super.key,
+    required this.icon,
+    required this.label,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon),
+          const SizedBox(height: 4),
+          Text(label),
+        ],
+      ),
+    );
+  }
+}
+```
+
+## Key Takeaways
+
+- Row and Column are fundamental layout widgets for horizontal and vertical arrangements
+- MainAxisAlignment controls alignment along the main axis
+- CrossAxisAlignment controls alignment along the cross axis
+- Expanded forces its child to fill available space
+- Flexible allows its child to be smaller than available space
+- LayoutBuilder helps create responsive layouts
+- Flex values in Expanded widgets determine proportional space distribution
+
+Tomorrow, we'll explore more layout widgets including ListView, GridView, and SingleChildScrollView! 

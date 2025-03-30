@@ -1,0 +1,366 @@
+---
+title: "Day 12: Assets & Resources in Flutter"
+description: "Learn how to work with assets and resources in Flutter, including adding images, custom fonts, loading assets, asset bundling, and platform-specific assets."
+---
+
+Welcome to Day 12 of the "Hundred Days of Flutter" course! Today, we'll explore how to work with assets and resources in Flutter, which is essential for creating visually appealing applications.
+
+## Adding Assets
+
+### Declaring Assets in pubspec.yaml
+
+```yaml
+flutter:
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/data/
+```
+
+### Loading Images
+
+```dart
+Image.asset(
+  'assets/images/logo.png',
+  width: 200,
+  height: 200,
+  fit: BoxFit.contain,
+)
+```
+
+### Loading JSON Files
+
+```dart
+Future<void> loadJsonData() async {
+  final String jsonString = await rootBundle.loadString('assets/data/config.json');
+  final Map<String, dynamic> jsonData = json.decode(jsonString);
+  print(jsonData);
+}
+```
+
+## Custom Fonts
+
+### Adding Custom Fonts
+
+First, add the font files to your project and declare them in `pubspec.yaml`:
+
+```yaml
+flutter:
+  fonts:
+    - family: RobotoMono
+      fonts:
+        - asset: assets/fonts/RobotoMono-Regular.ttf
+        - asset: assets/fonts/RobotoMono-Bold.ttf
+          weight: 700
+```
+
+### Using Custom Fonts
+
+```dart
+Text(
+  'Hello World',
+  style: TextStyle(
+    fontFamily: 'RobotoMono',
+    fontSize: 24,
+  ),
+)
+```
+
+## Asset Bundling
+
+### Asset Types
+
+1. **Images**
+   - PNG, JPG, WebP, GIF
+   - SVG (requires flutter_svg package)
+
+2. **Fonts**
+   - TTF, OTF
+
+3. **Data Files**
+   - JSON, XML, YAML
+
+4. **Other Resources**
+   - Audio files
+   - Video files
+   - PDFs
+
+### Asset Resolution
+
+```dart
+// Different resolutions for different pixel densities
+Image.asset(
+  'assets/images/logo.png', // Will automatically use the appropriate resolution
+  width: 200,
+  height: 200,
+)
+```
+
+## Platform-Specific Assets
+
+### Platform-Specific Images
+
+```dart
+Image.asset(
+  'assets/images/logo.png',
+  width: 200,
+  height: 200,
+  // Platform-specific image
+  image: AssetImage(
+    'assets/images/logo.png',
+    bundle: rootBundle,
+  ),
+)
+```
+
+### Platform-Specific Fonts
+
+```dart
+Text(
+  'Hello World',
+  style: TextStyle(
+    fontFamily: Platform.isIOS ? 'SF Pro' : 'Roboto',
+    fontSize: 24,
+  ),
+)
+```
+
+## Asset Loading Best Practices
+
+### Preloading Assets
+
+```dart
+class AssetPreloader {
+  static Future<void> preloadAssets() async {
+    await Future.wait([
+      precacheImage(AssetImage('assets/images/logo.png'), context),
+      rootBundle.load('assets/data/config.json'),
+    ]);
+  }
+}
+```
+
+### Error Handling
+
+```dart
+class SafeAssetImage extends StatelessWidget {
+  final String assetPath;
+  final double width;
+  final double height;
+
+  const SafeAssetImage({
+    super.key,
+    required this.assetPath,
+    required this.width,
+    required this.height,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Image.asset(
+      assetPath,
+      width: width,
+      height: height,
+      errorBuilder: (context, error, stackTrace) {
+        return Container(
+          width: width,
+          height: height,
+          color: Colors.grey[300],
+          child: Center(
+            child: Icon(Icons.error),
+          ),
+        );
+      },
+    );
+  }
+}
+```
+
+## Knowledge Check
+
+Let's test your understanding of today's concepts:
+
+<MCQ
+  question="What is the purpose of the assets section in pubspec.yaml?"
+  options={[
+    { text: "To define app dependencies", hint: "That's what dependencies section does" },
+    { text: "To declare project resources", hint: "This is the correct answer" },
+    { text: "To set app configuration", hint: "That's not related to assets" },
+    { text: "To define app permissions", hint: "That's not related to assets" },
+  ]}
+  correctOption={1}
+/>
+
+<MCQ
+  question="Which file format is commonly used for custom fonts in Flutter?"
+  options={[
+    { text: "MP3", hint: "That's an audio format" },
+    { text: "TTF", hint: "This is the correct answer" },
+    { text: "PDF", hint: "That's a document format" },
+    { text: "SVG", hint: "That's an image format" },
+  ]}
+  correctOption={1}
+/>
+
+<MCQ
+  question="What is the purpose of asset bundling in Flutter?"
+  options={[
+    { text: "To compress files", hint: "That's not the main purpose" },
+    { text: "To organize project structure", hint: "That's not the main purpose" },
+    { text: "To include resources in the app bundle", hint: "This is the correct answer" },
+    { text: "To manage dependencies", hint: "That's not related to asset bundling" },
+  ]}
+  correctOption={2}
+/>
+
+## Mini-Challenge: Asset Management App
+
+Create an app that:
+1. Uses custom fonts for different text styles
+2. Loads and displays images from assets
+3. Reads and displays JSON data
+4. Handles platform-specific assets
+5. Implements asset preloading
+6. Shows loading states
+7. Handles errors gracefully
+
+Here's a starting point:
+
+```dart
+class AssetManagementApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      theme: ThemeData(
+        fontFamily: 'RobotoMono',
+      ),
+      home: AssetManagementScreen(),
+    );
+  }
+}
+
+class AssetManagementScreen extends StatefulWidget {
+  @override
+  _AssetManagementScreenState createState() => _AssetManagementScreenState();
+}
+
+class _AssetManagementScreenState extends State<AssetManagementScreen> {
+  bool _isLoading = true;
+  Map<String, dynamic>? _configData;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAssets();
+  }
+
+  Future<void> _loadAssets() async {
+    try {
+      // Preload assets
+      await Future.wait([
+        precacheImage(AssetImage('assets/images/logo.png'), context),
+        rootBundle.load('assets/data/config.json'),
+      ]);
+
+      // Load JSON data
+      final String jsonString = await rootBundle.loadString('assets/data/config.json');
+      final Map<String, dynamic> jsonData = json.decode(jsonString);
+
+      setState(() {
+        _configData = jsonData;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Asset Management'),
+        centerTitle: true,
+      ),
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : _error != null
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.error_outline, color: Colors.red, size: 48),
+                      SizedBox(height: 16),
+                      Text(
+                        'Error loading assets',
+                        style: TextStyle(
+                          fontFamily: 'RobotoMono',
+                          fontSize: 18,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        _error!,
+                        style: TextStyle(
+                          fontFamily: 'RobotoMono',
+                          color: Colors.red,
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: _loadAssets,
+                        child: Text('Retry'),
+                      ),
+                    ],
+                  ),
+                )
+              : SingleChildScrollView(
+                  padding: EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SafeAssetImage(
+                        assetPath: 'assets/images/logo.png',
+                        width: 200,
+                        height: 200,
+                      ),
+                      SizedBox(height: 24),
+                      Text(
+                        'Configuration Data:',
+                        style: TextStyle(
+                          fontFamily: 'RobotoMono',
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        json.encode(_configData),
+                        style: TextStyle(
+                          fontFamily: 'RobotoMono',
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+    );
+  }
+}
+```
+
+## Key Takeaways
+
+- Assets must be declared in pubspec.yaml
+- Custom fonts can enhance app typography
+- Asset bundling ensures resources are included in the app
+- Platform-specific assets can improve user experience
+- Preloading assets can improve performance
+- Error handling is crucial for asset loading
+- Consider asset resolution for different devices
+
+Tomorrow, we'll explore styling and theming in Flutter! 

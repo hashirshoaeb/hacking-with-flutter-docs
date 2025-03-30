@@ -1,0 +1,405 @@
+---
+title: "Day 8: Layout Widgets - Part 2"
+description: "Learn about Flutter's advanced layout widgets including ListView, GridView, and SingleChildScrollView to create scrollable and grid-based user interfaces."
+---
+
+Welcome to Day 8 of the "Hundred Days of Flutter" course! Today, we'll explore more advanced layout widgets that help us create scrollable and grid-based user interfaces. These widgets are essential for building modern mobile applications.
+
+## ListView
+
+ListView is one of the most commonly used widgets in Flutter. It displays a scrollable list of widgets.
+
+### Basic ListView
+
+```dart
+ListView(
+  children: [
+    ListTile(
+      leading: Icon(Icons.star),
+      title: Text('First Item'),
+      subtitle: Text('Subtitle'),
+    ),
+    ListTile(
+      leading: Icon(Icons.star),
+      title: Text('Second Item'),
+      subtitle: Text('Subtitle'),
+    ),
+  ],
+)
+```
+
+### ListView.builder
+
+ListView.builder is more efficient for long lists as it only builds items that are visible:
+
+```dart
+ListView.builder(
+  itemCount: 100,
+  itemBuilder: (context, index) {
+    return ListTile(
+      leading: Icon(Icons.star),
+      title: Text('Item $index'),
+      subtitle: Text('Subtitle $index'),
+    );
+  },
+)
+```
+
+### ListView.separated
+
+ListView.separated adds separators between items:
+
+```dart
+ListView.separated(
+  itemCount: 10,
+  separatorBuilder: (context, index) => Divider(),
+  itemBuilder: (context, index) {
+    return ListTile(
+      title: Text('Item $index'),
+    );
+  },
+)
+```
+
+## GridView
+
+GridView displays items in a grid layout.
+
+### Basic GridView
+
+```dart
+GridView.count(
+  crossAxisCount: 2,
+  children: [
+    Container(color: Colors.red),
+    Container(color: Colors.blue),
+    Container(color: Colors.green),
+    Container(color: Colors.yellow),
+  ],
+)
+```
+
+### GridView.builder
+
+GridView.builder is efficient for large grids:
+
+```dart
+GridView.builder(
+  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+    crossAxisCount: 2,
+    crossAxisSpacing: 10,
+    mainAxisSpacing: 10,
+  ),
+  itemCount: 20,
+  itemBuilder: (context, index) {
+    return Container(
+      color: Colors.primaries[index % Colors.primaries.length],
+      child: Center(
+        child: Text('Item $index'),
+      ),
+    );
+  },
+)
+```
+
+### GridView with Custom Delegate
+
+```dart
+GridView.custom(
+  gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+    maxCrossAxisExtent: 150,
+    mainAxisSpacing: 10,
+    crossAxisSpacing: 10,
+  ),
+  childrenDelegate: SliverChildBuilderDelegate(
+    (context, index) => Container(
+      color: Colors.primaries[index % Colors.primaries.length],
+      child: Center(
+        child: Text('Item $index'),
+      ),
+    ),
+    childCount: 20,
+  ),
+)
+```
+
+## SingleChildScrollView
+
+SingleChildScrollView allows scrolling of a single child widget that might be larger than the screen.
+
+### Basic SingleChildScrollView
+
+```dart
+SingleChildScrollView(
+  child: Column(
+    children: [
+      Container(
+        height: 1000,
+        color: Colors.blue,
+      ),
+      Container(
+        height: 1000,
+        color: Colors.red,
+      ),
+    ],
+  ),
+)
+```
+
+### SingleChildScrollView with Padding
+
+```dart
+SingleChildScrollView(
+  padding: EdgeInsets.all(16),
+  child: Column(
+    children: [
+      Card(
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Text('First Card'),
+        ),
+      ),
+      SizedBox(height: 16),
+      Card(
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Text('Second Card'),
+        ),
+      ),
+    ],
+  ),
+)
+```
+
+## Common Patterns
+
+### Pull-to-Refresh ListView
+
+```dart
+RefreshIndicator(
+  onRefresh: () async {
+    // Fetch new data
+    await Future.delayed(Duration(seconds: 1));
+  },
+  child: ListView.builder(
+    itemCount: 20,
+    itemBuilder: (context, index) {
+      return ListTile(
+        title: Text('Item $index'),
+      );
+    },
+  ),
+)
+```
+
+### Infinite Scroll ListView
+
+```dart
+class InfiniteScrollListView extends StatefulWidget {
+  @override
+  _InfiniteScrollListViewState createState() => _InfiniteScrollListViewState();
+}
+
+class _InfiniteScrollListViewState extends State<InfiniteScrollListView> {
+  final List<String> items = [];
+  final ScrollController _scrollController = ScrollController();
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMoreItems();
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >=
+          _scrollController.position.maxScrollExtent - 200) {
+        _loadMoreItems();
+      }
+    });
+  }
+
+  Future<void> _loadMoreItems() async {
+    if (_isLoading) return;
+    setState(() => _isLoading = true);
+    
+    await Future.delayed(Duration(seconds: 1));
+    setState(() {
+      items.addAll(List.generate(10, (index) => 'Item ${items.length + index}'));
+      _isLoading = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      controller: _scrollController,
+      itemCount: items.length + 1,
+      itemBuilder: (context, index) {
+        if (index == items.length) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+        return ListTile(
+          title: Text(items[index]),
+        );
+      },
+    );
+  }
+}
+```
+
+## Knowledge Check
+
+Let's test your understanding of today's concepts:
+
+<MCQ
+  question="What is the main advantage of using ListView.builder over a regular ListView?"
+  options={[
+    { text: "It's more beautiful", hint: "Appearance is not the main advantage" },
+    { text: "It's more performant for long lists", hint: "This is the correct answer" },
+    { text: "It has more features", hint: "Regular ListView has similar features" },
+    { text: "It's easier to use", hint: "Both are equally easy to use" },
+  ]}
+  correctOption={1}
+/>
+
+<MCQ
+  question="Which widget would you use to display items in a grid layout?"
+  options={[
+    { text: "ListView", hint: "ListView is for linear lists" },
+    { text: "GridView", hint: "This is the correct answer" },
+    { text: "Column", hint: "Column is for vertical arrangement" },
+    { text: "Stack", hint: "Stack is for overlapping widgets" },
+  ]}
+  correctOption={1}
+/>
+
+<MCQ
+  question="What is the purpose of SingleChildScrollView?"
+  options={[
+    { text: "To create scrollable lists", hint: "That's what ListView is for" },
+    { text: "To create grid layouts", hint: "That's what GridView is for" },
+    { text: "To make a single widget scrollable", hint: "This is the correct answer" },
+    { text: "To create infinite scroll", hint: "That's a pattern using ListView" },
+  ]}
+  correctOption={2}
+/>
+
+## Mini-Challenge: Photo Gallery
+
+Create a photo gallery app that:
+1. Displays photos in a grid layout
+2. Supports pull-to-refresh
+3. Implements infinite scroll
+4. Shows loading indicators
+5. Handles errors gracefully
+
+Here's a starting point:
+
+```dart
+class PhotoGallery extends StatefulWidget {
+  @override
+  _PhotoGalleryState createState() => _PhotoGalleryState();
+}
+
+class _PhotoGalleryState extends State<PhotoGallery> {
+  final List<String> photos = [];
+  final ScrollController _scrollController = ScrollController();
+  bool _isLoading = false;
+  bool _hasError = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPhotos();
+    _scrollController.addListener(_onScroll);
+  }
+
+  Future<void> _loadPhotos() async {
+    if (_isLoading) return;
+    setState(() => _isLoading = true);
+    
+    try {
+      await Future.delayed(Duration(seconds: 1)); // Simulate network delay
+      setState(() {
+        photos.addAll(List.generate(10, (index) => 
+          'https://picsum.photos/200/200?random=${photos.length + index}'));
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _hasError = true;
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      _loadPhotos();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return RefreshIndicator(
+      onRefresh: () async {
+        setState(() {
+          photos.clear();
+          _hasError = false;
+        });
+        await _loadPhotos();
+      },
+      child: _hasError
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Error loading photos'),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() => _hasError = false);
+                      _loadPhotos();
+                    },
+                    child: Text('Retry'),
+                  ),
+                ],
+              ),
+            )
+          : GridView.builder(
+              controller: _scrollController,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+              ),
+              itemCount: photos.length + 1,
+              itemBuilder: (context, index) {
+                if (index == photos.length) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                return Image.network(
+                  photos[index],
+                  fit: BoxFit.cover,
+                );
+              },
+            ),
+    );
+  }
+}
+```
+
+## Key Takeaways
+
+- ListView is perfect for displaying scrollable lists of items
+- ListView.builder is more efficient for long lists
+- GridView displays items in a grid layout
+- SingleChildScrollView makes any widget scrollable
+- Pull-to-refresh and infinite scroll are common patterns
+- Always consider performance when building lists and grids
+- Handle loading states and errors gracefully
+
+Tomorrow, we'll explore StatefulWidgets and learn how to create interactive UI elements! 

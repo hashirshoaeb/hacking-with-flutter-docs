@@ -1,0 +1,527 @@
+---
+title: "Day 13: Styling & Theming in Flutter"
+description: "Master Flutter's theming system, including ThemeData, colors, typography, custom themes, dark mode, and responsive design basics."
+---
+
+Welcome to Day 13 of the "Hundred Days of Flutter" course! Today, we'll explore styling and theming in Flutter, which is essential for creating visually consistent and appealing applications.
+
+## ThemeData
+
+### Basic Theme Setup
+
+```dart
+MaterialApp(
+  theme: ThemeData(
+    primarySwatch: Colors.blue,
+    brightness: Brightness.light,
+    scaffoldBackgroundColor: Colors.white,
+  ),
+  home: MyHomePage(),
+)
+```
+
+### Theme Properties
+
+```dart
+ThemeData(
+  // Colors
+  primaryColor: Colors.blue,
+  accentColor: Colors.orange,
+  backgroundColor: Colors.white,
+  
+  // Typography
+  textTheme: TextTheme(
+    headline1: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+    bodyText1: TextStyle(fontSize: 16),
+    caption: TextStyle(fontSize: 12),
+  ),
+  
+  // Component Themes
+  elevatedButtonTheme: ElevatedButtonThemeData(
+    style: ElevatedButton.styleFrom(
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+      ),
+    ),
+  ),
+  
+  // Other Properties
+  cardTheme: CardTheme(
+    elevation: 4,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(12),
+    ),
+  ),
+)
+```
+
+## Colors and Typography
+
+### Color Schemes
+
+```dart
+ThemeData(
+  colorScheme: ColorScheme.light(
+    primary: Colors.blue,
+    secondary: Colors.orange,
+    surface: Colors.white,
+    background: Colors.grey[100],
+    error: Colors.red,
+    onPrimary: Colors.white,
+    onSecondary: Colors.white,
+    onSurface: Colors.black,
+    onBackground: Colors.black,
+    onError: Colors.white,
+  ),
+)
+```
+
+### Typography System
+
+```dart
+ThemeData(
+  textTheme: TextTheme(
+    // Headlines
+    headline1: TextStyle(
+      fontSize: 32,
+      fontWeight: FontWeight.bold,
+      letterSpacing: -1.5,
+    ),
+    headline2: TextStyle(
+      fontSize: 24,
+      fontWeight: FontWeight.bold,
+      letterSpacing: -0.5,
+    ),
+    
+    // Body
+    bodyText1: TextStyle(
+      fontSize: 16,
+      letterSpacing: 0.15,
+    ),
+    bodyText2: TextStyle(
+      fontSize: 14,
+      letterSpacing: 0.25,
+    ),
+    
+    // Captions
+    caption: TextStyle(
+      fontSize: 12,
+      letterSpacing: 0.4,
+    ),
+  ),
+)
+```
+
+## Custom Themes
+
+### Theme Extension
+
+```dart
+class CustomTheme extends ThemeExtension<CustomTheme> {
+  final Color customColor;
+  final double customSpacing;
+  final TextStyle customTextStyle;
+
+  CustomTheme({
+    required this.customColor,
+    required this.customSpacing,
+    required this.customTextStyle,
+  });
+
+  @override
+  ThemeExtension<CustomTheme> copyWith({
+    Color? customColor,
+    double? customSpacing,
+    TextStyle? customTextStyle,
+  }) {
+    return CustomTheme(
+      customColor: customColor ?? this.customColor,
+      customSpacing: customSpacing ?? this.customSpacing,
+      customTextStyle: customTextStyle ?? this.customTextStyle,
+    );
+  }
+
+  @override
+  ThemeExtension<CustomTheme> lerp(
+    ThemeExtension<CustomTheme>? other,
+    double t,
+  ) {
+    if (other is! CustomTheme) {
+      return this;
+    }
+    return CustomTheme(
+      customColor: Color.lerp(customColor, other.customColor, t)!,
+      customSpacing: lerpDouble(customSpacing, other.customSpacing, t)!,
+      customTextStyle: TextStyle.lerp(customTextStyle, other.customTextStyle, t)!,
+    );
+  }
+}
+
+// Usage
+ThemeData(
+  extensions: [
+    CustomTheme(
+      customColor: Colors.purple,
+      customSpacing: 16.0,
+      customTextStyle: TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+  ],
+)
+```
+
+## Dark Mode
+
+### Dark Theme Setup
+
+```dart
+MaterialApp(
+  theme: ThemeData.light(),
+  darkTheme: ThemeData.dark(),
+  themeMode: ThemeMode.system, // or ThemeMode.light or ThemeMode.dark
+  home: MyHomePage(),
+)
+```
+
+### Dynamic Theme Switching
+
+```dart
+class ThemeSwitcher extends StatefulWidget {
+  @override
+  _ThemeSwitcherState createState() => _ThemeSwitcherState();
+}
+
+class _ThemeSwitcherState extends State<ThemeSwitcher> {
+  bool _isDarkMode = false;
+
+  void _toggleTheme() {
+    setState(() {
+      _isDarkMode = !_isDarkMode;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      theme: _isDarkMode ? ThemeData.dark() : ThemeData.light(),
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('Theme Switcher'),
+          actions: [
+            IconButton(
+              icon: Icon(_isDarkMode ? Icons.light_mode : Icons.dark_mode),
+              onPressed: _toggleTheme,
+            ),
+          ],
+        ),
+        body: Center(
+          child: Text('Theme Switcher Example'),
+        ),
+      ),
+    );
+  }
+}
+```
+
+## Responsive Design Basics
+
+### LayoutBuilder
+
+```dart
+class ResponsiveLayout extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 600) {
+          return MobileLayout();
+        } else if (constraints.maxWidth < 900) {
+          return TabletLayout();
+        } else {
+          return DesktopLayout();
+        }
+      },
+    );
+  }
+}
+```
+
+### MediaQuery
+
+```dart
+class ResponsiveWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final orientation = MediaQuery.of(context).orientation;
+    
+    return Container(
+      width: size.width * 0.8,
+      height: orientation == Orientation.portrait
+          ? size.height * 0.3
+          : size.height * 0.5,
+      child: Center(
+        child: Text('Responsive Widget'),
+      ),
+    );
+  }
+}
+```
+
+## Knowledge Check
+
+Let's test your understanding of today's concepts:
+
+<MCQ
+  question="What is the purpose of ThemeData in Flutter?"
+  options={[
+    { text: "To create animations", hint: "That's not related to ThemeData" },
+    { text: "To define app-wide styling", hint: "This is the correct answer" },
+    { text: "To handle state management", hint: "That's not related to ThemeData" },
+    { text: "To manage navigation", hint: "That's not related to ThemeData" },
+  ]}
+  correctOption={1}
+/>
+
+<MCQ
+  question="Which property is used to switch between light and dark themes?"
+  options={[
+    { text: "themeMode", hint: "This is the correct answer" },
+    { text: "brightness", hint: "This is a property of ThemeData" },
+    { text: "isDarkMode", hint: "This is not a built-in property" },
+    { text: "colorScheme", hint: "This defines colors, not theme mode" },
+  ]}
+  correctOption={0}
+/>
+
+<MCQ
+  question="What is the purpose of LayoutBuilder in responsive design?"
+  options={[
+    { text: "To create animations", hint: "That's not related to LayoutBuilder" },
+    { text: "To handle state management", hint: "That's not related to LayoutBuilder" },
+    { text: "To adapt layout based on constraints", hint: "This is the correct answer" },
+    { text: "To manage navigation", hint: "That's not related to LayoutBuilder" },
+  ]}
+  correctOption={2}
+/>
+
+## Mini-Challenge: Themed Todo App
+
+Create a themed todo app that:
+1. Supports both light and dark themes
+2. Uses custom colors and typography
+3. Implements responsive design
+4. Has custom component themes
+5. Includes theme switching
+6. Adapts layout based on screen size
+7. Uses theme extensions for custom styling
+
+Here's a starting point:
+
+```dart
+class ThemedTodoApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      theme: ThemeData.light().copyWith(
+        primaryColor: Colors.blue,
+        colorScheme: ColorScheme.light(
+          primary: Colors.blue,
+          secondary: Colors.orange,
+          surface: Colors.white,
+          background: Colors.grey[100],
+          error: Colors.red,
+        ),
+        textTheme: TextTheme(
+          headline1: TextStyle(
+            fontSize: 32,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+          bodyText1: TextStyle(
+            fontSize: 16,
+            color: Colors.black87,
+          ),
+        ),
+        cardTheme: CardTheme(
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ),
+      darkTheme: ThemeData.dark().copyWith(
+        primaryColor: Colors.blue,
+        colorScheme: ColorScheme.dark(
+          primary: Colors.blue,
+          secondary: Colors.orange,
+          surface: Colors.grey[900],
+          background: Colors.black,
+          error: Colors.red,
+        ),
+        textTheme: TextTheme(
+          headline1: TextStyle(
+            fontSize: 32,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+          bodyText1: TextStyle(
+            fontSize: 16,
+            color: Colors.white70,
+          ),
+        ),
+        cardTheme: CardTheme(
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ),
+      themeMode: ThemeMode.system,
+      home: TodoScreen(),
+    );
+  }
+}
+
+class TodoScreen extends StatefulWidget {
+  @override
+  _TodoScreenState createState() => _TodoScreenState();
+}
+
+class _TodoScreenState extends State<TodoScreen> {
+  final List<String> _todos = [];
+  final _controller = TextEditingController();
+  bool _isDarkMode = false;
+
+  void _toggleTheme() {
+    setState(() {
+      _isDarkMode = !_isDarkMode;
+    });
+  }
+
+  void _addTodo() {
+    if (_controller.text.isNotEmpty) {
+      setState(() {
+        _todos.add(_controller.text);
+        _controller.clear();
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Themed Todo App'),
+        actions: [
+          IconButton(
+            icon: Icon(_isDarkMode ? Icons.light_mode : Icons.dark_mode),
+            onPressed: _toggleTheme,
+          ),
+        ],
+      ),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  'My Todos',
+                  style: theme.textTheme.headline1,
+                ),
+                SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _controller,
+                        decoration: InputDecoration(
+                          hintText: 'Add a new todo',
+                          border: OutlineInputBorder(),
+                        ),
+                        onSubmitted: (_) => _addTodo(),
+                      ),
+                    ),
+                    SizedBox(width: 16),
+                    ElevatedButton(
+                      onPressed: _addTodo,
+                      child: Text('Add'),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 24),
+                if (constraints.maxWidth > 600)
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 16,
+                    ),
+                    itemCount: _todos.length,
+                    itemBuilder: (context, index) {
+                      return Card(
+                        child: ListTile(
+                          title: Text(_todos[index]),
+                          trailing: IconButton(
+                            icon: Icon(Icons.delete),
+                            onPressed: () {
+                              setState(() {
+                                _todos.removeAt(index);
+                              });
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                  )
+                else
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: _todos.length,
+                    itemBuilder: (context, index) {
+                      return Card(
+                        child: ListTile(
+                          title: Text(_todos[index]),
+                          trailing: IconButton(
+                            icon: Icon(Icons.delete),
+                            onPressed: () {
+                              setState(() {
+                                _todos.removeAt(index);
+                              });
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+```
+
+## Key Takeaways
+
+- ThemeData provides app-wide styling
+- Color schemes ensure consistent colors
+- Typography system maintains text hierarchy
+- Custom themes can extend default themes
+- Dark mode support improves user experience
+- Responsive design adapts to different screen sizes
+- Theme extensions allow custom styling properties
+
+Tomorrow, we'll explore gestures and animations in Flutter!

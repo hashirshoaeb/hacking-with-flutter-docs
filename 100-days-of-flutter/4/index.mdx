@@ -1,0 +1,278 @@
+---
+title: "Day 4: Collections & Null Safety in Dart"
+description: "Master Dart's collection types and null safety features to write more robust and type-safe code in your Flutter applications."
+---
+
+Welcome to Day 4 of the "Hundred Days of Flutter" course! Today, we'll dive deep into Dart's collection types and null safety features, which are essential for writing robust and type-safe code.
+
+## Collections in Dart
+
+Collections are data structures that allow you to group multiple items together. Dart provides three main types of collections: Lists, Maps, and Sets.
+
+### Lists
+
+Lists are ordered collections of items. They can contain duplicate values and are the most commonly used collection type in Dart.
+
+```dart
+void main() {
+  // Creating a list
+  List<String> fruits = ['apple', 'banana', 'orange'];
+  
+  // Adding items
+  fruits.add('mango');
+  
+  // Accessing items
+  print(fruits[0]); // Output: apple
+  
+  // List methods
+  print(fruits.length); // Output: 4
+  print(fruits.contains('banana')); // Output: true
+  print(fruits.indexOf('orange')); // Output: 2
+  
+  // List operations
+  fruits.remove('banana');
+  fruits.sort();
+  fruits.clear();
+  
+  // Creating a fixed-length list
+  List<int> numbers = List.filled(3, 0); // [0, 0, 0]
+  
+  // List with different types (not recommended)
+  List<dynamic> mixed = [1, 'hello', true, 3.14];
+}
+```
+
+### Maps
+
+Maps are collections of key-value pairs. Each key must be unique, and you can use any type as a key or value.
+
+```dart
+void main() {
+  // Creating a map
+  Map<String, int> ages = {
+    'John': 25,
+    'Jane': 30,
+    'Bob': 35,
+  };
+  
+  // Adding items
+  ages['Alice'] = 28;
+  
+  // Accessing values
+  print(ages['John']); // Output: 25
+  
+  // Map methods
+  print(ages.containsKey('Jane')); // Output: true
+  print(ages.containsValue(30)); // Output: true
+  print(ages.length); // Output: 4
+  
+  // Iterating over a map
+  ages.forEach((key, value) {
+    print('$key is $value years old');
+  });
+  
+  // Creating a map with different types
+  Map<dynamic, dynamic> mixedMap = {
+    1: 'one',
+    'two': 2,
+    true: 3.14,
+  };
+}
+```
+
+### Sets
+
+Sets are collections of unique items. They don't maintain order and don't allow duplicates.
+
+```dart
+void main() {
+  // Creating a set
+  Set<String> colors = {'red', 'blue', 'green'};
+  
+  // Adding items
+  colors.add('yellow');
+  
+  // Checking for items
+  print(colors.contains('red')); // Output: true
+  
+  // Set operations
+  Set<String> primaryColors = {'red', 'blue', 'yellow'};
+  Set<String> secondaryColors = {'green', 'purple', 'orange'};
+  
+  // Union
+  print(primaryColors.union(secondaryColors));
+  
+  // Intersection
+  print(primaryColors.intersection(secondaryColors));
+  
+  // Difference
+  print(primaryColors.difference(secondaryColors));
+}
+```
+
+## Null Safety
+
+Null safety is a feature in Dart that helps prevent null reference errors, which are a common source of bugs in many programming languages.
+
+### Null Safety Basics
+
+```dart
+void main() {
+  // Non-nullable variables
+  String name = 'John'; // Can't be null
+  int age = 25; // Can't be null
+  
+  // Nullable variables
+  String? nullableName; // Can be null
+  int? nullableAge; // Can be null
+  
+  // Initializing nullable variables
+  nullableName = 'Jane';
+  nullableName = null; // This is allowed
+  
+  // Error: Can't assign null to non-nullable variable
+  // name = null; // This will cause an error
+}
+```
+
+### Null-Aware Operators
+
+Dart provides several operators to handle null values safely:
+
+```dart
+void main() {
+  String? name;
+  
+  // ?? operator (null coalescing)
+  String displayName = name ?? 'Anonymous';
+  
+  // ??= operator (null-aware assignment)
+  name ??= 'John';
+  
+  // ?. operator (null-aware access)
+  print(name?.length); // Safely access length if name is not null
+  
+  // ! operator (null assertion)
+  // Use this only when you're certain the value won't be null
+  String nonNullName = name!;
+  
+  // Example with collections
+  List<String>? names;
+  print(names?.length ?? 0); // Output: 0
+  print(names?.first ?? 'No names'); // Output: No names
+}
+```
+
+### Late Variables
+
+The `late` keyword is used when you want to declare a non-nullable variable that will be initialized later:
+
+```dart
+class User {
+  late String name;
+  
+  void setName(String newName) {
+    name = newName;
+  }
+  
+  void printName() {
+    print(name); // Safe to use here because we know it's initialized
+  }
+}
+```
+
+## Knowledge Check
+
+Let's test your understanding of today's concepts:
+
+<MCQ
+  question="Which collection type in Dart maintains order and allows duplicate values?"
+  options={[
+    { text: "Set", hint: "Sets don't maintain order and don't allow duplicates" },
+    { text: "Map", hint: "Maps store key-value pairs" },
+    { text: "List", hint: "Lists maintain order and allow duplicates" },
+    { text: "Queue", hint: "Not a standard Dart collection type" },
+  ]}
+  correctOption={2}
+/>
+
+<MCQ
+  question="What is the purpose of the ?? operator in Dart?"
+  options={[
+    { text: "To create a new variable", hint: "Not the primary purpose" },
+    { text: "To provide a default value when a value is null", hint: "This is the null coalescing operator" },
+    { text: "To check if a value is null", hint: "That's what the ? operator does" },
+    { text: "To convert a value to null", hint: "Not a valid operation" },
+  ]}
+  correctOption={1}
+/>
+
+<MCQ
+  question="Which of the following is true about Sets in Dart?"
+  options={[
+    { text: "They maintain order", hint: "Sets don't maintain order" },
+    { text: "They allow duplicate values", hint: "Sets don't allow duplicates" },
+    { text: "They are collections of unique items", hint: "This is the correct definition" },
+    { text: "They can only contain numbers", hint: "Sets can contain any type" },
+  ]}
+  correctOption={2}
+/>
+
+## Mini-Challenge: Contact List Manager
+
+Create a simple contact list manager that demonstrates your understanding of collections and null safety:
+
+1. Create a `Contact` class with name and phone number
+2. Create a list to store contacts
+3. Implement methods to:
+   - Add a contact
+   - Remove a contact
+   - Find a contact by name
+   - Print all contacts
+
+Here's a starting point:
+
+```dart
+class Contact {
+  final String name;
+  final String phoneNumber;
+  
+  Contact(this.name, this.phoneNumber);
+}
+
+class ContactManager {
+  final List<Contact> contacts = [];
+  
+  void addContact(String name, String phoneNumber) {
+    contacts.add(Contact(name, phoneNumber));
+  }
+  
+  void removeContact(String name) {
+    contacts.removeWhere((contact) => contact.name == name);
+  }
+  
+  Contact? findContact(String name) {
+    return contacts.firstWhere(
+      (contact) => contact.name == name,
+      orElse: () => null,
+    );
+  }
+  
+  void printContacts() {
+    contacts.forEach((contact) {
+      print('${contact.name}: ${contact.phoneNumber}');
+    });
+  }
+}
+```
+
+## Key Takeaways
+
+- Lists are ordered collections that allow duplicates
+- Maps store key-value pairs with unique keys
+- Sets are collections of unique items without order
+- Null safety helps prevent null reference errors
+- Use null-aware operators (??, ??=, ?., !) to handle null values safely
+- The `late` keyword allows for delayed initialization of non-nullable variables
+
+Tomorrow, we'll explore Object-Oriented Programming in Dart, including classes, inheritance, and interfaces. 

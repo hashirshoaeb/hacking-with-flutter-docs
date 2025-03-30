@@ -1,0 +1,497 @@
+---
+title: "Day 10: Navigation and Routing in Flutter"
+description: "Master Flutter's navigation system, including basic navigation, named routes, and passing data between screens to create multi-screen applications."
+---
+
+Welcome to Day 10 of the "Hundred Days of Flutter" course! Today, we'll explore navigation and routing in Flutter, which are essential for creating multi-screen applications.
+
+## Basic Navigation
+
+Flutter provides several ways to navigate between screens. Let's start with the most basic approach.
+
+### Push and Pop
+
+```dart
+// Navigate to a new screen
+Navigator.push(
+  context,
+  MaterialPageRoute(
+    builder: (context) => SecondScreen(),
+  ),
+);
+
+// Navigate back
+Navigator.pop(context);
+
+// Navigate and wait for result
+final result = await Navigator.push(
+  context,
+  MaterialPageRoute(
+    builder: (context) => SecondScreen(),
+  ),
+);
+```
+
+### Basic Navigation Example
+
+```dart
+class FirstScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('First Screen')),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => SecondScreen(),
+              ),
+            );
+          },
+          child: Text('Go to Second Screen'),
+        ),
+      ),
+    );
+  }
+}
+
+class SecondScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Second Screen')),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: Text('Go Back'),
+        ),
+      ),
+    );
+  }
+}
+```
+
+## Passing Data Between Screens
+
+### Passing Data Forward
+
+```dart
+class FirstScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('First Screen')),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => SecondScreen(
+                  data: 'Hello from First Screen!',
+                ),
+              ),
+            );
+          },
+          child: Text('Send Data'),
+        ),
+      ),
+    );
+  }
+}
+
+class SecondScreen extends StatelessWidget {
+  final String data;
+
+  const SecondScreen({super.key, required this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Second Screen')),
+      body: Center(
+        child: Text(data),
+      ),
+    );
+  }
+}
+```
+
+### Returning Data Back
+
+```dart
+class FirstScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('First Screen')),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () async {
+            final result = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => SecondScreen(),
+              ),
+            );
+            print('Received: $result');
+          },
+          child: Text('Get Result'),
+        ),
+      ),
+    );
+  }
+}
+
+class SecondScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Second Screen')),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.pop(context, 'Hello from Second Screen!');
+          },
+          child: Text('Send Result Back'),
+        ),
+      ),
+    );
+  }
+}
+```
+
+## Named Routes
+
+Named routes provide a more organized way to handle navigation.
+
+### Setting Up Named Routes
+
+```dart
+void main() {
+  runApp(MaterialApp(
+    initialRoute: '/',
+    routes: {
+      '/': (context) => FirstScreen(),
+      '/second': (context) => SecondScreen(),
+      '/third': (context) => ThirdScreen(),
+    },
+  ));
+}
+```
+
+### Using Named Routes
+
+```dart
+// Navigate using named route
+Navigator.pushNamed(context, '/second');
+
+// Navigate and wait for result
+final result = await Navigator.pushNamed(context, '/second');
+
+// Navigate and replace current route
+Navigator.pushReplacementNamed(context, '/second');
+
+// Navigate and remove all previous routes
+Navigator.pushNamedAndRemoveUntil(
+  context,
+  '/second',
+  (route) => false,
+);
+```
+
+## Advanced Navigation Patterns
+
+### Bottom Navigation Bar
+
+```dart
+class MainScreen extends StatefulWidget {
+  @override
+  _MainScreenState createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+  int _selectedIndex = 0;
+  
+  final List<Widget> _screens = [
+    HomeScreen(),
+    ProfileScreen(),
+    SettingsScreen(),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _screens[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: (index) {
+          setState(() => _selectedIndex = index);
+        },
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings',
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
+
+### Tab Bar Navigation
+
+```dart
+class TabScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        appBar: AppBar(
+          bottom: TabBar(
+            tabs: [
+              Tab(text: 'Tab 1'),
+              Tab(text: 'Tab 2'),
+              Tab(text: 'Tab 3'),
+            ],
+          ),
+        ),
+        body: TabBarView(
+          children: [
+            Tab1Screen(),
+            Tab2Screen(),
+            Tab3Screen(),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+
+## Knowledge Check
+
+Let's test your understanding of today's concepts:
+
+<MCQ
+  question="What is the main difference between Navigator.push and Navigator.pushNamed?"
+  options={[
+    { text: "pushNamed is faster", hint: "Performance is not the main difference" },
+    { text: "pushNamed uses predefined routes", hint: "This is the correct answer" },
+    { text: "pushNamed can't pass data", hint: "Both can pass data" },
+    { text: "pushNamed is newer", hint: "Both have been available since Flutter's inception" },
+  ]}
+  correctOption={1}
+/>
+
+<MCQ
+  question="Which method is used to navigate back to the previous screen?"
+  options={[
+    { text: "Navigator.goBack", hint: "This method doesn't exist" },
+    { text: "Navigator.pop", hint: "This is the correct answer" },
+    { text: "Navigator.back", hint: "This method doesn't exist" },
+    { text: "Navigator.return", hint: "This method doesn't exist" },
+  ]}
+  correctOption={1}
+/>
+
+<MCQ
+  question="What is the purpose of MaterialPageRoute?"
+  options={[
+    { text: "To create a new screen", hint: "That's what StatelessWidget/StatefulWidget does" },
+    { text: "To define the navigation animation and behavior", hint: "This is the correct answer" },
+    { text: "To handle state management", hint: "That's what StatefulWidget does" },
+    { text: "To style the screen", hint: "That's what Theme does" },
+  ]}
+  correctOption={1}
+/>
+
+## Mini-Challenge: Multi-Screen Todo App
+
+Create a multi-screen todo app that:
+1. Shows a list of todos on the main screen
+2. Allows adding new todos on a separate screen
+3. Shows todo details on another screen
+4. Uses named routes for navigation
+5. Passes data between screens
+
+Here's a starting point:
+
+```dart
+class Todo {
+  final String id;
+  final String title;
+  final String description;
+  bool completed;
+
+  Todo({
+    required this.id,
+    required this.title,
+    required this.description,
+    this.completed = false,
+  });
+}
+
+class TodoListScreen extends StatelessWidget {
+  final List<Todo> todos = [];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Todo List')),
+      body: ListView.builder(
+        itemCount: todos.length,
+        itemBuilder: (context, index) {
+          final todo = todos[index];
+          return ListTile(
+            title: Text(todo.title),
+            subtitle: Text(todo.description),
+            onTap: () {
+              Navigator.pushNamed(
+                context,
+                '/todo-details',
+                arguments: todo,
+              );
+            },
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.pushNamed(context, '/add-todo');
+        },
+        child: Icon(Icons.add),
+      ),
+    );
+  }
+}
+
+class AddTodoScreen extends StatefulWidget {
+  @override
+  _AddTodoScreenState createState() => _AddTodoScreenState();
+}
+
+class _AddTodoScreenState extends State<AddTodoScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _titleController = TextEditingController();
+  final _descriptionController = TextEditingController();
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    if (_formKey.currentState!.validate()) {
+      final todo = Todo(
+        id: DateTime.now().toString(),
+        title: _titleController.text,
+        description: _descriptionController.text,
+      );
+      Navigator.pop(context, todo);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Add Todo')),
+      body: Form(
+        key: _formKey,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              TextFormField(
+                controller: _titleController,
+                decoration: InputDecoration(labelText: 'Title'),
+                validator: (value) {
+                  if (value?.isEmpty ?? true) {
+                    return 'Please enter a title';
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: _descriptionController,
+                decoration: InputDecoration(labelText: 'Description'),
+                validator: (value) {
+                  if (value?.isEmpty ?? true) {
+                    return 'Please enter a description';
+                  }
+                  return null;
+                },
+              ),
+              ElevatedButton(
+                onPressed: _submit,
+                child: Text('Add Todo'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class TodoDetailsScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final todo = ModalRoute.of(context)!.settings.arguments as Todo;
+    
+    return Scaffold(
+      appBar: AppBar(title: Text('Todo Details')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              todo.title,
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            SizedBox(height: 16),
+            Text(todo.description),
+            SizedBox(height: 16),
+            SwitchListTile(
+              title: Text('Completed'),
+              value: todo.completed,
+              onChanged: (value) {
+                // Update todo status
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+
+## Key Takeaways
+
+- Navigator.push and Navigator.pop are basic navigation methods
+- Named routes provide organized navigation
+- Data can be passed between screens
+- Bottom navigation and tab bars are common navigation patterns
+- Always handle navigation results appropriately
+- Consider using named routes for complex navigation
+- Remember to clean up resources when navigating
+
+Tomorrow, we'll explore forms and user input in Flutter! 

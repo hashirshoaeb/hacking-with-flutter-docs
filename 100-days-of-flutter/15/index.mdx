@@ -1,0 +1,419 @@
+---
+title: "Day 15: Error Handling & Debugging in Flutter"
+description: "Learn about error handling techniques, debugging tools, logging, error boundaries, and performance profiling in Flutter applications."
+---
+
+Welcome to Day 15 of the "Hundred Days of Flutter" course! Today, we'll explore error handling and debugging techniques in Flutter, which are crucial for building robust and maintainable applications.
+
+## Error Handling
+
+### Try-Catch Blocks
+
+```dart
+Future<void> fetchData() async {
+  try {
+    final response = await http.get(Uri.parse('https://api.example.com/data'));
+    if (response.statusCode == 200) {
+      // Process data
+    } else {
+      throw Exception('Failed to load data');
+    }
+  } catch (e) {
+    print('Error: $e');
+    // Handle error appropriately
+  } finally {
+    // Clean up resources
+  }
+}
+```
+
+### Custom Error Handling
+
+```dart
+class CustomError implements Exception {
+  final String message;
+  final String code;
+
+  CustomError(this.message, this.code);
+
+  @override
+  String toString() => 'CustomError: $code - $message';
+}
+
+void handleError(CustomError error) {
+  switch (error.code) {
+    case 'NETWORK_ERROR':
+      // Handle network errors
+      break;
+    case 'VALIDATION_ERROR':
+      // Handle validation errors
+      break;
+    default:
+      // Handle unknown errors
+      break;
+  }
+}
+```
+
+## Debugging Tools
+
+### Flutter DevTools
+
+```dart
+void main() {
+  debugPrint('Starting app...');
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // Enable DevTools debugging
+    debugPrint('Building MyApp...');
+    return MaterialApp(
+      home: Scaffold(
+        body: Center(
+          child: Text('Debug Example'),
+        ),
+      ),
+    );
+  }
+}
+```
+
+### Widget Inspector
+
+```dart
+class DebugExample extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      // Add debug label for widget inspector
+      debugLabel: 'DebugContainer',
+      child: Column(
+        children: [
+          Text('Debug Example'),
+          // Add debug paint for layout debugging
+          Container(
+            debugPaintSizeEnabled: true,
+            child: Text('Debug Paint'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
+
+## Logging
+
+### Custom Logger
+
+```dart
+class AppLogger {
+  static void log(String message, {String? tag}) {
+    final timestamp = DateTime.now().toIso8601String();
+    final logMessage = '[${tag ?? 'APP'}] $timestamp: $message';
+    debugPrint(logMessage);
+  }
+
+  static void error(String message, {String? tag, Object? error}) {
+    final timestamp = DateTime.now().toIso8601String();
+    final logMessage = '[${tag ?? 'ERROR'}] $timestamp: $message';
+    if (error != null) {
+      debugPrint('$logMessage\nError: $error');
+    } else {
+      debugPrint(logMessage);
+    }
+  }
+}
+
+// Usage
+void someFunction() {
+  AppLogger.log('Function started', tag: 'API');
+  try {
+    // Some operation
+    AppLogger.log('Operation successful', tag: 'API');
+  } catch (e) {
+    AppLogger.error('Operation failed', tag: 'API', error: e);
+  }
+}
+```
+
+## Error Boundaries
+
+### Error Boundary Widget
+
+```dart
+class ErrorBoundary extends StatefulWidget {
+  final Widget child;
+  final Widget Function(Object error)? errorBuilder;
+
+  const ErrorBoundary({
+    Key? key,
+    required this.child,
+    this.errorBuilder,
+  }) : super(key: key);
+
+  @override
+  _ErrorBoundaryState createState() => _ErrorBoundaryState();
+}
+
+class _ErrorBoundaryState extends State<ErrorBoundary> {
+  Object? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    ErrorWidget.builder = (FlutterErrorDetails details) {
+      return widget.errorBuilder?.call(details.exception) ??
+          Container(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.error_outline, color: Colors.red, size: 48),
+                SizedBox(height: 16),
+                Text(
+                  'Something went wrong',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  details.exception.toString(),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.red),
+                ),
+                SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _error = null;
+                    });
+                  },
+                  child: Text('Try Again'),
+                ),
+              ],
+            ),
+          );
+    };
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_error != null) {
+      return widget.errorBuilder?.call(_error!) ??
+          ErrorWidget(_error!);
+    }
+    return widget.child;
+  }
+}
+
+// Usage
+ErrorBoundary(
+  child: MyWidget(),
+  errorBuilder: (error) => CustomErrorWidget(error: error),
+)
+```
+
+## Performance Profiling
+
+### Performance Overlay
+
+```dart
+class PerformanceExample extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      showPerformanceOverlay: true, // Enable performance overlay
+      home: Scaffold(
+        body: ListView.builder(
+          itemCount: 1000,
+          itemBuilder: (context, index) {
+            return ListTile(
+              title: Text('Item $index'),
+              // Add performance tracking
+              onTap: () {
+                debugPrint('Tapped item $index');
+              },
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+```
+
+### Memory Profiling
+
+```dart
+class MemoryProfilingExample extends StatefulWidget {
+  @override
+  _MemoryProfilingExampleState createState() => _MemoryProfilingExampleState();
+}
+
+class _MemoryProfilingExampleState extends State<MemoryProfilingExample> {
+  List<Object> _items = [];
+
+  void _addItems() {
+    setState(() {
+      // Add items to track memory usage
+      for (int i = 0; i < 1000; i++) {
+        _items.add(Object());
+      }
+    });
+  }
+
+  void _clearItems() {
+    setState(() {
+      _items.clear();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Column(
+        children: [
+          Text('Items: ${_items.length}'),
+          ElevatedButton(
+            onPressed: _addItems,
+            child: Text('Add Items'),
+          ),
+          ElevatedButton(
+            onPressed: _clearItems,
+            child: Text('Clear Items'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
+
+## Knowledge Check
+
+Let's test your understanding of today's concepts:
+
+<MCQ
+  question="What is the purpose of an ErrorBoundary widget?"
+  options={[
+    { text: "To create animations", hint: "That's not related to error boundaries" },
+    { text: "To handle and display errors gracefully", hint: "This is the correct answer" },
+    { text: "To improve performance", hint: "That's not the main purpose" },
+    { text: "To manage state", hint: "That's not related to error boundaries" },
+  ]}
+  correctOption={1}
+/>
+
+<MCQ
+  question="Which tool is best for debugging widget layouts?"
+  options={[
+    { text: "ErrorBoundary", hint: "That's for error handling" },
+    { text: "Widget Inspector", hint: "This is the correct answer" },
+    { text: "Performance Overlay", hint: "That's for performance profiling" },
+    { text: "Custom Logger", hint: "That's for logging" },
+  ]}
+  correctOption={1}
+/>
+
+<MCQ
+  question="What is the purpose of the finally block in try-catch?"
+  options={[
+    { text: "To handle errors", hint: "That's what catch is for" },
+    { text: "To execute code regardless of success or failure", hint: "This is the correct answer" },
+    { text: "To improve performance", hint: "That's not the purpose" },
+    { text: "To manage state", hint: "That's not the purpose" },
+  ]}
+  correctOption={1}
+/>
+
+## Mini-Challenge: Error Handling App
+
+Create an app that:
+1. Implements proper error handling
+2. Uses custom error boundaries
+3. Includes logging functionality
+4. Has performance monitoring
+5. Handles network errors
+6. Provides user-friendly error messages
+7. Includes debugging tools
+
+Here's a starting point:
+
+```dart
+class ErrorHandlingApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      showPerformanceOverlay: true,
+      home: ErrorBoundary(
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text('Error Handling Demo'),
+          ),
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () async {
+                    try {
+                      AppLogger.log('Fetching data...', tag: 'API');
+                      final response = await http.get(
+                        Uri.parse('https://api.example.com/data'),
+                      );
+                      if (response.statusCode == 200) {
+                        AppLogger.log('Data fetched successfully', tag: 'API');
+                      } else {
+                        throw CustomError(
+                          'Failed to load data',
+                          'NETWORK_ERROR',
+                        );
+                      }
+                    } catch (e) {
+                      AppLogger.error(
+                        'Failed to fetch data',
+                        tag: 'API',
+                        error: e,
+                      );
+                      // Show error message to user
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Error: ${e.toString()}'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  },
+                  child: Text('Fetch Data'),
+                ),
+                SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    throw Exception('Test Error');
+                  },
+                  child: Text('Trigger Error'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+```
+
+## Key Takeaways
+
+- Try-catch blocks handle runtime errors
+- Custom error handling provides better control
+- Flutter DevTools help with debugging
+- Logging helps track application flow
+- Error boundaries prevent app crashes
+- Performance profiling identifies bottlenecks
+- Memory profiling tracks resource usage
+
+Tomorrow, we'll start working on our first mini-project! 

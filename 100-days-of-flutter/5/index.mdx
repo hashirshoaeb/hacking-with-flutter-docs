@@ -1,0 +1,375 @@
+---
+title: "Day 5: Object-Oriented Programming in Dart"
+description: "Learn the fundamentals of Object-Oriented Programming in Dart, including classes, inheritance, interfaces, and mixins to build well-structured Flutter applications."
+---
+
+Welcome to Day 5 of the "Hundred Days of Flutter" course! Today, we'll explore Object-Oriented Programming (OOP) concepts in Dart, which are essential for building well-structured and maintainable Flutter applications.
+
+## Classes and Objects
+
+Classes are the building blocks of OOP in Dart. They define the structure and behavior of objects.
+
+### Basic Class Definition
+
+```dart
+class Person {
+  // Properties (instance variables)
+  String name;
+  int age;
+  
+  // Constructor
+  Person(this.name, this.age);
+  
+  // Methods
+  void sayHello() {
+    print('Hello, my name is $name');
+  }
+  
+  // Getter
+  String get info => '$name is $age years old';
+  
+  // Setter
+  set setAge(int value) {
+    if (value >= 0) {
+      age = value;
+    }
+  }
+}
+
+void main() {
+  // Creating an object
+  final person = Person('John', 25);
+  person.sayHello(); // Output: Hello, my name is John
+  print(person.info); // Output: John is 25 years old
+  person.setAge = 26;
+}
+```
+
+### Private Members
+
+Dart uses the underscore (_) prefix to make members private:
+
+```dart
+class BankAccount {
+  String _accountNumber; // Private property
+  double _balance; // Private property
+  
+  BankAccount(this._accountNumber, this._balance);
+  
+  // Public getter
+  double get balance => _balance;
+  
+  // Public method
+  void deposit(double amount) {
+    if (amount > 0) {
+      _balance += amount;
+    }
+  }
+}
+```
+
+## Constructors
+
+Dart provides several types of constructors:
+
+### Default Constructor
+
+```dart
+class Car {
+  String brand;
+  String model;
+  
+  // Default constructor
+  Car(this.brand, this.model);
+  
+  // Named constructor
+  Car.toyota(this.model) : brand = 'Toyota';
+  
+  // Factory constructor
+  factory Car.fromJson(Map<String, dynamic> json) {
+    return Car(json['brand'], json['model']);
+  }
+}
+```
+
+### Constructor Initialization List
+
+```dart
+class Point {
+  final double x;
+  final double y;
+  
+  Point(double x, double y)
+      : x = x,
+        y = y,
+        assert(x >= 0),
+        assert(y >= 0);
+}
+```
+
+## Inheritance
+
+Dart supports single inheritance and interfaces.
+
+### Basic Inheritance
+
+```dart
+class Animal {
+  String name;
+  
+  Animal(this.name);
+  
+  void makeSound() {
+    print('Some sound');
+  }
+}
+
+class Dog extends Animal {
+  String breed;
+  
+  Dog(String name, this.breed) : super(name);
+  
+  @override
+  void makeSound() {
+    print('Woof!');
+  }
+  
+  void fetch() {
+    print('$name is fetching the ball');
+  }
+}
+
+void main() {
+  final dog = Dog('Rex', 'German Shepherd');
+  dog.makeSound(); // Output: Woof!
+  dog.fetch(); // Output: Rex is fetching the ball
+}
+```
+
+### Abstract Classes
+
+```dart
+abstract class Shape {
+  double get area;
+  double get perimeter;
+}
+
+class Circle extends Shape {
+  final double radius;
+  
+  Circle(this.radius);
+  
+  @override
+  double get area => 3.14 * radius * radius;
+  
+  @override
+  double get perimeter => 2 * 3.14 * radius;
+}
+
+class Rectangle extends Shape {
+  final double width;
+  final double height;
+  
+  Rectangle(this.width, this.height);
+  
+  @override
+  double get area => width * height;
+  
+  @override
+  double get perimeter => 2 * (width + height);
+}
+```
+
+## Interfaces
+
+Dart doesn't have a dedicated `interface` keyword. Instead, any class can be used as an interface.
+
+```dart
+class Flyable {
+  void fly() {
+    print('Flying');
+  }
+}
+
+class Bird implements Flyable {
+  @override
+  void fly() {
+    print('Bird is flying');
+  }
+}
+
+class Airplane implements Flyable {
+  @override
+  void fly() {
+    print('Airplane is flying');
+  }
+}
+```
+
+## Mixins
+
+Mixins are a way to reuse code in multiple class hierarchies:
+
+```dart
+mixin Swimming {
+  void swim() {
+    print('Swimming');
+  }
+}
+
+mixin Flying {
+  void fly() {
+    print('Flying');
+  }
+}
+
+class Duck extends Animal with Swimming, Flying {
+  Duck(String name) : super(name);
+  
+  @override
+  void makeSound() {
+    print('Quack!');
+  }
+}
+
+void main() {
+  final duck = Duck('Donald');
+  duck.swim(); // Output: Swimming
+  duck.fly(); // Output: Flying
+  duck.makeSound(); // Output: Quack!
+}
+```
+
+## Static Members
+
+Static members belong to the class itself, not to instances:
+
+```dart
+class MathUtils {
+  static const double pi = 3.14159;
+  
+  static double square(double number) {
+    return number * number;
+  }
+  
+  static double sum(List<double> numbers) {
+    return numbers.reduce((a, b) => a + b);
+  }
+}
+
+void main() {
+  print(MathUtils.pi); // Output: 3.14159
+  print(MathUtils.square(5)); // Output: 25
+  print(MathUtils.sum([1, 2, 3, 4, 5])); // Output: 15
+}
+```
+
+## Knowledge Check
+
+Let's test your understanding of today's concepts:
+
+<MCQ
+  question="What is the purpose of the 'extends' keyword in Dart?"
+  options={[
+    { text: "To create a new class", hint: "That's what the 'class' keyword does" },
+    { text: "To implement an interface", hint: "That's what the 'implements' keyword does" },
+    { text: "To inherit from another class", hint: "This is the correct definition" },
+    { text: "To create a mixin", hint: "That's what the 'mixin' keyword does" },
+  ]}
+  correctOption={2}
+/>
+
+<MCQ
+  question="Which of the following is true about abstract classes in Dart?"
+  options={[
+    { text: "They can be instantiated directly", hint: "Abstract classes cannot be instantiated" },
+    { text: "They must implement all methods", hint: "Abstract classes can have abstract methods" },
+    { text: "They can have both abstract and concrete methods", hint: "This is the correct definition" },
+    { text: "They can only have abstract methods", hint: "Abstract classes can have concrete methods" },
+  ]}
+  correctOption={2}
+/>
+
+<MCQ
+  question="What is the purpose of mixins in Dart?"
+  options={[
+    { text: "To create new classes", hint: "That's what the 'class' keyword does" },
+    { text: "To implement interfaces", hint: "That's what the 'implements' keyword does" },
+    { text: "To reuse code across multiple class hierarchies", hint: "This is the correct definition" },
+    { text: "To create abstract classes", hint: "That's what the 'abstract' keyword does" },
+  ]}
+  correctOption={2}
+/>
+
+## Mini-Challenge: Shape Calculator
+
+Create a shape calculator that demonstrates your understanding of OOP concepts:
+
+1. Create an abstract `Shape` class with abstract methods for area and perimeter
+2. Create concrete classes for different shapes (Circle, Rectangle, Triangle)
+3. Create a `ShapeCalculator` class that can:
+   - Calculate the total area of multiple shapes
+   - Find the shape with the largest area
+   - Print information about all shapes
+
+Here's a starting point:
+
+```dart
+abstract class Shape {
+  double get area;
+  double get perimeter;
+  String get name;
+}
+
+class Circle extends Shape {
+  final double radius;
+  
+  Circle(this.radius);
+  
+  @override
+  double get area => 3.14 * radius * radius;
+  
+  @override
+  double get perimeter => 2 * 3.14 * radius;
+  
+  @override
+  String get name => 'Circle';
+}
+
+class ShapeCalculator {
+  final List<Shape> shapes = [];
+  
+  void addShape(Shape shape) {
+    shapes.add(shape);
+  }
+  
+  double get totalArea {
+    return shapes.fold(0, (sum, shape) => sum + shape.area);
+  }
+  
+  Shape get largestShape {
+    return shapes.reduce((a, b) => a.area > b.area ? a : b);
+  }
+  
+  void printShapes() {
+    shapes.forEach((shape) {
+      print('${shape.name}:');
+      print('  Area: ${shape.area}');
+      print('  Perimeter: ${shape.perimeter}');
+      print('');
+    });
+  }
+}
+```
+
+## Key Takeaways
+
+- Classes are the building blocks of OOP in Dart
+- Constructors can be default, named, or factory
+- Inheritance is supported through the `extends` keyword
+- Abstract classes can have both abstract and concrete methods
+- Interfaces are implemented using the `implements` keyword
+- Mixins allow code reuse across multiple class hierarchies
+- Static members belong to the class itself, not instances
+
+Tomorrow, we'll start exploring Flutter's widget system and begin building our first Flutter application! 

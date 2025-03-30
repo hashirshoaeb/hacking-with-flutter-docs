@@ -1,0 +1,585 @@
+---
+title: "Day 11: Forms and User Input in Flutter"
+description: "Learn how to create and handle forms in Flutter, including form validation, different input types, and best practices for user interaction."
+---
+
+Welcome to Day 11 of the "Hundred Days of Flutter" course! Today, we'll explore forms and user input in Flutter, which are essential for creating interactive applications.
+
+## Basic Form Structure
+
+Flutter provides a `Form` widget that helps manage form state and validation.
+
+### Simple Form Example
+
+```dart
+class SimpleForm extends StatefulWidget {
+  @override
+  _SimpleFormState createState() => _SimpleFormState();
+}
+
+class _SimpleFormState extends State<SimpleForm> {
+  final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
+
+  void _submitForm() {
+    if (_formKey.currentState!.validate()) {
+      print('Name: ${_nameController.text}');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: [
+          TextFormField(
+            controller: _nameController,
+            decoration: InputDecoration(
+              labelText: 'Name',
+              border: OutlineInputBorder(),
+            ),
+            validator: (value) {
+              if (value?.isEmpty ?? true) {
+                return 'Please enter your name';
+              }
+              return null;
+            },
+          ),
+          ElevatedButton(
+            onPressed: _submitForm,
+            child: Text('Submit'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
+
+## Different Input Types
+
+### Text Input
+
+```dart
+TextFormField(
+  controller: _controller,
+  decoration: InputDecoration(
+    labelText: 'Username',
+    prefixIcon: Icon(Icons.person),
+    border: OutlineInputBorder(),
+  ),
+  keyboardType: TextInputType.text,
+  textInputAction: TextInputAction.next,
+)
+```
+
+### Email Input
+
+```dart
+TextFormField(
+  controller: _emailController,
+  decoration: InputDecoration(
+    labelText: 'Email',
+    prefixIcon: Icon(Icons.email),
+    border: OutlineInputBorder(),
+  ),
+  keyboardType: TextInputType.emailAddress,
+  validator: (value) {
+    if (value?.isEmpty ?? true) {
+      return 'Please enter your email';
+    }
+    if (!value!.contains('@')) {
+      return 'Please enter a valid email';
+    }
+    return null;
+  },
+)
+```
+
+### Password Input
+
+```dart
+TextFormField(
+  controller: _passwordController,
+  decoration: InputDecoration(
+    labelText: 'Password',
+    prefixIcon: Icon(Icons.lock),
+    border: OutlineInputBorder(),
+  ),
+  obscureText: true,
+  validator: (value) {
+    if (value?.isEmpty ?? true) {
+      return 'Please enter your password';
+    }
+    if (value!.length < 6) {
+      return 'Password must be at least 6 characters';
+    }
+    return null;
+  },
+)
+```
+
+### Number Input
+
+```dart
+TextFormField(
+  controller: _ageController,
+  decoration: InputDecoration(
+    labelText: 'Age',
+    prefixIcon: Icon(Icons.numbers),
+    border: OutlineInputBorder(),
+  ),
+  keyboardType: TextInputType.number,
+  validator: (value) {
+    if (value?.isEmpty ?? true) {
+      return 'Please enter your age';
+    }
+    if (int.tryParse(value!) == null) {
+      return 'Please enter a valid number';
+    }
+    return null;
+  },
+)
+```
+
+## Form Validation
+
+### Real-time Validation
+
+```dart
+class RealTimeValidationForm extends StatefulWidget {
+  @override
+  _RealTimeValidationFormState createState() => _RealTimeValidationFormState();
+}
+
+class _RealTimeValidationFormState extends State<RealTimeValidationForm> {
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: [
+          TextFormField(
+            controller: _emailController,
+            decoration: InputDecoration(
+              labelText: 'Email',
+              border: OutlineInputBorder(),
+            ),
+            keyboardType: TextInputType.emailAddress,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: (value) {
+              if (value?.isEmpty ?? true) {
+                return 'Please enter your email';
+              }
+              if (!value!.contains('@')) {
+                return 'Please enter a valid email';
+              }
+              return null;
+            },
+          ),
+          TextFormField(
+            controller: _passwordController,
+            decoration: InputDecoration(
+              labelText: 'Password',
+              border: OutlineInputBorder(),
+            ),
+            obscureText: true,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: (value) {
+              if (value?.isEmpty ?? true) {
+                return 'Please enter your password';
+              }
+              if (value!.length < 6) {
+                return 'Password must be at least 6 characters';
+              }
+              return null;
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
+
+## Custom Form Fields
+
+### Date Picker
+
+```dart
+class DatePickerField extends StatelessWidget {
+  final TextEditingController controller;
+  final String label;
+
+  const DatePickerField({
+    super.key,
+    required this.controller,
+    required this.label,
+  });
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+    if (picked != null) {
+      controller.text = picked.toString().split(' ')[0];
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: label,
+        suffixIcon: IconButton(
+          icon: Icon(Icons.calendar_today),
+          onPressed: () => _selectDate(context),
+        ),
+        border: OutlineInputBorder(),
+      ),
+      readOnly: true,
+      validator: (value) {
+        if (value?.isEmpty ?? true) {
+          return 'Please select a date';
+        }
+        return null;
+      },
+    );
+  }
+}
+```
+
+### Dropdown Menu
+
+```dart
+class DropdownField extends StatelessWidget {
+  final String value;
+  final List<String> items;
+  final Function(String?) onChanged;
+  final String label;
+
+  const DropdownField({
+    super.key,
+    required this.value,
+    required this.items,
+    required this.onChanged,
+    required this.label,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButtonFormField<String>(
+      value: value,
+      items: items.map((String item) {
+        return DropdownMenuItem<String>(
+          value: item,
+          child: Text(item),
+        );
+      }).toList(),
+      onChanged: onChanged,
+      decoration: InputDecoration(
+        labelText: label,
+        border: OutlineInputBorder(),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please select an option';
+        }
+        return null;
+      },
+    );
+  }
+}
+```
+
+## Knowledge Check
+
+Let's test your understanding of today's concepts:
+
+<MCQ
+  question="What is the purpose of the Form widget in Flutter?"
+  options={[
+    { text: "To style form elements", hint: "That's what InputDecoration does" },
+    { text: "To manage form state and validation", hint: "This is the correct answer" },
+    { text: "To create input fields", hint: "That's what TextFormField does" },
+    { text: "To handle form submission", hint: "That's what onPressed does" },
+  ]}
+  correctOption={1}
+/>
+
+<MCQ
+  question="Which property is used to show validation errors in real-time?"
+  options={[
+    { text: "validateOnChange", hint: "This property doesn't exist" },
+    { text: "autovalidateMode", hint: "This is the correct answer" },
+    { text: "realTimeValidation", hint: "This property doesn't exist" },
+    { text: "validateImmediately", hint: "This property doesn't exist" },
+  ]}
+  correctOption={1}
+/>
+
+<MCQ
+  question="What is the purpose of the validator function in TextFormField?"
+  options={[
+    { text: "To style the input field", hint: "That's what decoration does" },
+    { text: "To handle form submission", hint: "That's what onPressed does" },
+    { text: "To validate user input", hint: "This is the correct answer" },
+    { text: "To create the input field", hint: "That's what the widget itself does" },
+  ]}
+  correctOption={2}
+/>
+
+## Mini-Challenge: Registration Form
+
+Create a registration form that includes:
+1. Username field with validation
+2. Email field with validation
+3. Password field with validation
+4. Age field with validation
+5. Country dropdown
+6. Date of birth picker
+7. Submit button that shows all form data when valid
+
+Here's a starting point:
+
+```dart
+class RegistrationForm extends StatefulWidget {
+  @override
+  _RegistrationFormState createState() => _RegistrationFormState();
+}
+
+class _RegistrationFormState extends State<RegistrationForm> {
+  final _formKey = GlobalKey<FormState>();
+  final _usernameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _ageController = TextEditingController();
+  final _dobController = TextEditingController();
+  String _selectedCountry = '';
+
+  final List<String> _countries = [
+    'United States',
+    'United Kingdom',
+    'Canada',
+    'Australia',
+    'India',
+  ];
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _ageController.dispose();
+    _dobController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null) {
+      _dobController.text = picked.toString().split(' ')[0];
+    }
+  }
+
+  void _submitForm() {
+    if (_formKey.currentState!.validate()) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Registration Details'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Username: ${_usernameController.text}'),
+              Text('Email: ${_emailController.text}'),
+              Text('Age: ${_ageController.text}'),
+              Text('Country: $_selectedCountry'),
+              Text('Date of Birth: ${_dobController.text}'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: _formKey,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TextFormField(
+              controller: _usernameController,
+              decoration: InputDecoration(
+                labelText: 'Username',
+                border: OutlineInputBorder(),
+              ),
+              validator: (value) {
+                if (value?.isEmpty ?? true) {
+                  return 'Please enter a username';
+                }
+                if (value!.length < 3) {
+                  return 'Username must be at least 3 characters';
+                }
+                return null;
+              },
+            ),
+            SizedBox(height: 16),
+            TextFormField(
+              controller: _emailController,
+              decoration: InputDecoration(
+                labelText: 'Email',
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.emailAddress,
+              validator: (value) {
+                if (value?.isEmpty ?? true) {
+                  return 'Please enter your email';
+                }
+                if (!value!.contains('@')) {
+                  return 'Please enter a valid email';
+                }
+                return null;
+              },
+            ),
+            SizedBox(height: 16),
+            TextFormField(
+              controller: _passwordController,
+              decoration: InputDecoration(
+                labelText: 'Password',
+                border: OutlineInputBorder(),
+              ),
+              obscureText: true,
+              validator: (value) {
+                if (value?.isEmpty ?? true) {
+                  return 'Please enter your password';
+                }
+                if (value!.length < 6) {
+                  return 'Password must be at least 6 characters';
+                }
+                return null;
+              },
+            ),
+            SizedBox(height: 16),
+            TextFormField(
+              controller: _ageController,
+              decoration: InputDecoration(
+                labelText: 'Age',
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.number,
+              validator: (value) {
+                if (value?.isEmpty ?? true) {
+                  return 'Please enter your age';
+                }
+                if (int.tryParse(value!) == null) {
+                  return 'Please enter a valid number';
+                }
+                return null;
+              },
+            ),
+            SizedBox(height: 16),
+            DropdownButtonFormField<String>(
+              value: _selectedCountry.isEmpty ? null : _selectedCountry,
+              decoration: InputDecoration(
+                labelText: 'Country',
+                border: OutlineInputBorder(),
+              ),
+              items: _countries.map((String country) {
+                return DropdownMenuItem<String>(
+                  value: country,
+                  child: Text(country),
+                );
+              }).toList(),
+              onChanged: (String? value) {
+                setState(() {
+                  _selectedCountry = value ?? '';
+                });
+              },
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please select a country';
+                }
+                return null;
+              },
+            ),
+            SizedBox(height: 16),
+            TextFormField(
+              controller: _dobController,
+              decoration: InputDecoration(
+                labelText: 'Date of Birth',
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.calendar_today),
+                  onPressed: () => _selectDate(context),
+                ),
+                border: OutlineInputBorder(),
+              ),
+              readOnly: true,
+              validator: (value) {
+                if (value?.isEmpty ?? true) {
+                  return 'Please select your date of birth';
+                }
+                return null;
+              },
+            ),
+            SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: _submitForm,
+              child: Text('Register'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+
+## Key Takeaways
+
+- Forms are essential for user input and data collection
+- Form validation ensures data quality
+- Different input types serve different purposes
+- Real-time validation improves user experience
+- Custom form fields can be created for specific needs
+- Always clean up controllers in dispose method
+- Consider accessibility when designing forms
+
+Tomorrow, we'll explore assets and resources in Flutter, including how to work with images, custom fonts, and other resources!

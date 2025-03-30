@@ -1,0 +1,333 @@
+---
+title: "Day 6: Flutter Widget Tree & Stateless Widgets"
+description: "Learn about Flutter's widget tree structure and how to create stateless widgets to build the foundation of your Flutter applications."
+---
+
+Welcome to Day 6 of the "Hundred Days of Flutter" course! Today, we'll dive into Flutter's widget system, starting with the widget tree and stateless widgets. This is where we begin building actual Flutter applications!
+
+## Understanding the Widget Tree
+
+In Flutter, everything is a widget. The widget tree is a hierarchical structure that represents your app's UI. Each widget can contain other widgets, creating a tree-like structure.
+
+### Basic Widget Tree Structure
+
+```dart
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('My First App'),
+        ),
+        body: Center(
+          child: Text('Hello, Flutter!'),
+        ),
+      ),
+    );
+  }
+}
+```
+
+In this example:
+- `MyApp` is the root widget
+- `MaterialApp` provides the app's theme and navigation
+- `Scaffold` provides the basic app structure
+- `AppBar` is the top bar
+- `Center` centers its child widget
+- `Text` displays text
+
+## Stateless Widgets
+
+Stateless widgets are widgets that don't maintain any state. They are immutable and rebuild only when their parent widget rebuilds.
+
+### Creating a Stateless Widget
+
+```dart
+class WelcomeCard extends StatelessWidget {
+  final String name;
+  
+  const WelcomeCard({
+    super.key,
+    required this.name,
+  });
+  
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Welcome, $name!',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                // Button pressed
+              },
+              child: const Text('Get Started'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+
+### Common Stateless Widgets
+
+1. **Container**
+```dart
+Container(
+  width: 100,
+  height: 100,
+  decoration: BoxDecoration(
+    color: Colors.blue,
+    borderRadius: BorderRadius.circular(8),
+  ),
+  child: const Center(
+    child: Text('Container'),
+  ),
+)
+```
+
+2. **Row and Column**
+```dart
+Row(
+  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  children: [
+    Icon(Icons.star),
+    Icon(Icons.star),
+    Icon(Icons.star),
+  ],
+)
+
+Column(
+  mainAxisAlignment: MainAxisAlignment.center,
+  children: [
+    Text('First'),
+    Text('Second'),
+    Text('Third'),
+  ],
+)
+```
+
+3. **Stack**
+```dart
+Stack(
+  children: [
+    Container(
+      color: Colors.blue,
+      width: 200,
+      height: 200,
+    ),
+    Positioned(
+      top: 20,
+      left: 20,
+      child: Container(
+        color: Colors.red,
+        width: 100,
+        height: 100,
+      ),
+    ),
+  ],
+)
+```
+
+## Widget Properties
+
+Widgets have various properties that control their appearance and behavior:
+
+### Styling Properties
+
+```dart
+Container(
+  width: 200,
+  height: 200,
+  margin: const EdgeInsets.all(16),
+  padding: const EdgeInsets.all(8),
+  decoration: BoxDecoration(
+    color: Colors.blue,
+    borderRadius: BorderRadius.circular(8),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withOpacity(0.2),
+        blurRadius: 8,
+        offset: const Offset(0, 4),
+      ),
+    ],
+  ),
+  child: const Text(
+    'Styled Container',
+    style: TextStyle(
+      color: Colors.white,
+      fontSize: 20,
+      fontWeight: FontWeight.bold,
+    ),
+  ),
+)
+```
+
+### Layout Properties
+
+```dart
+Column(
+  mainAxisAlignment: MainAxisAlignment.center,
+  crossAxisAlignment: CrossAxisAlignment.stretch,
+  mainAxisSize: MainAxisSize.min,
+  children: [
+    Container(
+      height: 100,
+      color: Colors.red,
+    ),
+    Container(
+      height: 100,
+      color: Colors.blue,
+    ),
+  ],
+)
+```
+
+## Hot Reload and Hot Restart
+
+Flutter provides two powerful features for development:
+
+1. **Hot Reload (r)**: Updates the UI while preserving the app's state
+2. **Hot Restart (R)**: Completely rebuilds the app while preserving the widget tree
+
+## Knowledge Check
+
+Let's test your understanding of today's concepts:
+
+<MCQ
+  question="What is the main difference between StatelessWidget and StatefulWidget?"
+  options={[
+    { text: "StatelessWidget is faster", hint: "Performance is not the main difference" },
+    { text: "StatelessWidget can't have children", hint: "StatelessWidget can have children" },
+    { text: "StatelessWidget doesn't maintain state", hint: "This is the correct definition" },
+    { text: "StatelessWidget can't be styled", hint: "StatelessWidget can be styled" },
+  ]}
+  correctOption={2}
+/>
+
+<MCQ
+  question="Which widget is used to create a basic app structure with an app bar and body?"
+  options={[
+    { text: "Container", hint: "Container is for styling and layout" },
+    { text: "Scaffold", hint: "This is the correct answer" },
+    { text: "MaterialApp", hint: "MaterialApp provides the app's theme" },
+    { text: "AppBar", hint: "AppBar is just the top bar" },
+  ]}
+  correctOption={1}
+/>
+
+<MCQ
+  question="What is the purpose of the build method in a StatelessWidget?"
+  options={[
+    { text: "To initialize the widget", hint: "That's what the constructor does" },
+    { text: "To define the widget's UI structure", hint: "This is the correct definition" },
+    { text: "To handle user interactions", hint: "That's handled by callbacks" },
+    { text: "To manage the widget's state", hint: "StatelessWidget doesn't manage state" },
+  ]}
+  correctOption={1}
+/>
+
+## Mini-Challenge: Profile Card
+
+Create a profile card widget that displays a user's information:
+
+1. Create a `ProfileCard` stateless widget
+2. Include the following elements:
+   - User's avatar (use CircleAvatar)
+   - User's name
+   - User's bio
+   - A row of social media icons
+3. Style it with proper spacing and colors
+
+Here's a starting point:
+
+```dart
+class ProfileCard extends StatelessWidget {
+  final String name;
+  final String bio;
+  final String avatarUrl;
+  
+  const ProfileCard({
+    super.key,
+    required this.name,
+    required this.bio,
+    required this.avatarUrl,
+  });
+  
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.all(16),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircleAvatar(
+              radius: 50,
+              backgroundImage: NetworkImage(avatarUrl),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              name,
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              bio,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.facebook),
+                  onPressed: () {},
+                ),
+                IconButton(
+                  icon: const Icon(Icons.twitter),
+                  onPressed: () {},
+                ),
+                IconButton(
+                  icon: const Icon(Icons.instagram),
+                  onPressed: () {},
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+
+## Key Takeaways
+
+- Everything in Flutter is a widget
+- The widget tree represents your app's UI hierarchy
+- Stateless widgets are immutable and don't maintain state
+- Widgets can be styled using various properties
+- Hot reload and hot restart help in rapid development
+- Common widgets like Container, Row, Column, and Stack help in layout
+- The build method defines a widget's UI structure
+
+Tomorrow, we'll explore StatefulWidgets and learn how to create interactive UI elements! 

@@ -1,0 +1,495 @@
+---
+title: "Day 14: Gestures & Animations in Flutter"
+description: "Learn about gesture detection, basic animations, and animation controllers in Flutter, including GestureDetector, InkWell, AnimatedContainer, and custom animations."
+---
+
+Welcome to Day 14 of the "Hundred Days of Flutter" course! Today, we'll explore gestures and animations in Flutter, which are essential for creating interactive and engaging user experiences.
+
+## Gesture Detection
+
+### GestureDetector
+
+```dart
+GestureDetector(
+  onTap: () {
+    print('Tapped!');
+  },
+  onLongPress: () {
+    print('Long pressed!');
+  },
+  onDoubleTap: () {
+    print('Double tapped!');
+  },
+  child: Container(
+    width: 100,
+    height: 100,
+    color: Colors.blue,
+    child: Center(
+      child: Text('Tap me!'),
+    ),
+  ),
+)
+```
+
+### InkWell
+
+```dart
+InkWell(
+  onTap: () {
+    print('Tapped!');
+  },
+  splashColor: Colors.blue,
+  highlightColor: Colors.blue.withOpacity(0.3),
+  child: Container(
+    width: 100,
+    height: 100,
+    color: Colors.grey[200],
+    child: Center(
+      child: Text('Tap me!'),
+    ),
+  ),
+)
+```
+
+### Advanced Gestures
+
+```dart
+GestureDetector(
+  onPanStart: (details) {
+    print('Pan started at: ${details.globalPosition}');
+  },
+  onPanUpdate: (details) {
+    print('Pan updated: ${details.delta}');
+  },
+  onPanEnd: (details) {
+    print('Pan ended with velocity: ${details.velocity}');
+  },
+  onScaleStart: (details) {
+    print('Scale started at: ${details.focalPoint}');
+  },
+  onScaleUpdate: (details) {
+    print('Scale updated: ${details.scale}');
+  },
+  onScaleEnd: (details) {
+    print('Scale ended with velocity: ${details.velocity}');
+  },
+  child: Container(
+    width: 100,
+    height: 100,
+    color: Colors.blue,
+    child: Center(
+      child: Text('Interact with me!'),
+    ),
+  ),
+)
+```
+
+## Basic Animations
+
+### AnimatedContainer
+
+```dart
+class AnimatedContainerExample extends StatefulWidget {
+  @override
+  _AnimatedContainerExampleState createState() => _AnimatedContainerExampleState();
+}
+
+class _AnimatedContainerExampleState extends State<AnimatedContainerExample> {
+  bool _isExpanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _isExpanded = !_isExpanded;
+        });
+      },
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 300),
+        width: _isExpanded ? 200 : 100,
+        height: _isExpanded ? 200 : 100,
+        color: _isExpanded ? Colors.blue : Colors.red,
+        child: Center(
+          child: Text(
+            _isExpanded ? 'Expanded' : 'Tap to expand',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+      ),
+    );
+  }
+}
+```
+
+### AnimatedOpacity
+
+```dart
+class AnimatedOpacityExample extends StatefulWidget {
+  @override
+  _AnimatedOpacityExampleState createState() => _AnimatedOpacityExampleState();
+}
+
+class _AnimatedOpacityExampleState extends State<AnimatedOpacityExample> {
+  bool _isVisible = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        AnimatedOpacity(
+          duration: Duration(milliseconds: 500),
+          opacity: _isVisible ? 1.0 : 0.0,
+          child: Container(
+            width: 100,
+            height: 100,
+            color: Colors.blue,
+            child: Center(
+              child: Text('Fade me!'),
+            ),
+          ),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            setState(() {
+              _isVisible = !_isVisible;
+            });
+          },
+          child: Text(_isVisible ? 'Hide' : 'Show'),
+        ),
+      ],
+    );
+  }
+}
+```
+
+## Animation Controller
+
+### Basic Animation Controller
+
+```dart
+class AnimationControllerExample extends StatefulWidget {
+  @override
+  _AnimationControllerExampleState createState() => _AnimationControllerExampleState();
+}
+
+class _AnimationControllerExampleState extends State<AnimationControllerExample>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: Duration(seconds: 2),
+      vsync: this,
+    );
+
+    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        AnimatedBuilder(
+          animation: _animation,
+          builder: (context, child) {
+            return Transform.scale(
+              scale: 1.0 + _animation.value,
+              child: Container(
+                width: 100,
+                height: 100,
+                color: Colors.blue,
+                child: Center(
+                  child: Text('Scale me!'),
+                ),
+              ),
+            );
+          },
+        ),
+        ElevatedButton(
+          onPressed: () {
+            if (_controller.isCompleted) {
+              _controller.reverse();
+            } else {
+              _controller.forward();
+            }
+          },
+          child: Text('Animate'),
+        ),
+      ],
+    );
+  }
+}
+```
+
+### Custom Animation Curves
+
+```dart
+class CustomAnimationExample extends StatefulWidget {
+  @override
+  _CustomAnimationExampleState createState() => _CustomAnimationExampleState();
+}
+
+class _CustomAnimationExampleState extends State<CustomAnimationExample>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _bounceAnimation;
+  late Animation<double> _easeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: Duration(seconds: 2),
+      vsync: this,
+    );
+
+    _bounceAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.bounceOut,
+      ),
+    );
+
+    _easeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeInOut,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            AnimatedBuilder(
+              animation: _bounceAnimation,
+              builder: (context, child) {
+                return Transform.translate(
+                  offset: Offset(0, -100 * _bounceAnimation.value),
+                  child: Container(
+                    width: 50,
+                    height: 50,
+                    color: Colors.blue,
+                  ),
+                );
+              },
+            ),
+            AnimatedBuilder(
+              animation: _easeAnimation,
+              builder: (context, child) {
+                return Transform.translate(
+                  offset: Offset(0, -100 * _easeAnimation.value),
+                  child: Container(
+                    width: 50,
+                    height: 50,
+                    color: Colors.red,
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+        ElevatedButton(
+          onPressed: () {
+            if (_controller.isCompleted) {
+              _controller.reverse();
+            } else {
+              _controller.forward();
+            }
+          },
+          child: Text('Animate'),
+        ),
+      ],
+    );
+  }
+}
+```
+
+## Knowledge Check
+
+Let's test your understanding of today's concepts:
+
+<MCQ
+  question="What is the main difference between GestureDetector and InkWell?"
+  options={[
+    { text: "GestureDetector is more performant", hint: "That's not the main difference" },
+    { text: "InkWell provides visual feedback", hint: "This is the correct answer" },
+    { text: "GestureDetector supports more gestures", hint: "That's not the main difference" },
+    { text: "InkWell is more modern", hint: "That's not the main difference" },
+  ]}
+  correctOption={1}
+/>
+
+<MCQ
+  question="What is the purpose of an AnimationController?"
+  options={[
+    { text: "To create animations", hint: "That's not the main purpose" },
+    { text: "To control animation progress", hint: "This is the correct answer" },
+    { text: "To define animation duration", hint: "That's not the main purpose" },
+    { text: "To handle gesture events", hint: "That's not related to AnimationController" },
+  ]}
+  correctOption={1}
+/>
+
+<MCQ
+  question="Which widget is best for creating smooth transitions between states?"
+  options={[
+    { text: "AnimatedContainer", hint: "This is the correct answer" },
+    { text: "GestureDetector", hint: "That's for handling gestures" },
+    { text: "InkWell", hint: "That's for handling taps with visual feedback" },
+    { text: "AnimationController", hint: "That's for controlling animations" },
+  ]}
+  correctOption={0}
+/>
+
+## Mini-Challenge: Interactive Card Game
+
+Create a card game that:
+1. Uses gesture detection for card interactions
+2. Implements smooth animations for card movements
+3. Uses custom animation curves
+4. Handles multiple gesture types
+5. Includes visual feedback
+6. Manages animation states
+7. Provides smooth transitions
+
+Here's a starting point:
+
+```dart
+class CardGame extends StatefulWidget {
+  @override
+  _CardGameState createState() => _CardGameState();
+}
+
+class _CardGameState extends State<CardGame> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _rotateAnimation;
+  bool _isFlipped = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: Duration(milliseconds: 500),
+      vsync: this,
+    );
+
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.1).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeInOut,
+      ),
+    );
+
+    _rotateAnimation = Tween<double>(begin: 0.0, end: 180.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeInOut,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _flipCard() {
+    setState(() {
+      _isFlipped = !_isFlipped;
+      if (_isFlipped) {
+        _controller.forward();
+      } else {
+        _controller.reverse();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Card Game'),
+      ),
+      body: Center(
+        child: GestureDetector(
+          onTap: _flipCard,
+          onLongPress: () {
+            // Add long press animation
+          },
+          child: AnimatedBuilder(
+            animation: _controller,
+            builder: (context, child) {
+              return Transform(
+                transform: Matrix4.identity()
+                  ..scale(_scaleAnimation.value)
+                  ..rotateY(_rotateAnimation.value * (pi / 180)),
+                alignment: Alignment.center,
+                child: Container(
+                  width: 200,
+                  height: 300,
+                  decoration: BoxDecoration(
+                    color: _isFlipped ? Colors.blue : Colors.red,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.3),
+                        blurRadius: 10,
+                        offset: Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Text(
+                      _isFlipped ? 'Back' : 'Front',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+```
+
+## Key Takeaways
+
+- GestureDetector provides basic gesture detection
+- InkWell adds visual feedback to taps
+- AnimatedContainer enables smooth state transitions
+- AnimationController controls animation progress
+- Custom animation curves create unique effects
+- Gestures and animations work together for interactivity
+- Proper animation disposal prevents memory leaks
+
+Tomorrow, we'll explore error handling and debugging in Flutter! 

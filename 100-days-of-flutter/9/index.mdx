@@ -1,0 +1,454 @@
+---
+title: "Day 9: StatefulWidgets and State Management"
+description: "Learn about StatefulWidgets, state management, and lifecycle methods in Flutter to create interactive and dynamic user interfaces."
+---
+
+Welcome to Day 9 of the "Hundred Days of Flutter" course! Today, we'll explore StatefulWidgets and state management, which are essential for creating interactive and dynamic user interfaces in Flutter.
+
+## Understanding State
+
+State is the data that can change over time in your widget. Unlike StatelessWidgets, StatefulWidgets can maintain and update their state.
+
+### Basic StatefulWidget Structure
+
+```dart
+class Counter extends StatefulWidget {
+  const Counter({super.key});
+
+  @override
+  State<Counter> createState() => _CounterState();
+}
+
+class _CounterState extends State<Counter> {
+  int _count = 0;
+
+  void _increment() {
+    setState(() {
+      _count++;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text('Count: $_count'),
+        ElevatedButton(
+          onPressed: _increment,
+          child: Text('Increment'),
+        ),
+      ],
+    );
+  }
+}
+```
+
+## StatefulWidget Lifecycle
+
+StatefulWidgets have a lifecycle that includes several important methods:
+
+### Lifecycle Methods
+
+```dart
+class _MyStatefulWidgetState extends State<MyStatefulWidget> {
+  @override
+  void initState() {
+    super.initState();
+    // Called when the widget is first created
+    // Initialize variables, controllers, etc.
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Called after initState and when dependencies change
+    // Access inherited widgets, etc.
+  }
+
+  @override
+  void build(BuildContext context) {
+    // Called to build the widget
+    return Container();
+  }
+
+  @override
+  void didUpdateWidget(MyStatefulWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Called when the widget is rebuilt with new configuration
+    // Compare old and new widget properties
+  }
+
+  @override
+  void dispose() {
+    // Called when the widget is removed from the tree
+    // Clean up resources, controllers, etc.
+    super.dispose();
+  }
+}
+```
+
+## Common State Management Patterns
+
+### Counter Example with State
+
+```dart
+class Counter extends StatefulWidget {
+  const Counter({super.key});
+
+  @override
+  State<Counter> createState() => _CounterState();
+}
+
+class _CounterState extends State<Counter> {
+  int _count = 0;
+  bool _isLoading = false;
+
+  Future<void> _incrementAsync() async {
+    setState(() => _isLoading = true);
+    
+    await Future.delayed(Duration(seconds: 1));
+    
+    setState(() {
+      _count++;
+      _isLoading = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          'Count: $_count',
+          style: Theme.of(context).textTheme.headlineMedium,
+        ),
+        if (_isLoading)
+          CircularProgressIndicator()
+        else
+          ElevatedButton(
+            onPressed: _incrementAsync,
+            child: Text('Increment'),
+          ),
+      ],
+    );
+  }
+}
+```
+
+### Form with State
+
+```dart
+class LoginForm extends StatefulWidget {
+  @override
+  _LoginFormState createState() => _LoginFormState();
+}
+
+class _LoginFormState extends State<LoginForm> {
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  bool _isLoading = false;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() => _isLoading = true);
+      
+      // Simulate API call
+      await Future.delayed(Duration(seconds: 2));
+      
+      setState(() => _isLoading = false);
+      // Handle successful login
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: [
+          TextFormField(
+            controller: _emailController,
+            decoration: InputDecoration(labelText: 'Email'),
+            validator: (value) {
+              if (value?.isEmpty ?? true) {
+                return 'Please enter your email';
+              }
+              return null;
+            },
+          ),
+          TextFormField(
+            controller: _passwordController,
+            decoration: InputDecoration(labelText: 'Password'),
+            obscureText: true,
+            validator: (value) {
+              if (value?.isEmpty ?? true) {
+                return 'Please enter your password';
+              }
+              return null;
+            },
+          ),
+          if (_isLoading)
+            CircularProgressIndicator()
+          else
+            ElevatedButton(
+              onPressed: _submit,
+              child: Text('Login'),
+            ),
+        ],
+      ),
+    );
+  }
+}
+```
+
+## State Management Best Practices
+
+1. **Keep State Minimal**
+```dart
+class _MyWidgetState extends State<MyWidget> {
+  // Only store what needs to change
+  int _counter = 0;
+  bool _isLoading = false;
+  
+  // Don't store what can be computed
+  int get doubled => _counter * 2;
+}
+```
+
+2. **Use setState Properly**
+```dart
+// Good
+setState(() {
+  _counter++;
+  _isLoading = true;
+});
+
+// Bad - multiple setState calls
+setState(() => _counter++);
+setState(() => _isLoading = true);
+```
+
+3. **Clean Up Resources**
+```dart
+class _MyWidgetState extends State<MyWidget> {
+  late final TextEditingController _controller;
+  late final StreamSubscription _subscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController();
+    _subscription = myStream.listen(_handleData);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _subscription.cancel();
+    super.dispose();
+  }
+}
+```
+
+## Knowledge Check
+
+Let's test your understanding of today's concepts:
+
+<MCQ
+  question="What is the main difference between StatelessWidget and StatefulWidget?"
+  options={[
+    { text: "StatefulWidget is faster", hint: "Performance is not the main difference" },
+    { text: "StatefulWidget can maintain mutable state", hint: "This is the correct answer" },
+    { text: "StatefulWidget has more features", hint: "Both have similar features" },
+    { text: "StatefulWidget is newer", hint: "Both have been available since Flutter's inception" },
+  ]}
+  correctOption={1}
+/>
+
+<MCQ
+  question="Which lifecycle method is called when a widget is first created?"
+  options={[
+    { text: "build", hint: "build is called multiple times" },
+    { text: "initState", hint: "This is the correct answer" },
+    { text: "dispose", hint: "dispose is called when the widget is removed" },
+    { text: "didUpdateWidget", hint: "This is called when the widget is rebuilt" },
+  ]}
+  correctOption={1}
+/>
+
+<MCQ
+  question="What is the purpose of setState in a StatefulWidget?"
+  options={[
+    { text: "To create a new widget", hint: "That's what createState does" },
+    { text: "To notify Flutter that the widget's state has changed", hint: "This is the correct answer" },
+    { text: "To dispose of the widget", hint: "That's what dispose does" },
+    { text: "To initialize the widget", hint: "That's what initState does" },
+  ]}
+  correctOption={1}
+/>
+
+## Mini-Challenge: Todo List
+
+Create a simple todo list app that demonstrates state management:
+
+1. Create a Todo class with title and completed status
+2. Implement add, remove, and toggle completion functionality
+3. Show a loading state when adding todos
+4. Persist todos between app restarts
+5. Add error handling
+
+Here's a starting point:
+
+```dart
+class Todo {
+  final String id;
+  final String title;
+  bool completed;
+
+  Todo({
+    required this.id,
+    required this.title,
+    this.completed = false,
+  });
+}
+
+class TodoList extends StatefulWidget {
+  @override
+  _TodoListState createState() => _TodoListState();
+}
+
+class _TodoListState extends State<TodoList> {
+  final List<Todo> _todos = [];
+  final _titleController = TextEditingController();
+  bool _isLoading = false;
+  String? _error;
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _addTodo() async {
+    if (_titleController.text.isEmpty) {
+      setState(() => _error = 'Please enter a title');
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    try {
+      // Simulate network delay
+      await Future.delayed(Duration(seconds: 1));
+      
+      setState(() {
+        _todos.add(Todo(
+          id: DateTime.now().toString(),
+          title: _titleController.text,
+        ));
+        _titleController.clear();
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = 'Failed to add todo';
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _toggleTodo(String id) {
+    setState(() {
+      final todo = _todos.firstWhere((t) => t.id == id);
+      todo.completed = !todo.completed;
+    });
+  }
+
+  void _removeTodo(String id) {
+    setState(() {
+      _todos.removeWhere((t) => t.id == id);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _titleController,
+                  decoration: InputDecoration(
+                    labelText: 'New Todo',
+                    errorText: _error,
+                  ),
+                ),
+              ),
+              if (_isLoading)
+                CircularProgressIndicator()
+              else
+                IconButton(
+                  icon: Icon(Icons.add),
+                  onPressed: _addTodo,
+                ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: _todos.length,
+            itemBuilder: (context, index) {
+              final todo = _todos[index];
+              return ListTile(
+                leading: Checkbox(
+                  value: todo.completed,
+                  onChanged: (_) => _toggleTodo(todo.id),
+                ),
+                title: Text(
+                  todo.title,
+                  style: TextStyle(
+                    decoration: todo.completed
+                        ? TextDecoration.lineThrough
+                        : null,
+                  ),
+                ),
+                trailing: IconButton(
+                  icon: Icon(Icons.delete),
+                  onPressed: () => _removeTodo(todo.id),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+```
+
+## Key Takeaways
+
+- StatefulWidgets can maintain mutable state
+- setState is used to notify Flutter of state changes
+- Lifecycle methods help manage widget resources
+- Keep state minimal and only store what needs to change
+- Clean up resources in dispose method
+- Handle loading and error states appropriately
+- Use controllers for form inputs
+
+Tomorrow, we'll explore navigation and routing in Flutter! 
