@@ -220,7 +220,7 @@ class _InfiniteScrollListViewState extends State<InfiniteScrollListView> {
   Future<void> _loadMoreItems() async {
     if (_isLoading) return;
     setState(() => _isLoading = true);
-    
+
     await Future.delayed(Duration(seconds: 1));
     setState(() {
       items.addAll(List.generate(10, (index) => 'Item ${items.length + index}'));
@@ -255,9 +255,18 @@ Let's test your understanding of today's concepts:
 <MCQ
   question="What is the main advantage of using ListView.builder over a regular ListView?"
   options={[
-    { text: "It's more beautiful", hint: "Appearance is not the main advantage" },
-    { text: "It's more performant for long lists", hint: "This is the correct answer" },
-    { text: "It has more features", hint: "Regular ListView has similar features" },
+    {
+      text: "It's more beautiful",
+      hint: "Appearance is not the main advantage",
+    },
+    {
+      text: "It's more performant for long lists",
+      hint: "This is the correct answer",
+    },
+    {
+      text: "It has more features",
+      hint: "Regular ListView has similar features",
+    },
     { text: "It's easier to use", hint: "Both are equally easy to use" },
   ]}
   correctOption={1}
@@ -279,8 +288,14 @@ Let's test your understanding of today's concepts:
   options={[
     { text: "To create scrollable lists", hint: "That's what ListView is for" },
     { text: "To create grid layouts", hint: "That's what GridView is for" },
-    { text: "To make a single widget scrollable", hint: "This is the correct answer" },
-    { text: "To create infinite scroll", hint: "That's a pattern using ListView" },
+    {
+      text: "To make a single widget scrollable",
+      hint: "This is the correct answer",
+    },
+    {
+      text: "To create infinite scroll",
+      hint: "That's a pattern using ListView",
+    },
   ]}
   correctOption={2}
 />
@@ -288,6 +303,7 @@ Let's test your understanding of today's concepts:
 ## Mini-Challenge: Photo Gallery
 
 Create a photo gallery app that:
+
 1. Displays photos in a grid layout
 2. Supports pull-to-refresh
 3. Implements infinite scroll
@@ -318,11 +334,11 @@ class _PhotoGalleryState extends State<PhotoGallery> {
   Future<void> _loadPhotos() async {
     if (_isLoading) return;
     setState(() => _isLoading = true);
-    
+
     try {
       await Future.delayed(Duration(seconds: 1)); // Simulate network delay
       setState(() {
-        photos.addAll(List.generate(10, (index) => 
+        photos.addAll(List.generate(10, (index) =>
           'https://picsum.photos/200/200?random=${photos.length + index}'));
         _isLoading = false;
       });
@@ -402,4 +418,4 @@ class _PhotoGalleryState extends State<PhotoGallery> {
 - Always consider performance when building lists and grids
 - Handle loading states and errors gracefully
 
-Tomorrow, we'll explore StatefulWidgets and learn how to create interactive UI elements! 
+Tomorrow, we'll explore StatefulWidgets and learn how to create interactive UI elements!

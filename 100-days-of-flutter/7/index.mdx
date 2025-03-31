@@ -284,10 +284,22 @@ Let's test your understanding of today's concepts:
 <MCQ
   question="What is the main difference between Expanded and Flexible widgets?"
   options={[
-    { text: "Expanded is for rows, Flexible is for columns", hint: "Both can be used in rows and columns" },
-    { text: "Expanded forces its child to fill available space, Flexible doesn't", hint: "This is the correct definition" },
-    { text: "Expanded is more performant", hint: "Performance is not the main difference" },
-    { text: "Flexible is newer", hint: "Both widgets have been available since Flutter's inception" },
+    {
+      text: "Expanded is for rows, Flexible is for columns",
+      hint: "Both can be used in rows and columns",
+    },
+    {
+      text: "Expanded forces its child to fill available space, Flexible doesn't",
+      hint: "This is the correct definition",
+    },
+    {
+      text: "Expanded is more performant",
+      hint: "Performance is not the main difference",
+    },
+    {
+      text: "Flexible is newer",
+      hint: "Both widgets have been available since Flutter's inception",
+    },
   ]}
   correctOption={1}
 />
@@ -295,7 +307,10 @@ Let's test your understanding of today's concepts:
 <MCQ
   question="Which property in Row and Column determines how children are aligned along the main axis?"
   options={[
-    { text: "crossAxisAlignment", hint: "This aligns children along the cross axis" },
+    {
+      text: "crossAxisAlignment",
+      hint: "This aligns children along the cross axis",
+    },
     { text: "mainAxisAlignment", hint: "This is the correct answer" },
     { text: "mainAxisSize", hint: "This determines the size of the main axis" },
     { text: "children", hint: "This is the list of child widgets" },
@@ -306,9 +321,18 @@ Let's test your understanding of today's concepts:
 <MCQ
   question="What happens when you use multiple Expanded widgets with different flex values?"
   options={[
-    { text: "Only the highest flex value is considered", hint: "All flex values are considered" },
-    { text: "The space is divided proportionally according to flex values", hint: "This is the correct answer" },
-    { text: "The widgets take equal space", hint: "This happens when flex values are equal" },
+    {
+      text: "Only the highest flex value is considered",
+      hint: "All flex values are considered",
+    },
+    {
+      text: "The space is divided proportionally according to flex values",
+      hint: "This is the correct answer",
+    },
+    {
+      text: "The widgets take equal space",
+      hint: "This happens when flex values are equal",
+    },
     { text: "An error occurs", hint: "Different flex values are valid" },
   ]}
   correctOption={1}
@@ -317,6 +341,7 @@ Let's test your understanding of today's concepts:
 ## Mini-Challenge: Responsive Navigation Bar
 
 Create a responsive navigation bar that:
+
 1. Shows items horizontally on wide screens
 2. Shows items vertically on narrow screens
 3. Uses Expanded/Flexible appropriately
@@ -417,4 +442,4 @@ class NavBarItem extends StatelessWidget {
 - LayoutBuilder helps create responsive layouts
 - Flex values in Expanded widgets determine proportional space distribution
 
-Tomorrow, we'll explore more layout widgets including ListView, GridView, and SingleChildScrollView! 
+Tomorrow, we'll explore more layout widgets including ListView, GridView, and SingleChildScrollView!

@@ -28,14 +28,14 @@ ThemeData(
   primaryColor: Colors.blue,
   accentColor: Colors.orange,
   backgroundColor: Colors.white,
-  
+
   // Typography
   textTheme: TextTheme(
     headline1: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
     bodyText1: TextStyle(fontSize: 16),
     caption: TextStyle(fontSize: 12),
   ),
-  
+
   // Component Themes
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
@@ -45,7 +45,7 @@ ThemeData(
       ),
     ),
   ),
-  
+
   // Other Properties
   cardTheme: CardTheme(
     elevation: 4,
@@ -93,7 +93,7 @@ ThemeData(
       fontWeight: FontWeight.bold,
       letterSpacing: -0.5,
     ),
-    
+
     // Body
     bodyText1: TextStyle(
       fontSize: 16,
@@ -103,7 +103,7 @@ ThemeData(
       fontSize: 14,
       letterSpacing: 0.25,
     ),
-    
+
     // Captions
     caption: TextStyle(
       fontSize: 12,
@@ -257,7 +257,7 @@ class ResponsiveWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final orientation = MediaQuery.of(context).orientation;
-    
+
     return Container(
       width: size.width * 0.8,
       height: orientation == Orientation.portrait
@@ -280,7 +280,10 @@ Let's test your understanding of today's concepts:
   options={[
     { text: "To create animations", hint: "That's not related to ThemeData" },
     { text: "To define app-wide styling", hint: "This is the correct answer" },
-    { text: "To handle state management", hint: "That's not related to ThemeData" },
+    {
+      text: "To handle state management",
+      hint: "That's not related to ThemeData",
+    },
     { text: "To manage navigation", hint: "That's not related to ThemeData" },
   ]}
   correctOption={1}
@@ -300,10 +303,22 @@ Let's test your understanding of today's concepts:
 <MCQ
   question="What is the purpose of LayoutBuilder in responsive design?"
   options={[
-    { text: "To create animations", hint: "That's not related to LayoutBuilder" },
-    { text: "To handle state management", hint: "That's not related to LayoutBuilder" },
-    { text: "To adapt layout based on constraints", hint: "This is the correct answer" },
-    { text: "To manage navigation", hint: "That's not related to LayoutBuilder" },
+    {
+      text: "To create animations",
+      hint: "That's not related to LayoutBuilder",
+    },
+    {
+      text: "To handle state management",
+      hint: "That's not related to LayoutBuilder",
+    },
+    {
+      text: "To adapt layout based on constraints",
+      hint: "This is the correct answer",
+    },
+    {
+      text: "To manage navigation",
+      hint: "That's not related to LayoutBuilder",
+    },
   ]}
   correctOption={2}
 />
@@ -311,6 +326,7 @@ Let's test your understanding of today's concepts:
 ## Mini-Challenge: Themed Todo App
 
 Create a themed todo app that:
+
 1. Supports both light and dark themes
 2. Uses custom colors and typography
 3. Implements responsive design
@@ -414,7 +430,7 @@ class _TodoScreenState extends State<TodoScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Themed Todo App'),
