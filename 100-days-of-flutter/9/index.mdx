@@ -105,9 +105,9 @@ class _CounterState extends State<Counter> {
 
   Future<void> _incrementAsync() async {
     setState(() => _isLoading = true);
-    
+
     await Future.delayed(Duration(seconds: 1));
-    
+
     setState(() {
       _count++;
       _isLoading = false;
@@ -160,10 +160,10 @@ class _LoginFormState extends State<LoginForm> {
   Future<void> _submit() async {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
-      
+
       // Simulate API call
       await Future.delayed(Duration(seconds: 2));
-      
+
       setState(() => _isLoading = false);
       // Handle successful login
     }
@@ -213,18 +213,20 @@ class _LoginFormState extends State<LoginForm> {
 ## State Management Best Practices
 
 1. **Keep State Minimal**
+
 ```dart
 class _MyWidgetState extends State<MyWidget> {
   // Only store what needs to change
   int _counter = 0;
   bool _isLoading = false;
-  
+
   // Don't store what can be computed
   int get doubled => _counter * 2;
 }
 ```
 
 2. **Use setState Properly**
+
 ```dart
 // Good
 setState(() {
@@ -238,6 +240,7 @@ setState(() => _isLoading = true);
 ```
 
 3. **Clean Up Resources**
+
 ```dart
 class _MyWidgetState extends State<MyWidget> {
   late final TextEditingController _controller;
@@ -266,10 +269,22 @@ Let's test your understanding of today's concepts:
 <MCQ
   question="What is the main difference between StatelessWidget and StatefulWidget?"
   options={[
-    { text: "StatefulWidget is faster", hint: "Performance is not the main difference" },
-    { text: "StatefulWidget can maintain mutable state", hint: "This is the correct answer" },
-    { text: "StatefulWidget has more features", hint: "Both have similar features" },
-    { text: "StatefulWidget is newer", hint: "Both have been available since Flutter's inception" },
+    {
+      text: "StatefulWidget is faster",
+      hint: "Performance is not the main difference",
+    },
+    {
+      text: "StatefulWidget can maintain mutable state",
+      hint: "This is the correct answer",
+    },
+    {
+      text: "StatefulWidget has more features",
+      hint: "Both have similar features",
+    },
+    {
+      text: "StatefulWidget is newer",
+      hint: "Both have been available since Flutter's inception",
+    },
   ]}
   correctOption={1}
 />
@@ -280,7 +295,10 @@ Let's test your understanding of today's concepts:
     { text: "build", hint: "build is called multiple times" },
     { text: "initState", hint: "This is the correct answer" },
     { text: "dispose", hint: "dispose is called when the widget is removed" },
-    { text: "didUpdateWidget", hint: "This is called when the widget is rebuilt" },
+    {
+      text: "didUpdateWidget",
+      hint: "This is called when the widget is rebuilt",
+    },
   ]}
   correctOption={1}
 />
@@ -289,7 +307,10 @@ Let's test your understanding of today's concepts:
   question="What is the purpose of setState in a StatefulWidget?"
   options={[
     { text: "To create a new widget", hint: "That's what createState does" },
-    { text: "To notify Flutter that the widget's state has changed", hint: "This is the correct answer" },
+    {
+      text: "To notify Flutter that the widget's state has changed",
+      hint: "This is the correct answer",
+    },
     { text: "To dispose of the widget", hint: "That's what dispose does" },
     { text: "To initialize the widget", hint: "That's what initState does" },
   ]}
@@ -352,7 +373,7 @@ class _TodoListState extends State<TodoList> {
     try {
       // Simulate network delay
       await Future.delayed(Duration(seconds: 1));
-      
+
       setState(() {
         _todos.add(Todo(
           id: DateTime.now().toString(),
@@ -451,4 +472,4 @@ class _TodoListState extends State<TodoList> {
 - Handle loading and error states appropriately
 - Use controllers for form inputs
 
-Tomorrow, we'll explore navigation and routing in Flutter! 
+Tomorrow, we'll explore navigation and routing in Flutter!

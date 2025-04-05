@@ -71,13 +71,16 @@ Text(
 ### Asset Types
 
 1. **Images**
+
    - PNG, JPG, WebP, GIF
    - SVG (requires flutter_svg package)
 
 2. **Fonts**
+
    - TTF, OTF
 
 3. **Data Files**
+
    - JSON, XML, YAML
 
 4. **Other Resources**
@@ -183,8 +186,14 @@ Let's test your understanding of today's concepts:
 <MCQ
   question="What is the purpose of the assets section in pubspec.yaml?"
   options={[
-    { text: "To define app dependencies", hint: "That's what dependencies section does" },
-    { text: "To declare project resources", hint: "This is the correct answer" },
+    {
+      text: "To define app dependencies",
+      hint: "That's what dependencies section does",
+    },
+    {
+      text: "To declare project resources",
+      hint: "This is the correct answer",
+    },
     { text: "To set app configuration", hint: "That's not related to assets" },
     { text: "To define app permissions", hint: "That's not related to assets" },
   ]}
@@ -206,9 +215,18 @@ Let's test your understanding of today's concepts:
   question="What is the purpose of asset bundling in Flutter?"
   options={[
     { text: "To compress files", hint: "That's not the main purpose" },
-    { text: "To organize project structure", hint: "That's not the main purpose" },
-    { text: "To include resources in the app bundle", hint: "This is the correct answer" },
-    { text: "To manage dependencies", hint: "That's not related to asset bundling" },
+    {
+      text: "To organize project structure",
+      hint: "That's not the main purpose",
+    },
+    {
+      text: "To include resources in the app bundle",
+      hint: "This is the correct answer",
+    },
+    {
+      text: "To manage dependencies",
+      hint: "That's not related to asset bundling",
+    },
   ]}
   correctOption={2}
 />
@@ -216,6 +234,7 @@ Let's test your understanding of today's concepts:
 ## Mini-Challenge: Asset Management App
 
 Create an app that:
+
 1. Uses custom fonts for different text styles
 2. Loads and displays images from assets
 3. Reads and displays JSON data
@@ -363,4 +382,4 @@ class _AssetManagementScreenState extends State<AssetManagementScreen> {
 - Error handling is crucial for asset loading
 - Consider asset resolution for different devices
 
-Tomorrow, we'll explore styling and theming in Flutter! 
+Tomorrow, we'll explore styling and theming in Flutter!

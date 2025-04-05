@@ -16,18 +16,18 @@ class Person {
   // Properties (instance variables)
   String name;
   int age;
-  
+
   // Constructor
   Person(this.name, this.age);
-  
+
   // Methods
   void sayHello() {
     print('Hello, my name is $name');
   }
-  
+
   // Getter
   String get info => '$name is $age years old';
-  
+
   // Setter
   set setAge(int value) {
     if (value >= 0) {
@@ -47,18 +47,18 @@ void main() {
 
 ### Private Members
 
-Dart uses the underscore (_) prefix to make members private:
+Dart uses the underscore (\_) prefix to make members private:
 
 ```dart
 class BankAccount {
   String _accountNumber; // Private property
   double _balance; // Private property
-  
+
   BankAccount(this._accountNumber, this._balance);
-  
+
   // Public getter
   double get balance => _balance;
-  
+
   // Public method
   void deposit(double amount) {
     if (amount > 0) {
@@ -78,13 +78,13 @@ Dart provides several types of constructors:
 class Car {
   String brand;
   String model;
-  
+
   // Default constructor
   Car(this.brand, this.model);
-  
+
   // Named constructor
   Car.toyota(this.model) : brand = 'Toyota';
-  
+
   // Factory constructor
   factory Car.fromJson(Map<String, dynamic> json) {
     return Car(json['brand'], json['model']);
@@ -98,7 +98,7 @@ class Car {
 class Point {
   final double x;
   final double y;
-  
+
   Point(double x, double y)
       : x = x,
         y = y,
@@ -116,9 +116,9 @@ Dart supports single inheritance and interfaces.
 ```dart
 class Animal {
   String name;
-  
+
   Animal(this.name);
-  
+
   void makeSound() {
     print('Some sound');
   }
@@ -126,14 +126,14 @@ class Animal {
 
 class Dog extends Animal {
   String breed;
-  
+
   Dog(String name, this.breed) : super(name);
-  
+
   @override
   void makeSound() {
     print('Woof!');
   }
-  
+
   void fetch() {
     print('$name is fetching the ball');
   }
@@ -156,12 +156,12 @@ abstract class Shape {
 
 class Circle extends Shape {
   final double radius;
-  
+
   Circle(this.radius);
-  
+
   @override
   double get area => 3.14 * radius * radius;
-  
+
   @override
   double get perimeter => 2 * 3.14 * radius;
 }
@@ -169,12 +169,12 @@ class Circle extends Shape {
 class Rectangle extends Shape {
   final double width;
   final double height;
-  
+
   Rectangle(this.width, this.height);
-  
+
   @override
   double get area => width * height;
-  
+
   @override
   double get perimeter => 2 * (width + height);
 }
@@ -225,7 +225,7 @@ mixin Flying {
 
 class Duck extends Animal with Swimming, Flying {
   Duck(String name) : super(name);
-  
+
   @override
   void makeSound() {
     print('Quack!');
@@ -247,11 +247,11 @@ Static members belong to the class itself, not to instances:
 ```dart
 class MathUtils {
   static const double pi = 3.14159;
-  
+
   static double square(double number) {
     return number * number;
   }
-  
+
   static double sum(List<double> numbers) {
     return numbers.reduce((a, b) => a + b);
   }
@@ -271,9 +271,18 @@ Let's test your understanding of today's concepts:
 <MCQ
   question="What is the purpose of the 'extends' keyword in Dart?"
   options={[
-    { text: "To create a new class", hint: "That's what the 'class' keyword does" },
-    { text: "To implement an interface", hint: "That's what the 'implements' keyword does" },
-    { text: "To inherit from another class", hint: "This is the correct definition" },
+    {
+      text: "To create a new class",
+      hint: "That's what the 'class' keyword does",
+    },
+    {
+      text: "To implement an interface",
+      hint: "That's what the 'implements' keyword does",
+    },
+    {
+      text: "To inherit from another class",
+      hint: "This is the correct definition",
+    },
     { text: "To create a mixin", hint: "That's what the 'mixin' keyword does" },
   ]}
   correctOption={2}
@@ -282,10 +291,22 @@ Let's test your understanding of today's concepts:
 <MCQ
   question="Which of the following is true about abstract classes in Dart?"
   options={[
-    { text: "They can be instantiated directly", hint: "Abstract classes cannot be instantiated" },
-    { text: "They must implement all methods", hint: "Abstract classes can have abstract methods" },
-    { text: "They can have both abstract and concrete methods", hint: "This is the correct definition" },
-    { text: "They can only have abstract methods", hint: "Abstract classes can have concrete methods" },
+    {
+      text: "They can be instantiated directly",
+      hint: "Abstract classes cannot be instantiated",
+    },
+    {
+      text: "They must implement all methods",
+      hint: "Abstract classes can have abstract methods",
+    },
+    {
+      text: "They can have both abstract and concrete methods",
+      hint: "This is the correct definition",
+    },
+    {
+      text: "They can only have abstract methods",
+      hint: "Abstract classes can have concrete methods",
+    },
   ]}
   correctOption={2}
 />
@@ -293,10 +314,22 @@ Let's test your understanding of today's concepts:
 <MCQ
   question="What is the purpose of mixins in Dart?"
   options={[
-    { text: "To create new classes", hint: "That's what the 'class' keyword does" },
-    { text: "To implement interfaces", hint: "That's what the 'implements' keyword does" },
-    { text: "To reuse code across multiple class hierarchies", hint: "This is the correct definition" },
-    { text: "To create abstract classes", hint: "That's what the 'abstract' keyword does" },
+    {
+      text: "To create new classes",
+      hint: "That's what the 'class' keyword does",
+    },
+    {
+      text: "To implement interfaces",
+      hint: "That's what the 'implements' keyword does",
+    },
+    {
+      text: "To reuse code across multiple class hierarchies",
+      hint: "This is the correct definition",
+    },
+    {
+      text: "To create abstract classes",
+      hint: "That's what the 'abstract' keyword does",
+    },
   ]}
   correctOption={2}
 />
@@ -323,34 +356,34 @@ abstract class Shape {
 
 class Circle extends Shape {
   final double radius;
-  
+
   Circle(this.radius);
-  
+
   @override
   double get area => 3.14 * radius * radius;
-  
+
   @override
   double get perimeter => 2 * 3.14 * radius;
-  
+
   @override
   String get name => 'Circle';
 }
 
 class ShapeCalculator {
   final List<Shape> shapes = [];
-  
+
   void addShape(Shape shape) {
     shapes.add(shape);
   }
-  
+
   double get totalArea {
     return shapes.fold(0, (sum, shape) => sum + shape.area);
   }
-  
+
   Shape get largestShape {
     return shapes.reduce((a, b) => a.area > b.area ? a : b);
   }
-  
+
   void printShapes() {
     shapes.forEach((shape) {
       print('${shape.name}:');
@@ -372,4 +405,4 @@ class ShapeCalculator {
 - Mixins allow code reuse across multiple class hierarchies
 - Static members belong to the class itself, not instances
 
-Tomorrow, we'll start exploring Flutter's widget system and begin building our first Flutter application! 
+Tomorrow, we'll start exploring Flutter's widget system and begin building our first Flutter application!

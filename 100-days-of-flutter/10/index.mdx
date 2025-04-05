@@ -216,7 +216,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
-  
+
   final List<Widget> _screens = [
     HomeScreen(),
     ProfileScreen(),
@@ -290,10 +290,19 @@ Let's test your understanding of today's concepts:
 <MCQ
   question="What is the main difference between Navigator.push and Navigator.pushNamed?"
   options={[
-    { text: "pushNamed is faster", hint: "Performance is not the main difference" },
-    { text: "pushNamed uses predefined routes", hint: "This is the correct answer" },
+    {
+      text: "pushNamed is faster",
+      hint: "Performance is not the main difference",
+    },
+    {
+      text: "pushNamed uses predefined routes",
+      hint: "This is the correct answer",
+    },
     { text: "pushNamed can't pass data", hint: "Both can pass data" },
-    { text: "pushNamed is newer", hint: "Both have been available since Flutter's inception" },
+    {
+      text: "pushNamed is newer",
+      hint: "Both have been available since Flutter's inception",
+    },
   ]}
   correctOption={1}
 />
@@ -312,9 +321,18 @@ Let's test your understanding of today's concepts:
 <MCQ
   question="What is the purpose of MaterialPageRoute?"
   options={[
-    { text: "To create a new screen", hint: "That's what StatelessWidget/StatefulWidget does" },
-    { text: "To define the navigation animation and behavior", hint: "This is the correct answer" },
-    { text: "To handle state management", hint: "That's what StatefulWidget does" },
+    {
+      text: "To create a new screen",
+      hint: "That's what StatelessWidget/StatefulWidget does",
+    },
+    {
+      text: "To define the navigation animation and behavior",
+      hint: "This is the correct answer",
+    },
+    {
+      text: "To handle state management",
+      hint: "That's what StatefulWidget does",
+    },
     { text: "To style the screen", hint: "That's what Theme does" },
   ]}
   correctOption={1}
@@ -323,6 +341,7 @@ Let's test your understanding of today's concepts:
 ## Mini-Challenge: Multi-Screen Todo App
 
 Create a multi-screen todo app that:
+
 1. Shows a list of todos on the main screen
 2. Allows adding new todos on a separate screen
 3. Shows todo details on another screen
@@ -454,7 +473,7 @@ class TodoDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final todo = ModalRoute.of(context)!.settings.arguments as Todo;
-    
+
     return Scaffold(
       appBar: AppBar(title: Text('Todo Details')),
       body: Padding(
@@ -494,4 +513,4 @@ class TodoDetailsScreen extends StatelessWidget {
 - Consider using named routes for complex navigation
 - Remember to clean up resources when navigating
 
-Tomorrow, we'll explore forms and user input in Flutter! 
+Tomorrow, we'll explore forms and user input in Flutter!

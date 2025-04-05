@@ -36,6 +36,7 @@ class MyApp extends StatelessWidget {
 ```
 
 In this example:
+
 - `MyApp` is the root widget
 - `MaterialApp` provides the app's theme and navigation
 - `Scaffold` provides the basic app structure
@@ -52,12 +53,12 @@ Stateless widgets are widgets that don't maintain any state. They are immutable 
 ```dart
 class WelcomeCard extends StatelessWidget {
   final String name;
-  
+
   const WelcomeCard({
     super.key,
     required this.name,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -88,6 +89,7 @@ class WelcomeCard extends StatelessWidget {
 ### Common Stateless Widgets
 
 1. **Container**
+
 ```dart
 Container(
   width: 100,
@@ -103,6 +105,7 @@ Container(
 ```
 
 2. **Row and Column**
+
 ```dart
 Row(
   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -124,6 +127,7 @@ Column(
 ```
 
 3. **Stack**
+
 ```dart
 Stack(
   children: [
@@ -213,10 +217,22 @@ Let's test your understanding of today's concepts:
 <MCQ
   question="What is the main difference between StatelessWidget and StatefulWidget?"
   options={[
-    { text: "StatelessWidget is faster", hint: "Performance is not the main difference" },
-    { text: "StatelessWidget can't have children", hint: "StatelessWidget can have children" },
-    { text: "StatelessWidget doesn't maintain state", hint: "This is the correct definition" },
-    { text: "StatelessWidget can't be styled", hint: "StatelessWidget can be styled" },
+    {
+      text: "StatelessWidget is faster",
+      hint: "Performance is not the main difference",
+    },
+    {
+      text: "StatelessWidget can't have children",
+      hint: "StatelessWidget can have children",
+    },
+    {
+      text: "StatelessWidget doesn't maintain state",
+      hint: "This is the correct definition",
+    },
+    {
+      text: "StatelessWidget can't be styled",
+      hint: "StatelessWidget can be styled",
+    },
   ]}
   correctOption={2}
 />
@@ -235,10 +251,22 @@ Let's test your understanding of today's concepts:
 <MCQ
   question="What is the purpose of the build method in a StatelessWidget?"
   options={[
-    { text: "To initialize the widget", hint: "That's what the constructor does" },
-    { text: "To define the widget's UI structure", hint: "This is the correct definition" },
-    { text: "To handle user interactions", hint: "That's handled by callbacks" },
-    { text: "To manage the widget's state", hint: "StatelessWidget doesn't manage state" },
+    {
+      text: "To initialize the widget",
+      hint: "That's what the constructor does",
+    },
+    {
+      text: "To define the widget's UI structure",
+      hint: "This is the correct definition",
+    },
+    {
+      text: "To handle user interactions",
+      hint: "That's handled by callbacks",
+    },
+    {
+      text: "To manage the widget's state",
+      hint: "StatelessWidget doesn't manage state",
+    },
   ]}
   correctOption={1}
 />
@@ -262,14 +290,14 @@ class ProfileCard extends StatelessWidget {
   final String name;
   final String bio;
   final String avatarUrl;
-  
+
   const ProfileCard({
     super.key,
     required this.name,
     required this.bio,
     required this.avatarUrl,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -330,4 +358,4 @@ class ProfileCard extends StatelessWidget {
 - Common widgets like Container, Row, Column, and Stack help in layout
 - The build method defines a widget's UI structure
 
-Tomorrow, we'll explore StatefulWidgets and learn how to create interactive UI elements! 
+Tomorrow, we'll explore StatefulWidgets and learn how to create interactive UI elements!
