@@ -1,4 +1,15 @@
-# Hacking with flutter docs
+<div align="center">
+<img src="./hwf.svg" alt="Logo">
+  <h1 align="center" >Hacking with Flutter</h1>
+  <p align="center">
+    Hacking with Flutter is a place where anyone can learn Flutter at their own pace.
+    <br />
+    <br />
+    <a href="https://hackingwithflutter.com">Website</a>
+    ·
+    <a href="https://hackingwithflutter.com/community">Community</a>
+  </p>
+</div>
 
 [![License: CC BY-SA 4.0](https://img.shields.io/badge/License-CC%20BY--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-sa/4.0/)
 
