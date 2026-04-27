@@ -1,0 +1,35 @@
+---
+title: "Introduction to OOP"
+description: "Learn the core principles of object-oriented programming: classes, objects, encapsulation, and more."
+---
+
+## What is OOP?
+
+Object-oriented programming (OOP) organizes code around objects — instances of classes that bundle data and behavior together.
+
+## Classes and Objects
+
+```dart title="person.dart"
+class Person {
+  String name;
+  int age;
+
+  Person(this.name, this.age);
+
+  void greet() {
+    print('Hi, I am $name and I am $age years old.');
+  }
+}
+
+void main() {
+  final person = Person('Alice', 30);
+  person.greet();
+}
+```
+
+## The Four Pillars
+
+- **Encapsulation** — bundle data and methods, hide internal state
+- **Abstraction** — expose only what is necessary
+- **Inheritance** — share behavior across related classes
+- **Polymorphism** — use a common interface for different types
