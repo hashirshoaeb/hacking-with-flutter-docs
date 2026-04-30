@@ -1,0 +1,276 @@
+---
+title: "Classes and Objects in Depth"
+description: "Learn how fields, methods, and constructors work in Dart, including const, factory, and static members."
+---
+
+In Lesson 1, you created a `Person` class with a hardcoded name.
+
+```dart
+class Person {
+  String name = "Hashir";
+}
+```
+
+That's fine for one person. But what if you want to create a person named "Ali"? Or "Sara"?
+
+You need a way to pass data in when you create an object. That is what a constructor is for.
+
+But before we get there, let's look more closely at what lives inside a class.
+
+## Fields
+
+A **field** is a variable that belongs to an object.
+
+```dart
+class Person {
+  String name = "Hashir";  // field
+  int age = 25;            // also a field
+}
+```
+
+Every object you create from `Person` gets its own copy of `name` and `age`. They don't share. They are completely independent.
+
+| Field
+| Noun. A variable that belongs to an object. Also called a property.
+
+## Methods
+
+A **method** is a function that belongs to an object.
+
+```dart
+class Person {
+  String name = "Hashir";
+
+  void greet() {             // method
+    print("Hi, I am $name.");
+  }
+}
+```
+
+You call a method using a dot after the object: `person.greet()`.
+
+| Method
+| Noun. A function that belongs to an object.
+
+## Constructors
+
+Right now, every `Person` has the same hardcoded name. That's not very useful.
+
+A **constructor** is a special function that runs the moment you create an object. It lets you pass in your own values.
+
+| Constructor
+| Noun. A function that runs when an object is created, used to set its initial data.
+
+Here is `Person` with a constructor:
+
+```dart
+class Person {
+  String name;
+  int age;
+
+  Person(this.name, this.age);  // constructor
+}
+```
+
+Now you can create different people:
+
+```dart
+void main() {
+  final person1 = Person("Ali", 21);
+  final person2 = Person("Sara", 19);
+
+  print(person1.name);  // Ali
+  print(person2.name);  // Sara
+}
+```
+
+`person1` and `person2` are independent objects. Each has its own copy of `name` and `age`.
+
+Here is what that looks like in memory:
+
+```text
+Class: Person  ...  template (one copy)
+
+Instance 1             Instance 2
++--------------+       +--------------+
+| name: "Ali"  |       | name: "Sara" |
+| age:  21     |       | age:  19     |
++--------------+       +--------------+
+```
+
+One class. Two objects. Independent data.
+
+Let's look at the constructor syntax more closely.
+
+```dart
+Person(this.name, this.age);
+```
+
+`this.name` is a shorthand. It means: "take the parameter called `name` and assign it to the field called `name` on this object."
+
+Without the shorthand, you'd write:
+
+```dart
+Person(String name, int age) {
+  this.name = name;
+  this.age = age;
+}
+```
+
+Both versions do exactly the same thing. The shorthand is what you'll see in most Dart code.
+
+## The `this` keyword
+
+`this` refers to the current object. The specific instance being created or used right now.
+
+Most of the time, you don't need to write `this` explicitly. Inside `greet()`, writing `name` already means the `name` field on this object. But when a parameter and a field share the same name, `this` is the only way to tell them apart.
+
+```dart
+Person(String name, int age) {
+  this.name = name;  // this.name is the field, name is the parameter
+  this.age = age;
+}
+```
+
+Without `this`, the parameter shadows the field and the assignment goes nowhere useful.
+
+The shorthand `Person(this.name, this.age)` handles this automatically.
+
+## Named constructors
+
+What if you want to create a `Person` when you don't have a name yet?
+
+Dart lets you define multiple constructors on the same class by giving them names.
+
+```dart
+class Person {
+  String name;
+  int age;
+
+  Person(this.name, this.age);
+
+  Person.anonymous() : this("Anonymous", 0);   // named constructor
+}
+```
+
+The `: this("Anonymous", 0)` part redirects to the default constructor with default values. You don't have to repeat the field assignments. The default constructor handles them.
+
+Now you can create a person two ways:
+
+```dart
+void main() {
+  final real = Person("Ali", 21);     // default constructor
+  final anon = Person.anonymous();    // named constructor
+
+  print(real.name);   // Ali
+  print(anon.name);   // Anonymous
+}
+```
+
+Named constructors are useful whenever you have a common creation pattern that deserves its own name.
+
+## const constructors
+
+You have used `const` before for values that never change at compile time. The same idea applies to objects.
+
+When every field in a class is `final`, you can mark the constructor as `const`. Dart will then guarantee that two calls with the same values return the same object.
+
+```dart
+class Point {
+  final int x;
+  final int y;
+
+  const Point(this.x, this.y);  // const constructor
+}
+```
+
+```dart
+void main() {
+  const p1 = Point(0, 0);
+  const p2 = Point(0, 0);
+
+  print(identical(p1, p2));  // true. Dart reuses the same instance
+}
+```
+
+Without `const`, `p1` and `p2` would be two separate objects that happen to hold the same data. With `const`, Dart keeps only one.
+
+This only works when all fields are `final`. If any field can change after creation, `const` is not allowed.
+
+## Static members
+
+Everything we have covered so far belongs to an **instance**. Each `Person` object has its own `name`, its own `age`, its own data.
+
+But sometimes you want data or behavior that belongs to the **class itself**, shared across every instance.
+
+That is what `static` is for.
+
+```dart
+class Person {
+  String name;
+  int age;
+
+  static int totalPeopleCreated = 0;  // belongs to the class, not any instance
+
+  Person(this.name, this.age) {
+    totalPeopleCreated++;
+  }
+}
+```
+
+You access static members using the class name directly, not through an object:
+
+```dart
+void main() {
+  final p1 = Person("Ali", 21);
+  final p2 = Person("Sara", 19);
+
+  print(Person.totalPeopleCreated);  // 2
+}
+```
+
+`totalPeopleCreated` does not belong to `p1` or `p2`. It belongs to `Person` the class. Both objects share it.
+
+Static methods work the same way. You call them on the class: `Person.someStaticMethod()`. You don't need an instance.
+
+## Factory constructors
+
+A regular constructor always creates a brand-new object. A **factory constructor** can return any instance it wants. It might return one you already made.
+
+A common use is the **singleton pattern**, where you want exactly one instance of a class to exist for the whole program. A database connection, for example.
+
+```dart
+class Database {
+  static final Database _instance = Database._internal();  // built once, on first access
+
+  Database._internal();        // private named constructor, only callable from inside
+
+  factory Database() => _instance;   // every call returns the same instance
+}
+```
+
+```dart
+void main() {
+  final a = Database();
+  final b = Database();
+
+  print(identical(a, b));  // true. Same instance both times
+}
+```
+
+The first time anyone writes `Database()`, Dart builds `_instance` using the private `Database._internal()` constructor. Every call after that, the factory just hands back the one we already have.
+
+You write `factory` instead of the class name to tell Dart that this constructor may not produce a fresh object.
+
+## Summary
+
+| Concept | What it is |
+|---|---|
+| Field | A variable that belongs to an object |
+| Method | A function that belongs to an object |
+| `this` | Refers to the current object |
+| Default constructor | Runs when you create an object, sets initial field values |
+| Named constructor | A second (or third) constructor with its own name |
+| `const` constructor | Returns a shared canonical instance for the same inputs |
+| Factory constructor | Can return any instance, including cached or computed ones |
+| Static member | Belongs to the class itself, not to any instance |

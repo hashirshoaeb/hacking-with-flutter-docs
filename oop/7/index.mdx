@@ -1,0 +1,149 @@
+---
+title: "Mixins"
+description: "Learn how to compose reusable behavior across unrelated classes in Dart using mixins and the with keyword."
+---
+
+You know inheritance. One class can extend another and get its behavior.
+
+But inheritance has a limit. Dart only allows one parent.
+
+Now consider this: a `Duck` can fly and swim. A `Plane` can fly but cannot swim. A `Fish` can swim but cannot fly.
+
+You cannot model this with inheritance. If `Duck extends FlyingThing`, you lose the swimming. If `Duck extends SwimmingThing`, you lose the flying.
+
+You need a way to add abilities from multiple sources. That is what mixins do.
+
+## The stand-mixer analogy
+
+Think about a stand mixer in a kitchen.
+
+The mixer base stays the same. But you can snap on different attachments: a pasta maker, a meat grinder, an ice-cream churner. Each attachment adds a new ability to the same machine. The machine does not change. It just gains new capabilities.
+
+Mixins work the same way. A class stays what it is. You attach reusable pieces of behavior to it.
+
+## Defining a mixin
+
+You define a mixin with the `mixin` keyword.
+
+```dart
+mixin Flyable {
+  void fly() {
+    print("$runtimeType is flying.");
+  }
+}
+
+mixin Swimmable {
+  void swim() {
+    print("$runtimeType is swimming.");
+  }
+}
+```
+
+A mixin is like a class, but you do not instantiate it directly. It is only ever used as an addition to something else.
+
+## Using a mixin with `with`
+
+You attach mixins to a class using the `with` keyword.
+
+```dart
+class Animal {
+  String name;
+  Animal(this.name);
+}
+
+class Duck extends Animal with Flyable, Swimmable {
+  Duck(String name) : super(name);
+}
+
+class Plane with Flyable {
+  void takeOff() => print("Plane taking off.");
+}
+```
+
+```dart
+void main() {
+  final duck = Duck("Donald");
+  duck.fly();    // Donald is flying.
+  duck.swim();   // Donald is swimming.
+
+  final plane = Plane();
+  plane.fly();   // Plane is flying.
+}
+```
+
+`Duck` gets both `fly()` and `swim()`. `Plane` gets only `fly()`. The behaviors are reusable and composable.
+
+| Mixin
+| Noun. A reusable bundle of behavior that can be attached to any class, regardless of its position in the inheritance tree.
+
+## Multiple mixins and order
+
+You can apply multiple mixins to one class by separating them with commas.
+
+```dart
+class Duck extends Animal with Flyable, Swimmable {
+  ...
+}
+```
+
+If two mixins define a method with the same name, the **rightmost one wins**. The last mixin in the list takes precedence. This is rarely a problem in practice, but good to know.
+
+## The `on` keyword
+
+Sometimes a mixin only makes sense on a specific type of class. The `on` keyword restricts which classes the mixin can be applied to.
+
+```dart
+mixin Gradeable on Animal {
+  void assignGrade(int grade) {
+    print("$name received grade $grade.");  // can use Animal's name field
+  }
+}
+```
+
+`Gradeable on Animal` means: "this mixin can only be applied to subclasses of `Animal`." Inside the mixin, you can safely access anything `Animal` has.
+
+```dart
+class Student extends Animal with Gradeable {
+  Student(String name) : super(name);
+}
+```
+
+Without `on`, the mixin would have no way to know that `name` exists on the host class.
+
+## When to use which
+
+| Situation | Use |
+|---|---|
+| "Is-a" relationship, share implementation | `extends` |
+| Conform to a contract only | `implements` |
+| Add reusable behavior to unrelated classes | `with` (mixin) |
+| Define an abstract contract with some shared code | `abstract class` with `extends` |
+
+If your classes share an identity, use `extends`. If they share a capability, use a mixin.
+
+## Summary
+
+| Concept | What it is |
+|---|---|
+| `mixin` | A reusable bundle of behavior defined outside any class hierarchy |
+| `with` | Attaches one or more mixins to a class |
+| `on` | Restricts a mixin to subclasses of a specific type |
+| Multiple mixins | Separated by commas; rightmost wins on name conflicts |
+
+## Where you'll see all of this in Flutter
+
+You now have the complete OOP toolkit. Before you move to Flutter, here is where each concept shows up in the framework.
+
+**Classes and constructors.** Every Flutter widget is a class. `const Text("Hello")` works because `Text` has a `const` constructor, the same kind you learned in Lesson 2. `Color.fromARGB(...)` and `Image.network(...)` are factory constructors.
+
+**Encapsulation.** When you write a stateful widget, you will create a class called `_MyHomePageState`. That underscore is not an accident. State is private by design, exactly what you learned in Lesson 3.
+
+**Inheritance.** Every widget extends `Widget`. Then either `StatelessWidget` or `StatefulWidget`. The whole Flutter framework is built on `extends`.
+
+**Abstraction.** `Widget` itself is abstract. So is `StatelessWidget`. You never create a `Widget` directly. You always work with concrete subclasses: `Container`, `Text`, `Scaffold`, or your own.
+
+**Polymorphism.** `Container(child: ...)` accepts any `Widget`. `ListView.builder` returns a different widget for each row. The entire UI tree is polymorphism in motion. Each widget responds to `build()` in its own way.
+
+**Mixins.** The first time you build an animation in Flutter, you will write `with SingleTickerProviderStateMixin`. It adds a `Ticker` to your state class, the heartbeat that drives the animation. That is exactly what you learned in this lesson.
+
+You now have the toolkit. Every Flutter pattern you will meet builds on these concepts. Next stop: Flutter.

@@ -1,0 +1,169 @@
+---
+title: "Abstract Classes and Interfaces"
+description: "Learn how to define class shapes without implementations in Dart using abstract classes and the implements keyword."
+---
+
+You want every `Shape` to have an `area()` method.
+
+But here is the problem. What do you write inside `area()` for the base `Shape`?
+
+A circle uses `π × r²`. A rectangle uses `width × height`. A triangle uses something else entirely. There is no single formula. The base `Shape` has nothing meaningful to put there.
+
+You need a way to say: "every Shape must have an `area()`, but I'm not going to define how."
+
+That is what an abstract class does.
+
+## The job description analogy
+
+Think about a job description.
+
+It defines what the role does. "This position will handle client calls, produce monthly reports, and manage the sales pipeline." But the job description itself does not make any calls. It does not write any reports. It cannot.
+
+Only when you hire someone, a concrete person, does the work actually happen.
+
+An abstract class is the job description. A concrete subclass is the employee.
+
+## The `abstract` keyword
+
+You mark a class as abstract by adding the `abstract` keyword before `class`.
+
+```dart
+abstract class Shape {
+  double area();  // abstract method: no body, just a signature
+}
+```
+
+Two things change when a class is abstract:
+
+1. You cannot create an instance of it directly.
+2. Any method without a body is an **abstract method**, and subclasses must implement it.
+
+Try to create a `Shape` directly and Dart stops you:
+
+```dart
+void main() {
+  Shape s = Shape();  // Error: Abstract classes can't be instantiated.
+}
+```
+
+| Abstract class
+| Noun. A class that cannot be instantiated directly. It defines a contract that subclasses must fulfill.
+
+| Abstract method
+| Noun. A method with no body. Subclasses must provide the implementation.
+
+## Concrete subclasses
+
+To use an abstract class, you extend it and implement its abstract methods.
+
+```dart
+class Circle extends Shape {
+  final double radius;
+
+  Circle(this.radius);
+
+  @override
+  double area() => 3.14159 * radius * radius;
+}
+
+class Rectangle extends Shape {
+  final double width;
+  final double height;
+
+  Rectangle(this.width, this.height);
+
+  @override
+  double area() => width * height;
+}
+```
+
+If a subclass forgets to implement `area()`, Dart gives an error. The contract is enforced at compile time.
+
+```dart
+class Triangle extends Shape {
+  // forgot area(). Error: Missing concrete implementation of 'Shape.area'.
+}
+```
+
+## Concrete methods on abstract classes
+
+Abstract classes can also have regular methods with bodies. Those get inherited just like normal.
+
+```dart
+abstract class Shape {
+  double area();
+
+  void describe() {                        // concrete method: has a body
+    print("This shape has area: ${area()}");
+  }
+}
+```
+
+`Circle` and `Rectangle` both inherit `describe()` without writing it themselves.
+
+## extends vs implements
+
+You have been using `extends` to inherit from a class. But Dart also has `implements`.
+
+They do different things.
+
+| | extends | implements |
+|---|---|---|
+| Inherits method implementations? | Yes | No, must rewrite every member |
+| Can have multiple parents? | No, one only | Yes, many allowed |
+| Calls `super`? | Yes | No |
+| When to use | Reuse parent behavior | Conform to a contract only |
+
+Use `extends` when you want to inherit working code from a parent.
+
+Use `implements` when you only care that a class has certain methods. You don't need the implementation.
+
+```dart
+class Square implements Shape {
+  final double side;
+
+  Square(this.side);
+
+  @override
+  double area() => side * side;  // must write this yourself
+}
+```
+
+`Square implements Shape` means: "I promise to have everything `Shape` requires." No implementation comes along for free. You write it all.
+
+## Every Dart class is implicitly an interface
+
+Here is something that surprises most people.
+
+In Dart, every class automatically acts as an interface. You can `implements` any class, not just ones marked abstract.
+
+```dart
+class Greeter {
+  void hello(String name) {
+    print("Hello, $name.");
+  }
+}
+
+class LoudGreeter implements Greeter {
+  @override
+  void hello(String name) {
+    print("HELLO, ${name.toUpperCase()}!");  // must rewrite everything
+  }
+}
+```
+
+`LoudGreeter` does not extend `Greeter`. It implements it. So it inherits no code at all. It just promises to have a `hello(String)` method, and you write that method from scratch.
+
+Why does this matter? Because you can adopt any class as a contract, even classes from a third-party library that you cannot modify. If a package exposes a regular `User` class, you can write your own `FakeUser` that `implements User` for testing, without inheriting any of the original code.
+
+You will not reach for this often. But when you need it, it is there.
+
+## Summary
+
+| Concept | What it is |
+|---|---|
+| Abstract class | A class that cannot be instantiated; defines contracts for subclasses |
+| Abstract method | A method with no body; subclasses must implement it |
+| `extends` | Inherits both the contract and the implementation from one parent |
+| `implements` | Adopts only the contract; you write all implementations yourself |
+| Implicit interface | Every Dart class is automatically usable as an interface |

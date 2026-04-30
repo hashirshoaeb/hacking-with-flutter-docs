@@ -1,0 +1,159 @@
+---
+title: "Polymorphism"
+description: "Learn how polymorphism lets different objects respond to the same method call in their own way in Dart."
+---
+
+You have `Circle` and `Rectangle` from Lesson 5. Both extend `Shape`. Both have `area()`.
+
+Now put them in a list and loop over them.
+
+```dart
+void main() {
+  List<Shape> shapes = [
+    Circle(5),
+    Rectangle(3, 4),
+  ];
+
+  for (final shape in shapes) {
+    print(shape.area());
+  }
+}
+```
+
+Output:
+
+```text
+78.53975
+12.0
+```
+
+The loop calls `area()` on each shape. It does not know which shape it is holding. It does not check. It just calls the method and each object responds in its own way.
+
+That is polymorphism.
+
+## The power outlet analogy
+
+Think about a wall outlet.
+
+Every device uses the same socket. A lamp, a kettle, a phone charger. They all plug in the same way. But when you switch them on, each one does something completely different. The lamp lights up. The kettle boils. The charger charges.
+
+The outlet doesn't know which device is plugged in. It doesn't need to. It just provides the interface. Each device decides what to do with it.
+
+Your `for` loop is the outlet. `shape.area()` is the plug. Each shape decides how to respond.
+
+| Polymorphism
+| Noun. The ability of different objects to respond to the same method call, each in their own way.
+
+## Adding a new shape changes nothing
+
+Here is the real payoff.
+
+Add a `Triangle`. The loop still works. You change nothing about the calling code.
+
+```dart
+class Triangle extends Shape {
+  final double base;
+  final double height;
+
+  Triangle(this.base, this.height);
+
+  @override
+  double area() => 0.5 * base * height;
+}
+```
+
+```dart
+void main() {
+  List<Shape> shapes = [
+    Circle(5),
+    Rectangle(3, 4),
+    Triangle(6, 8),   // just add it here
+  ];
+
+  for (final shape in shapes) {
+    print(shape.area());  // loop unchanged
+  }
+}
+```
+
+You extended the system by adding a class. The existing code required zero edits. That is the win.
+
+## What is actually happening
+
+When you write `shape.area()`, the variable `shape` is declared as type `Shape`. But at runtime, it holds a `Circle` or a `Rectangle` or a `Triangle`.
+
+Dart looks at the **actual type at runtime** to decide which `area()` to call. Not the declared type. The real one.
+
+This is called **dynamic dispatch**.
+
+| Dynamic dispatch
+| Noun. The process of deciding at runtime which method implementation to call, based on the actual type of the object.
+
+```dart
+Shape shape = Circle(5);    // declared as Shape
+shape.area();               // but Circle's area() runs. Runtime type wins.
+```
+
+## The `is` operator
+
+Sometimes you need to check what type an object actually is at runtime.
+
+```dart
+void main() {
+  Shape shape = Circle(5);
+
+  if (shape is Circle) {
+    print("It's a circle.");
+  } else if (shape is Rectangle) {
+    print("It's a rectangle.");
+  }
+}
+```
+
+`is` returns `true` if the object is an instance of that type (or a subtype).
+
+```dart
+print(Circle(5) is Shape);   // true. Circle is a Shape
+print(Circle(5) is Circle);  // true
+```
+
+## The `as` operator
+
+`as` casts an object to a more specific type. Use it when you know what type you have but Dart doesn't.
+
+```dart
+Shape shape = Circle(5);
+final circle = shape as Circle;   // cast to Circle
+print(circle.radius);             // now you can access radius
+```
+
+But if you are wrong about the type, Dart throws at runtime.
+
+```dart
+Shape shape = Rectangle(3, 4);
+final circle = shape as Circle;   // throws: type 'Rectangle' is not a subtype of 'Circle'
+```
+
+## Type promotion
+
+Most of the time, you do not need `as` at all. Dart watches your `is` checks and promotes the variable for you.
+
+```dart
+if (shape is Circle) {
+  print(shape.radius);  // no cast needed. Dart already knows shape is a Circle here.
+}
+```
+
+Inside the `if` block, Dart treats `shape` as a `Circle`. You can read `radius` directly. No cast.
+
+This is called **type promotion**. Use `is` to narrow the type, and let Dart handle the rest. Reach for `as` only when you cannot use an `is` check first.
+
+## Summary
+
+| Concept | What it is |
+|---|---|
+| Polymorphism | Different objects responding to the same method call in their own way |
+| Dynamic dispatch | Dart picks which method to run based on the runtime type, not the declared type |
+| `is` | Type test: returns true if the object is that type or a subtype |
+| `as` | Type cast: treats the object as a more specific type; throws if wrong |
+| Type promotion | Dart automatically narrows the type inside an `is` check, so you rarely need `as` |

@@ -1,0 +1,275 @@
+---
+title: "Inheritance"
+description: "Learn how to share behavior across related classes in Dart using extends, super, and override."
+---
+
+You have a `Person` class from Lesson 2.
+
+```dart
+class Person {
+  String name;
+  int age;
+
+  Person(this.name, this.age);
+
+  void greet() {
+    print("Hi, I am $name.");
+  }
+}
+```
+
+Now you need a `Student` and a `Teacher`.
+
+Both have a name. Both have an age. Both can greet. So you copy the code.
+
+```dart
+class Student {
+  String name;
+  int age;
+  int grade;
+
+  Student(this.name, this.age, this.grade);
+
+  void greet() {
+    print("Hi, I am $name.");
+  }
+}
+
+class Teacher {
+  String name;
+  int age;
+  String subject;
+
+  Teacher(this.name, this.age, this.subject);
+
+  void greet() {
+    print("Hi, I am $name.");
+  }
+}
+```
+
+`name`, `age`, `greet()`. Copy-pasted three times now. Fix a bug in `greet()` and you have to fix it in three places. Add a new field to all people and again, three places.
+
+This does not scale.
+
+## The family analogy
+
+Think about a family. A child inherits their parent's eye color and height. But the child is still their own person. They have their own name, their own job, their own life. And they can do things their parents never could.
+
+That is exactly how inheritance works. A child class gets everything from its parent class: fields, methods, behavior. And it can add its own things on top.
+
+## The `extends` keyword
+
+You make one class inherit from another using `extends`.
+
+```dart
+class Student extends Person {
+  int grade;
+
+  Student(String name, int age, this.grade) : super(name, age);
+}
+```
+
+`Student extends Person` means: `Student` is built on top of `Person`. Every field and method that `Person` has, `Student` has too.
+
+| Inheritance
+| Noun. A relationship where one class receives the fields and methods of another.
+
+You can now use `Student` like this:
+
+```dart
+void main() {
+  final student = Student("Ali", 21, 90);
+
+  student.greet();        // Hi, I am Ali.
+  print(student.name);    // Ali
+  print(student.grade);   // 90
+}
+```
+
+`greet()` came from `Person`. You did not write it in `Student`. You inherited it.
+
+## What gets inherited
+
+Fields and methods are inherited. Constructors are not.
+
+Every subclass needs its own constructor. You cannot call `Student("Ali", 21, 90)` unless `Student` defines how to handle those three arguments.
+
+## The `super` keyword
+
+When `Student` is created, `Person` also needs to be set up. The `super` keyword calls the parent's constructor.
+
+```dart
+Student(String name, int age, this.grade) : super(name, age);
+```
+
+Read this as: "Take `name`, `age`, and `grade`. Assign `grade` to this student. Then pass `name` and `age` up to `Person` to handle."
+
+| super
+| Keyword. Refers to the parent class. Used to call the parent's constructor or methods.
+
+## Overriding methods
+
+What if `Student` needs a different greeting? One that mentions they are a student?
+
+You can replace the parent's method with your own using `@override`.
+
+```dart
+class Student extends Person {
+  int grade;
+
+  Student(String name, int age, this.grade) : super(name, age);
+
+  @override
+  void greet() {
+    print("Hi, I am $name and I am a student.");
+  }
+}
+```
+
+```dart
+void main() {
+  final student = Student("Ali", 21, 90);
+  student.greet();  // Hi, I am Ali and I am a student.
+}
+```
+
+The `@override` annotation does two things. It tells Dart you intend to replace the parent's method. And if you mistype the method name, Dart catches it.
+
+```dart
+@override
+void gret() {  // Error: 'gret' is not a method in the superclass
+  ...
+}
+```
+
+Without `@override`, that typo would silently create a brand new method instead of replacing the parent's one. The annotation protects you.
+
+## Calling the parent's method
+
+Sometimes you want to keep the parent's behavior and add to it, not replace it entirely.
+
+`super.methodName()` calls the parent's version from inside your override.
+
+```dart
+class Student extends Person {
+  int grade;
+
+  Student(String name, int age, this.grade) : super(name, age);
+
+  @override
+  void greet() {
+    super.greet();                          // runs Person's greet()
+    print("I am in grade $grade.");        // adds the student part
+  }
+}
+```
+
+```dart
+void main() {
+  final student = Student("Ali", 21, 90);
+  student.greet();
+  // Hi, I am Ali.
+  // I am in grade 90.
+}
+```
+
+## Overriding toString()
+
+Every class in Dart silently extends a base class called `Object`. It comes with a default `toString()` method that runs whenever you print an object.
+
+By default it is not very helpful.
+
+```dart
+void main() {
+  final person = Person("Ali", 21);
+  print(person);  // Instance of 'Person'
+}
+```
+
+You can override it to produce something readable.
+
+```dart
+class Person {
+  String name;
+  int age;
+
+  Person(this.name, this.age);
+
+  void greet() {
+    print("Hi, I am $name.");
+  }
+
+  @override
+  String toString() {
+    return "Person(name: $name, age: $age)";
+  }
+}
+```
+
+```dart
+void main() {
+  final person = Person("Ali", 21);
+  print(person);  // Person(name: Ali, age: 21)
+}
+```
+
+Much better. Overriding `toString()` is a small habit that pays off every time you debug.
+
+## Is-a vs has-a
+
+There are two ways a class can relate to another.
+
+**Is-a:** `Student` is a `Person`. Use `extends`. The subclass is a more specific version of the parent.
+
+**Has-a:** `Student` has an `Address`. The address is a separate object stored as a field.
+
+```dart
+class Student extends Person {   // is-a Person
+  Address address;               // has-a Address
+  int grade;
+  ...
+}
+```
+
+If you can say "A is a B," inheritance fits. If you can say "A has a B," a field fits.
+
+There is a third case: "A can do B". But neither inheritance nor a field quite captures it. That is what mixins are for. We will cover that in Lesson 7.
+
+## Common pitfall
+
+If the parent class has a constructor that takes required arguments, the child must call `super(...)`. Forget it and Dart gives you an error.
+
+```dart
+class Teacher extends Person {
+  String subject;
+
+  Teacher(this.subject);  // forgot to call super. Error!
+}
+```
+
+```
+The superclass 'Person' doesn't have a zero argument constructor.
+```
+
+The fix is to pass the required arguments up:
+
+```dart
+class Teacher extends Person {
+  String subject;
+
+  Teacher(String name, int age, this.subject) : super(name, age);
+}
+```
+
+## Summary
+
+| Concept | What it is |
+|---|---|
+| `extends` | Makes one class inherit fields and methods from another |
+| `super` | Refers to the parent class; used to call its constructor or methods |
+| `super.method()` | Calls the parent's version of a method from inside an override |
+| `@override` | Marks a method as intentionally replacing the parent's version |
+| `toString()` | A method inherited from `Object`; override it for readable output |
+| Is-a | An inheritance relationship: Student is-a Person |
+| Has-a | A field relationship: Student has-a Address |

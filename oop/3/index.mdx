@@ -1,0 +1,211 @@
+---
+title: "Encapsulation"
+description: "Learn how to protect object data in Dart using private fields, getters, and setters, with the ATM analogy."
+---
+
+You built a `Person` class in Lesson 2. It has a `name` and an `age`.
+
+Both fields are public. Anyone using your class can read them and change them.
+
+That includes this:
+
+```dart
+void main() {
+  final person = Person("Ali", 21);
+  person.age = -5;  // perfectly legal
+}
+```
+
+Dart does not complain. `-5` is a valid integer. The assignment goes through.
+
+But a person with age `-5` is nonsense. Your program now holds invalid data, and nothing stopped it from happening.
+
+This is the problem encapsulation solves.
+
+## The ATM analogy
+
+Think about an ATM.
+
+An ATM has buttons you can press. You can check your balance, deposit money, withdraw cash. Those are the **public actions** the machine exposes.
+
+But you cannot open the machine and reach into the vault directly. The vault is hidden. The machine controls all access to it. Before it lets you withdraw anything, it checks your PIN. It checks your balance. It validates the amount.
+
+That's encapsulation. The data (the vault) is hidden. The behavior (the buttons) is public. And the behavior validates before it acts.
+
+Your `BankAccount` class should work the same way.
+
+## Private fields
+
+In Dart, you make a field private by starting its name with an underscore: `_`.
+
+```dart
+class BankAccount {
+  double _balance = 0;  // private: no one outside this library can touch it
+}
+```
+
+Try to access `_balance` from outside, and Dart stops you:
+
+```dart
+// in another file
+void main() {
+  final account = BankAccount();
+  print(account._balance);  // Error: '_balance' isn't accessible in 'main.dart'
+}
+```
+
+The underscore signals: "this is an internal detail. Do not depend on it."
+
+But there is something important to know about how Dart's privacy actually works.
+
+## Library-private, not class-private
+
+In most object-oriented languages, a private field is hidden from all other classes, even ones in the same file.
+
+Dart is different.
+
+In Dart, `_` means **library-private**. Code in the **same file** can still access private fields, even from a different class.
+
+```dart
+// bank_account.dart
+
+class BankAccount {
+  double _balance = 0;
+}
+
+class Auditor {
+  void inspect(BankAccount account) {
+    print(account._balance);  // works: same file, same library
+  }
+}
+```
+
+```dart
+// main.dart
+
+void main() {
+  final account = BankAccount();
+  print(account._balance);  // Error: different file, different library
+}
+```
+
+This is not a bug. It is a deliberate design choice in Dart. The unit of privacy is the **library** (a file or a set of files), not the class.
+
+In practice, you will almost always have one class per file, so library-private and class-private end up feeling the same. But it is good to know the difference.
+
+## Getters
+
+Right now, `_balance` is completely hidden. But what if someone needs to read the current balance? They just cannot change it directly.
+
+A **getter** lets you expose read access to a private field without exposing write access.
+
+```dart
+class BankAccount {
+  double _balance = 0;
+
+  double get balance => _balance;  // read-only access
+}
+```
+
+```dart
+void main() {
+  final account = BankAccount();
+  print(account.balance);   // 0.0. Reading is allowed
+  account.balance = 100;    // Error: no setter exists
+}
+```
+
+The caller can see the balance. They cannot set it directly.
+
+| Getter
+| Noun. A special method that provides read access to a field. Written with the `get` keyword.
+
+## Setters
+
+A **setter** lets you expose write access with your own logic in the middle.
+
+```dart
+class BankAccount {
+  double _balance = 0;
+
+  double get balance => _balance;
+
+  set balance(double amount) {
+    if (amount < 0) {
+      throw ArgumentError("Balance cannot be negative.");
+    }
+    _balance = amount;
+  }
+}
+```
+
+Now instead of raw assignment, every write goes through your validation first.
+
+| Setter
+| Noun. A special method that controls how a field is written. Written with the `set` keyword.
+
+But in practice, you rarely expose a `set balance` at all. You let callers use specific methods like `deposit()` and `withdraw()` that encode the rules of the domain.
+
+## The BankAccount worked example
+
+Here is the complete `BankAccount` class with encapsulation applied:
+
+```dart
+class BankAccount {
+  double _balance = 0;  // private: only this class touches it directly
+
+  double get balance => _balance;  // read-only access for callers
+
+  void deposit(double amount) {
+    if (amount <= 0) {
+      throw ArgumentError("Deposit amount must be positive.");
+    }
+    _balance += amount;
+  }
+
+  void withdraw(double amount) {
+    if (amount <= 0) {
+      throw ArgumentError("Withdrawal amount must be positive.");
+    }
+    if (amount > _balance) {
+      throw StateError("Insufficient funds.");
+    }
+    _balance -= amount;
+  }
+}
+```
+
+```dart
+void main() {
+  final account = BankAccount();
+
+  account.deposit(100);
+  account.withdraw(30);
+
+  print(account.balance);    // 70.0
+
+  account.withdraw(200);     // throws: Insufficient funds.
+}
+```
+
+The caller never touches `_balance` directly. They go through `deposit()` and `withdraw()`. Those methods enforce the rules. Invalid states are impossible from outside.
+
+That is encapsulation in action.
+
+## The rule of thumb
+
+Make fields private by default. Expose only what callers actually need.
+
+If callers need to read a value, add a getter. If they need to change it, write a method that validates first. Keep the raw field hidden.
+
+The less you expose, the fewer places a bug can enter.
+
+## Summary
+
+| Concept | What it is |
+|---|---|
+| Encapsulation | Bundling data and behavior together, and controlling who can access what |
+| Private field | A field starting with `_`, hidden outside the library |
+| Library-private | Dart's privacy model: `_` hides from other files, not other classes in the same file |
+| Getter | Exposes read access to a private field |
+| Setter | Exposes write access with your own validation logic |

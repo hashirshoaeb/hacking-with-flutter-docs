@@ -1,35 +1,135 @@
 ---
-title: "Introduction to OOP"
-description: "Learn the core principles of object-oriented programming: classes, objects, encapsulation, and more."
+title: "What is Object-Oriented Programming?"
+description: "Learn what OOP is, why it exists, and how classes and objects work in Dart, using the cookie cutter analogy."
 ---
 
-## What is OOP?
+Imagine you are building a school management program. You start writing functions.
 
-Object-oriented programming (OOP) organizes code around objects — instances of classes that bundle data and behavior together.
+```dart
+String studentName1 = "Ali";
+String studentName2 = "Sara";
+String studentName3 = "Ravi";
 
-## Classes and Objects
+double getStudentGrade(String name) { ... }
+void setStudentGrade(String name, double grade) { ... }
+void printStudentReport(String name) { ... }
+```
 
-```dart title="person.dart"
+Fifty global variables. Twenty loose functions. No structure.
+
+Add a new feature, say tracking attendance, and you are touching ten different places. Rename a variable and something breaks somewhere you did not expect. The program works.
+
+But it is a wall of code.
+
+## The problem with loose functions
+
+When code is just a collection of functions and global variables, the data and the things that act on it live in completely separate places. `studentName1` is up top. `getStudentGrade` is somewhere in the middle. They belong together, but the language has no idea. Only you do.
+
+And "only you do" is the problem. As the program grows, you spend more time tracking relationships in your head than actually writing code.
+
+## A different way to think about it
+
+Object-oriented programming, OOP for short, is a way of organizing code so that **data and behavior live together**.
+
+Instead of a pile of loose variables and functions, you group them into a single unit called an **object**.
+
+Think about a cookie cutter.
+
+The cutter is just a shape, a template. It doesn't bake anything on its own. But press it into dough and you get a cookie. Press it again, another cookie. Same shape, different sprinkles.
+
+That's exactly how OOP works.
+
+The cookie cutter is the **class**. Each cookie is an **object** (also called an **instance**) of that class.
+
+| Class
+| Noun. A template that defines what an object looks like and what it can do.
+
+| Object
+| Noun. A concrete thing built from a class. Each object has its own copy of the data.
+
+| Instance
+| Noun. Another word for object, used when you want to emphasize "this particular one."
+
+One class. As many objects as you need.
+
+## Your first class
+
+Here is the smallest possible class in Dart:
+
+```dart
 class Person {
-  String name;
-  int age;
-
-  Person(this.name, this.age);
+  String name = "Hashir";  // data
 
   void greet() {
-    print('Hi, I am $name and I am $age years old.');
+    print("Hi, I am $name.");  // behavior
   }
 }
 
 void main() {
-  final person = Person('Alice', 30);
-  person.greet();
+  final person = Person();  // create an object from the class
+  person.greet();           // Output: Hi, I am Hashir.
 }
 ```
 
-## The Four Pillars
+The `Person` class has one piece of data, `name`, and one behavior, `greet()`. They live together, inside the class.
 
-- **Encapsulation** — bundle data and methods, hide internal state
-- **Abstraction** — expose only what is necessary
-- **Inheritance** — share behavior across related classes
-- **Polymorphism** — use a common interface for different types
+To use it, you call `Person()` to create a new object, then call `greet()` on that object.
+
+Don't worry about how to pass your own name in yet. We will cover constructors in Lesson 2.
+
+## Why this is already better
+
+With a class, the data and the behavior that acts on it are in the same place. You don't have to hold their relationship in your head. The language does it for you.
+
+Need 50 students? Still one class.
+
+```dart
+final student1 = Person();
+final student2 = Person();
+final student3 = Person();
+```
+
+Each object is independent. `student1` has its own `name`. `student2` has its own `name`. Change how `greet()` works and all 50 students get the update, in one place.
+
+## The four pillars
+
+OOP is built on four core ideas. You will learn all of them in this course.
+
+**Encapsulation.** Bundle data with the methods that touch it, and control who can change it. *(Lesson 3)*
+
+**Inheritance.** Let one class share behavior with another. *(Lesson 4)*
+
+**Abstraction.** Define the shape of a class without filling in all the details. *(Lesson 5)*
+
+**Polymorphism.** Treat different objects through one shared interface. *(Lesson 6)*
+
+And Dart adds one more.
+
+**Mixins.** Add reusable behavior to a class without inheritance. *(Lesson 7)*
+
+You do not need to understand any of these right now. Just know they exist, and that each one solves a real problem you will run into as your code grows.
+
+## Why this matters for Flutter
+
+Every Flutter widget is a class. `Text`, `Container`, `Column`, all classes. Your own widgets will be classes too. Every screen you have ever seen in a Flutter app is a tree of objects, each one an instance of some class. Without OOP, Flutter doesn't exist. We will come back to specific Flutter patterns in Lesson 7, once you have the full toolkit.
+
+## The course payoff
+
+By the end of this course, you will have built a small school in code. Students and Teachers that share behavior through inheritance. Grade fields that are private so nothing can set them to an invalid value. An abstract `Course` with concrete `MathCourse` and `EnglishCourse` subclasses. A `Searchable` mixin on the Library.
+
+You will write all of that from scratch. And when you do, it will make complete sense.
+
+Let's start in Lesson 2.
+
+## Summary
+
+| Concept | What it is |
+|---|---|
+| Class | A template that defines what an object looks like and what it can do |
+| Object | A concrete thing built from a class, with its own copy of the data |
+| Instance | Another word for object, used to emphasize "this particular one" |
+| Encapsulation | Bundle data with the methods that touch it *(Lesson 3)* |
+| Inheritance | Share behavior across related classes *(Lesson 4)* |
+| Abstraction | Define the shape without filling in all the details *(Lesson 5)* |
+| Polymorphism | Treat different objects through one interface *(Lesson 6)* |
+| Mixins | Add reusable behavior to unrelated classes *(Lesson 7)* |
