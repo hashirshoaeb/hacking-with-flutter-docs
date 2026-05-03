@@ -1,0 +1,139 @@
+---
+title: "Data Types"
+description: "Learn about Dart's four core value types: String, int, double, and bool, and how to write types explicitly."
+---
+
+Not all values are the same kind of thing.
+
+A name is text. An age is a number. A temperature might be a decimal. A yes-or-no answer is something else entirely.
+
+Dart treats each kind of value differently. The kind of value is called its **type**.
+
+## Why types matter
+
+Try this in DartPad:
+
+```dart
+void main() {
+  print('5' + '5'); // 55
+  print(5 + 5);     // 10
+}
+```
+
+Same symbols. Different types. Different results.
+
+`'5'` is text. `5` is a number. Adding text joins it together. Adding numbers does math.
+
+If Dart did not track types, you would never know which result you were going to get.
+
+## String
+
+A `String` is text. You write it inside quotes:
+
+```dart
+void main() {
+  var city = 'Lahore';
+  print(city); // Lahore
+}
+```
+
+Single quotes and double quotes both work. Pick one and be consistent.
+
+A `String` can be empty, one character, or thousands of characters long. It is still a `String`.
+
+There is more you can do with strings. But methods like `.length` and `.toUpperCase()` require classes. We cover them in Lesson 13.
+
+## int
+
+An `int` is a whole number. No decimal point:
+
+```dart
+void main() {
+  var age = 25;
+  var temperature = -3;
+  print(age); // 25
+}
+```
+
+Positive, negative, or zero. As long as there is no decimal point, it is an `int`.
+
+## double
+
+A `double` is a number with a decimal point:
+
+```dart
+void main() {
+  var price = 9.99;
+  var pi = 3.14159;
+  print(price); // 9.99
+}
+```
+
+Even `1.0` is a `double`, not an `int`. The decimal point is what decides.
+
+## bool
+
+A `bool` is either `true` or `false`. Nothing else:
+
+```dart
+void main() {
+  var isLoggedIn = true;
+  var hasError = false;
+  print(isLoggedIn); // true
+}
+```
+
+The name comes from George Boole, a mathematician who studied logic in the 1800s. You will use booleans constantly. Every decision your program makes comes down to one.
+
+## Writing the type explicitly
+
+In Lesson 2 you used `var` and let Dart figure out the type. But you can also write the type yourself:
+
+```dart
+void main() {
+  String name = 'Ali';
+  int age = 25;
+  double score = 98.5;
+  bool passed = true;
+
+  print(name); // Ali
+}
+```
+
+`String name = 'Ali'` and `var name = 'Ali'` produce the same result. The difference is intent. When you write the type, you are saying exactly what kind of value belongs there.
+
+Use explicit types when it makes your intent clear. Use `var` when the type is obvious from the value.
+
+## Type inference is not the same as no type
+
+Here is something important.
+
+When you write `var x = 5`, Dart infers that `x` is an `int`. But it does not forget. That variable is an `int` for the rest of its life.
+
+Try to put text in it:
+
+```dart
+void main() {
+  var x = 5;
+  x = 'hello'; // Error
+}
+```
+
+Dart will stop you:
+
+```
+A value of type 'String' can't be assigned to a variable of type 'int'.
+```
+
+`var` does not mean "any type." It means "figure out the type once, then lock it in."
+
+## Summary
+
+| Type | What it holds | Example |
+|---|---|---|
+| `String` | Text | `'Ali'`, `"Lahore"` |
+| `int` | Whole numbers | `25`, `-3`, `0` |
+| `double` | Decimal numbers | `9.99`, `3.14` |
+| `bool` | True or false | `true`, `false` |
+| Explicit type | Type written out instead of `var` | `String name = 'Ali'` |
+| Type inference | Dart locking in the type from the assigned value | `var x = 5` makes `x` an `int` |

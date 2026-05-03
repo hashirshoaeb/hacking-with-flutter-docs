@@ -1,27 +1,136 @@
 ---
-title: "Introduction to Dart"
-description: "Get started with the Dart programming language — variables, types, and your first program."
+title: "Hello World"
+description: "Write your first Dart program and learn about main, print, comments, and semicolons."
 ---
 
-## What is Dart?
+Every Dart program needs a starting point.
 
-Dart is a client-optimized language developed by Google. It is the language behind Flutter.
+In Dart, that point is a function called `main`.
 
-## Hello World
+It looks like this:
 
-```dart title="main.dart"
+```dart
 void main() {
-  print('Hello, Dart!');
+
 }
 ```
 
-## Variables
+This is the simplest valid Dart program.
 
-Dart is strongly typed. You can declare variables with `var`, explicit types, or `final`/`const`.
+It does not do anything. But it is still a valid program.
+
+What if you forget `main`? Dart will refuse to run your code:
+
+```
+Invoked Dart programs must have a 'main' function defined
+```
+
+So `main` is not optional.
+
+If you want your program to actually do something, use `print`:
 
 ```dart
-var name = 'Flutter';
-String greeting = 'Hello';
-final int year = 2024;
-const double pi = 3.14159;
+void main() {
+  print('Hello, world!');
+}
 ```
+
+Run it. You will see `Hello, world!`.
+
+That is the smallest useful Dart program.
+
+## What a Dart program is
+
+A Dart program is a text file that ends in `.dart`.
+
+You write code in that file. Dart reads it, then runs it.
+
+You do not need to install anything to follow this course. Open [DartPad](https://dartpad.dev) in your browser. That is your coding environment.
+
+## Using print
+
+You can call `print` as many times as you like:
+
+```dart
+void main() {
+  print('First line.');
+  print('Second line.');
+}
+```
+
+Each call prints on its own line. The order matches the order in your code.
+
+## A note on void and print
+
+You have seen `void`, `()`, and `print`. They might look unfamiliar.
+
+They are all part of a bigger concept called **functions**. Functions get their own full lesson. We cover them in Lesson 10.
+
+For now, treat `void main() { ... }` as the required wrapper that every Dart program needs. Treat `print(...)` as the thing that displays text.
+
+That is enough to keep going.
+
+## Comments
+
+A comment is a note you write for yourself, or for someone else reading your code later. Dart ignores it completely.
+
+A single-line comment starts with `//`:
+
+```dart
+void main() {
+  // This is a comment. Dart ignores this line.
+  print('Hello, world!'); // A comment can also go at the end of a line.
+}
+```
+
+A multi-line comment starts with `/*` and ends with `*/`:
+
+```dart
+void main() {
+  /*
+    This comment spans
+    multiple lines.
+  */
+  print('Hello, world!');
+}
+```
+
+Use comments to explain why you wrote something, not what it does. Good code usually explains itself. But comments fill in the gaps.
+
+## The semicolon
+
+Every statement in Dart ends with a semicolon:
+
+```dart
+void main() {
+  print('Hello, world!'); // <- semicolon here
+}
+```
+
+What if you forget it?
+
+```dart
+void main() {
+  print('Hello, world!')
+}
+```
+
+Dart will stop you:
+
+```
+Expected to find ';'
+```
+
+The semicolon rule comes from a language called ALGOL, designed in the 1950s. Dart inherited it, along with most modern languages. It tells the compiler where one instruction ends and the next begins.
+
+You will forget it. But everyone does. The error message tells you exactly where to look.
+
+## Summary
+
+| Concept | What it is |
+|---|---|
+| `main` | The entry point of every Dart program |
+| `print` | Writes a line of text to the terminal |
+| `//` comment | A single-line note that Dart ignores |
+| `/* */` comment | A multi-line note that Dart ignores |
+| Semicolon (`;`) | Marks the end of every statement |

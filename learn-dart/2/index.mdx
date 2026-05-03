@@ -1,0 +1,108 @@
+---
+title: "Variables"
+description: "Learn how Dart stores and remembers values using variables, type inference, and camelCase naming."
+---
+
+Your program needs to remember things.
+
+A name. A score. A total. Without a way to hold values, your program could only print fixed text.
+
+Variables are how Dart remembers.
+
+## Think of a labeled box
+
+Imagine a shelf. On that shelf, you place a box. You write a label on the box. Then you put something inside.
+
+```text
++---------------------+
+|   name: "Ali"       |
++---------------------+
+```
+
+That is a variable. The label is the name. The contents are the value. When your program needs the value, it looks up the box by its label and reads what is inside.
+
+## Creating a variable
+
+In Dart, you create a variable with `var`:
+
+```dart
+void main() {
+  var name = 'Ali';
+  print(name); // Ali
+}
+```
+
+`var` tells Dart you are creating a new variable. `name` is the label. `'Ali'` is what goes inside.
+
+When you call `print(name)`, Dart finds the box labeled `name`, reads the contents, and prints them.
+
+## Multiple variables
+
+You can have as many variables as you need:
+
+```dart
+void main() {
+  var firstName = 'Ali';
+  var age = 25;
+
+  print(firstName); // Ali
+  print(age);       // 25
+}
+```
+
+Each variable is its own box, with its own label and its own contents.
+
+## Type inference
+
+You did not tell Dart that `firstName` holds text or that `age` holds a number. Dart figured it out from the values you assigned.
+
+This is called **type inference**.
+
+| Type inference | Noun. Dart automatically determines the type of a variable by looking at the value assigned to it. |
+|---|---|
+
+Dart pays attention to what you put in the box. Once it knows the type, it locks it in. You will learn more about types in the next lesson.
+
+## Changing the value
+
+You can replace what is in the box:
+
+```dart
+void main() {
+  var name = 'Ali';
+  print(name); // Ali
+
+  name = 'Sara';
+  print(name); // Sara
+}
+```
+
+The label stays the same. The contents change.
+
+Notice that you do not write `var` again when you reassign. `var` is only for creating the variable the first time.
+
+Sometimes you want a value that never changes at all. Dart has two keywords for that: `final` and `const`. We cover them in Lesson 11.
+
+## Naming variables
+
+Dart follows a naming convention called **camelCase**. The first word is all lowercase, and every word after it starts with a capital letter.
+
+```dart
+var firstName = 'Ali';
+var lastLoginDate = '2026-01-01';
+var totalScore = 100;
+```
+
+Not `first_name`. Not `FirstName`. Just `firstName`.
+
+Dart will not reject a different style. But the Dart community follows camelCase, and so should you.
+
+## Summary
+
+| Concept | What it is |
+|---|---|
+| Variable | A named container for a value |
+| `var` | The keyword that creates a new variable |
+| Type inference | Dart determining a variable's type from its assigned value |
+| Reassignment | Replacing the value of an existing variable (no `var` keyword) |
+| camelCase | The naming convention for variables in Dart |
