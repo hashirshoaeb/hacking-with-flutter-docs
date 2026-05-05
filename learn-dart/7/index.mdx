@@ -1,0 +1,129 @@
+---
+title: "Collections"
+description: "Learn how to group values in Dart using List, Map, and Set."
+---
+
+One value is rarely enough.
+
+A list of students. A map of grades. A set of unique tags.
+
+Dart has three collection types for grouping values. You will use all of them.
+
+## List
+
+A `List` holds values in a specific order. Think of a numbered shopping list: first item, second item, third item.
+
+```dart
+void main() {
+  var names = ['Ali', 'Sara', 'John'];
+  print(names[0]); // Ali
+  print(names[1]); // Sara
+  print(names[2]); // John
+}
+```
+
+The values go inside `[...]`, separated by commas. Each value has a position called an **index**.
+
+| Index | Noun. A position in a `List`, starting at `0`. |
+|---|---|
+
+But indexing does not start at 1. It starts at 0.
+
+`names[0]` is the first item. `names[1]` is the second. `names[2]` is the third. This catches everyone at first. But it becomes natural quickly.
+
+To replace a value, assign to its index:
+
+```dart
+void main() {
+  var names = ['Ali', 'Sara', 'John'];
+  names[0] = 'Ahmed'; // replace the first item
+  print(names[0]); // Ahmed
+}
+```
+
+The index stays the same. The value at that position changes.
+
+## Map
+
+A `Map` holds key-value pairs. Think of a phone book: you look up a name (the key) and get back a number (the value).
+
+```dart
+void main() {
+  var grades = {'Math': 90, 'English': 85};
+  print(grades['Math']); // 90
+}
+```
+
+The pairs go inside `{...}`. Each pair is written as `key: value`, separated by commas. To read a value, use its key inside `[...]`.
+
+| Key | Noun. A label that identifies a value in a `Map`. |
+|---|---|
+
+Adding a new key and updating an existing key use the same syntax:
+
+```dart
+void main() {
+  var grades = {'Math': 90};
+  grades['Science'] = 78; // add a new key
+  grades['Math'] = 95;    // update an existing key
+  print(grades['Math']); // 95
+}
+```
+
+Dart checks whether the key exists. If it does, the value is updated. If it does not, a new pair is added.
+
+What if you read a key that does not exist?
+
+```dart
+void main() {
+  var grades = {'Math': 90};
+  print(grades['Science']); // null
+}
+```
+
+A missing key returns `null`. We cover null fully in Lesson 9.
+
+## Set
+
+A `Set` holds unique values. Order does not matter, and duplicates are not allowed.
+
+```dart
+void main() {
+  var fruits = {'apple', 'banana', 'orange'};
+  print(fruits); // {apple, banana, orange}
+}
+```
+
+The values go inside `{...}`, separated by commas. No key-value pairs. Just values.
+
+What if a value appears more than once?
+
+```dart
+void main() {
+  var fruits = {'apple', 'banana', 'apple'}; // apple appears twice
+  print(fruits); // {apple, banana}
+}
+```
+
+Dart silently keeps only one copy. No error. No warning. The second `'apple'` is dropped.
+
+## When to use which
+
+| You need... | Use |
+|---|---|
+| Ordered items, accessed by position | `List` |
+| Values looked up by a name or label | `Map` |
+| A collection with no duplicates | `Set` |
+
+There is a lot more you can do with collections: adding items, removing them, checking their length. But those require method calls, and method calls require classes. We cover them in Lesson 13.
+
+## Summary
+
+| Concept | What it is |
+|---|---|
+| `List` | An ordered collection of values, accessed by index |
+| Index | A position in a `List`, starting at `0` |
+| `Map` | A collection of key-value pairs, accessed by key |
+| Key | A label used to look up a value in a `Map` |
+| `Set` | An unordered collection that holds only unique values |
+| Uniqueness | Duplicate values in a `Set` are silently removed |
