@@ -1,0 +1,135 @@
+---
+title: "Strings and Interpolation"
+description: "Learn how to build and format strings in Dart using interpolation, multi-line strings, and raw strings."
+---
+
+A name. An error message. A welcome screen. A tweet.
+
+They are all strings.
+
+You have already seen `String` in Lesson 3. But there is one Dart feature for strings that changes everything: interpolation.
+
+## Quotes
+
+You can write a string with single quotes or double quotes:
+
+```dart
+void main() {
+  var a = 'Hello';
+  var b = "Hello";
+  print(a); // Hello
+  print(b); // Hello
+}
+```
+
+They are identical. Pick one and be consistent. This course uses single quotes throughout.
+
+## Concatenation
+
+Before interpolation, there is an older way to build strings from multiple values: the `+` operator.
+
+```dart
+void main() {
+  var name = 'Ali';
+  print('Hello, ' + name + '!'); // Hello, Ali!
+}
+```
+
+It works. But it is ugly. Every value needs a `+` on either side, and the quotes pile up fast.
+
+There is a better way.
+
+## Interpolation
+
+Dart lets you embed a variable directly inside a string with `$`:
+
+```dart
+void main() {
+  var name = 'Ali';
+  print('Hello, $name!'); // Hello, Ali!
+}
+```
+
+The `$` tells Dart: replace this with the value of the variable. The result is the same as concatenation. But the string reads like a sentence.
+
+## Expression interpolation
+
+`$name` works for a single variable. What if you want something more complex?
+
+Use `${}` and put any expression inside the curly braces:
+
+```dart
+void main() {
+  var age = 20;
+  print('You are $age years old.');               // You are 20 years old.
+  print('In ten years you will be ${age + 10}.'); // In ten years you will be 30.
+}
+```
+
+The rule is simple. A single variable gets `$`. Everything else gets `${}`.
+
+## Multi-line strings
+
+Sometimes a string spans more than one line. Triple quotes handle that:
+
+```dart
+void main() {
+  var message = '''Hello, Ali.
+Welcome back.
+You have 3 new messages.''';
+
+  print(message);
+}
+```
+
+Output:
+
+```
+Hello, Ali.
+Welcome back.
+You have 3 new messages.
+```
+
+The content between `'''` and `'''` is taken exactly as written, line breaks included. Triple double quotes work too: `"""..."""`. Same behavior.
+
+## Raw strings
+
+In a normal Dart string, a backslash has special meaning. `\n` becomes a newline:
+
+```dart
+void main() {
+  print('Line one.\nLine two.');
+}
+```
+
+Output:
+
+```
+Line one.
+Line two.
+```
+
+But sometimes you want the backslash to be a literal backslash. File paths are a common case.
+
+Prefix the string with `r` to make it raw:
+
+```dart
+void main() {
+  print(r'C:\Users\Ali\Documents'); // C:\Users\Ali\Documents
+}
+```
+
+In a raw string, backslashes are just backslashes. No special processing happens.
+
+There is a lot more you can do with strings: checking their length, converting to uppercase, searching for substrings. But those require method calls, and method calls require classes. We cover them in Lesson 13.
+
+## Summary
+
+| Feature | What it does |
+|---|---|
+| `'...'` and `"..."` | Single and double quotes are identical; pick one |
+| `+` | Joins strings together (concatenation) |
+| `$variable` | Embeds a variable directly in a string (interpolation) |
+| `${...}` | Embeds any expression in a string |
+| `'''...'''` | A string that spans multiple lines |
+| `r'...'` | A raw string where backslashes are literal characters |
