@@ -1,0 +1,183 @@
+---
+title: "Loops"
+description: "Learn how to repeat code in Dart using for, for-in, while, and do-while loops."
+---
+
+Print the numbers 1 to 100.
+
+Without a loop, that is 100 `print` statements. With a loop, it is two lines.
+
+Loops repeat code. They keep going until you tell them to stop.
+
+Think of a chore: wash each dish in the pile, one at a time. Keep going until the pile is empty, or stop after washing five. A loop does the same thing with code.
+
+## for
+
+The `for` loop is the classic way to repeat something a fixed number of times.
+
+```dart
+void main() {
+  for (int i = 1; i <= 5; i++) {
+    print(i);
+  }
+}
+```
+
+Run it. You will see `1`, `2`, `3`, `4`, `5` printed one per line.
+
+The `for` loop has three parts, separated by semicolons:
+
+| Part | Example | What it does |
+|---|---|---|
+| Initialize | `int i = 1` | Sets the starting value |
+| Condition | `i <= 5` | Keeps looping while `true` |
+| Increment | `i++` | Runs after each iteration |
+
+Dart checks the condition before every run. When `i` reaches `6`, the condition `i <= 5` becomes `false`. The loop stops.
+
+## for-in
+
+The `for` loop above requires you to count. But often you do not care about counting. You just want to do something with each item in a collection.
+
+That is what `for-in` is for.
+
+```dart
+void main() {
+  var names = ['Ali', 'Sara', 'John'];
+  for (var name in names) {
+    print(name); // prints each name in order
+  }
+}
+```
+
+No index. No counter. For each `name` in `names`, the body runs.
+
+It works the same way with a `Set`:
+
+```dart
+void main() {
+  var fruits = {'apple', 'banana', 'orange'};
+  for (var fruit in fruits) {
+    print(fruit);
+  }
+}
+```
+
+Iterating over a `Map` requires a method call we have not learned yet. We will cover that in Lesson 13.
+
+## while
+
+A `for` loop is for when you know the count in advance. A `while` loop is for when you do not.
+
+```dart
+void main() {
+  var count = 1;
+  while (count <= 5) {
+    print(count);
+    count++;
+  }
+}
+```
+
+The condition is checked before the body runs. If it is `true`, the body runs. Then Dart checks again. It keeps going until the condition is `false`.
+
+## do-while
+
+The `do-while` loop is like `while`, but the body always runs first. The condition is checked after.
+
+```dart
+void main() {
+  var count = 1;
+  do {
+    print(count);
+    count++;
+  } while (count <= 5);
+}
+```
+
+The body runs at least once. Even if the condition is `false` from the very start.
+
+When does that matter? When you need to do something first, then decide whether to keep going.
+
+## break
+
+You already saw `break` in `switch`. It works in loops too.
+
+`break` exits the loop immediately. No matter what the condition says.
+
+```dart
+void main() {
+  for (int i = 1; i <= 10; i++) {
+    if (i == 4) {
+      break; // stop the loop here
+    }
+    print(i);
+  }
+}
+```
+
+Output:
+
+```text
+1
+2
+3
+```
+
+The loop never reaches `4`. `break` exits it the moment the condition is met.
+
+## continue
+
+`continue` skips the rest of the current iteration and jumps to the next one.
+
+```dart
+void main() {
+  for (int i = 1; i <= 5; i++) {
+    if (i == 3) {
+      continue; // skip 3
+    }
+    print(i);
+  }
+}
+```
+
+Output:
+
+```text
+1
+2
+4
+5
+```
+
+`3` is skipped. The loop keeps going.
+
+## Infinite loops
+
+A loop whose condition never becomes `false` runs forever.
+
+| Infinite loop | Noun. A loop that never stops because its condition is always `true`. |
+|---|---|
+
+```dart
+void main() {
+  while (true) { // always true, never stops
+    print('stuck');
+  }
+}
+```
+
+Do not run that. It will freeze your program.
+
+This is a common beginner mistake. If your program hangs, check your loop condition. It is probably always `true`.
+
+## Summary
+
+| Concept | What it does |
+|---|---|
+| `for` | Repeats a fixed number of times using initialize, condition, and increment |
+| `for-in` | Repeats once for each item in a collection |
+| `while` | Repeats as long as a condition is `true`, checked before each run |
+| `do-while` | Like `while`, but runs the body at least once before checking |
+| `break` | Exits the loop immediately |
+| `continue` | Skips the current iteration and moves to the next one |
