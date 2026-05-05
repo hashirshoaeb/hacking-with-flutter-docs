@@ -1,0 +1,144 @@
+---
+title: "Control Flow"
+description: "Learn how to make decisions in Dart using if, else, ternary expressions, and switch statements."
+---
+
+Every useful program behaves differently depending on something.
+
+If the user is logged in, show the dashboard. If not, show the login screen. If a score is above 90, print an A. If it is below 60, print an F.
+
+That is control flow.
+
+## The fork in the road
+
+Think of your program as a traveler on a road. At certain points, the road splits. The traveler checks a sign (the condition) and takes one path or the other.
+
+```text
+            condition?
+                |
+        --------+--------
+        |                |
+      true              false
+        |                |
+   run this block    skip it
+```
+
+Every decision in Dart starts with a condition.
+
+| Condition | Noun. Any expression that evaluates to `true` or `false`. |
+|---|---|
+
+You already know how to write conditions. They are the comparison and logical expressions from Lesson 5: `age >= 18`, `score < 60`, `name == 'Ali'`.
+
+## if
+
+The simplest decision: run a block of code only when a condition is `true`.
+
+```dart
+void main() {
+  var age = 20;
+  if (age >= 18) {
+    print('You can vote.');
+  }
+}
+```
+
+The condition goes inside `(...)`. The code to run goes inside `{...}`.
+
+If the condition is `true`, the block runs. But if it is `false`, Dart skips it entirely. Nothing happens.
+
+## if / else
+
+What if you want to do something when the condition is false?
+
+```dart
+void main() {
+  var age = 16;
+  if (age >= 18) {
+    print('You can vote.');
+  } else {
+    print('You cannot vote yet.'); // this runs, age is 16
+  }
+}
+```
+
+`else` handles the false path. One branch always runs. But never both.
+
+## if / else if / else
+
+What if there are more than two paths?
+
+```dart
+void main() {
+  var score = 85;
+  if (score >= 90) {
+    print('A');
+  } else if (score >= 80) {
+    print('B'); // this runs, 85 >= 80
+  } else if (score >= 70) {
+    print('C');
+  } else {
+    print('F');
+  }
+}
+```
+
+Dart checks conditions from top to bottom. It runs the first one that is `true`, then stops. If none are `true`, `else` runs.
+
+You can add as many `else if` branches as you need. The final `else` is optional.
+
+## Ternary
+
+When an `if / else` assigns a single value, you can write it on one line:
+
+```dart
+void main() {
+  var age = 20;
+  var label = age >= 18 ? 'Adult' : 'Minor';
+  print(label); // Adult
+}
+```
+
+Read it left to right: if the condition is `true`, use the first value. If it is `false`, use the second.
+
+The ternary is for simple one-value choices. But if you need to do more than assign a single value, use a full `if / else`.
+
+## switch
+
+When one variable can be one of several specific values, `switch` is cleaner than a long chain of `else if`:
+
+```dart
+void main() {
+  var day = 'Monday';
+
+  switch (day) {
+    case 'Monday':
+      print('Start of the week.'); // this runs
+      break;
+    case 'Friday':
+      print('End of the work week.');
+      break;
+    default:
+      print('Another day.');
+  }
+}
+```
+
+Each `case` matches one specific value. When a match is found, that block runs. `break` exits the switch. Without `break`, Dart gives a compile-time error.
+
+`default` is the fallback. It runs when no `case` matches. It is optional, but a good habit.
+
+Dart 3 added more powerful `switch` expressions and pattern matching. Those live in the Dart in Depth course.
+
+## Summary
+
+| Concept | What it does |
+|---|---|
+| `if` | Runs a block when a condition is `true` |
+| `else if` | Adds another condition when the previous one is `false` |
+| `else` | Runs when all conditions above it are `false` |
+| Ternary (`? :`) | A one-line `if / else` that produces a single value |
+| `switch` | Compares one variable to multiple specific values |
+| `case` | One specific value to match in a `switch` |
+| `break` | Exits the `switch` after a case runs |
+| `default` | The fallback case when no other case matches |
