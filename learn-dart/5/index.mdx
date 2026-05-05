@@ -1,0 +1,120 @@
+---
+title: "Operators"
+description: "Learn Dart's arithmetic, comparison, and logical operators, and how to use compound assignment."
+---
+
+Math. Comparisons. Logic.
+
+Every program does all three. Dart uses one consistent set of symbols for all of them: operators.
+
+## Arithmetic operators
+
+Arithmetic operators work on numbers:
+
+| Operator | What it does | Example | Result |
+|---|---|---|---|
+| `+` | Addition | `5 + 3` | `8` |
+| `-` | Subtraction | `5 - 3` | `2` |
+| `*` | Multiplication | `5 * 3` | `15` |
+| `/` | Division | `5 / 2` | `2.5` |
+| `~/` | Integer division | `5 ~/ 2` | `2` |
+| `%` | Remainder | `7 % 3` | `1` |
+
+```dart
+void main() {
+  var sum = 5 + 3;       // 8
+  var product = 5 * 3;   // 15
+  var quotient = 5 / 2;  // 2.5
+  var intDiv = 5 ~/ 2;   // 2
+  var remainder = 7 % 3; // 1
+  print(sum); // 8
+}
+```
+
+Most of these are familiar. But `/` is not like the others.
+
+`5 / 2` gives `2.5`, not `2`. Division in Dart always produces a `double`, even when both numbers are whole.
+
+What if you need the whole number part? Use `~/`:
+
+```dart
+void main() {
+  var intDiv = 10 ~/ 3; // 3, the decimal is dropped
+  print(intDiv); // 3
+}
+```
+
+And `%` gives the remainder after division. `7 % 3` is `1`. Seven divided by 3 goes in twice, with 1 left over.
+
+## Comparison operators
+
+Comparison operators compare two values. They always return a `bool`:
+
+| Operator | Meaning |
+|---|---|
+| `==` | Equal to |
+| `!=` | Not equal to |
+| `<` | Less than |
+| `>` | Greater than |
+| `<=` | Less than or equal to |
+| `>=` | Greater than or equal to |
+
+```dart
+void main() {
+  var age = 20;
+  var isAdult = age >= 18; // true
+  var isTeen = age < 20;   // false
+  print(isAdult); // true
+}
+```
+
+The result is always `true` or `false`. Nothing else. You will use these constantly once you reach Lesson 6 on control flow.
+
+## Logical operators
+
+Logical operators combine booleans:
+
+| Operator | Meaning |
+|---|---|
+| `&&` | And (both must be `true`) |
+| `||` | Or (at least one must be `true`) |
+| `!` | Not (flips `true` to `false`, and vice versa) |
+
+```dart
+void main() {
+  var isAdult = true;
+  var hasLicense = true;
+  var canDrive = isAdult && hasLicense; // true, both are true
+  var cannotDrive = !canDrive;          // false, flipped
+  print(canDrive); // true
+}
+```
+
+`&&` requires both sides to be `true`. `||` only needs one side to be `true`. `!` flips whatever follows it.
+
+## Compound assignment
+
+These are shortcuts for updating a variable in place:
+
+```dart
+void main() {
+  var x = 10;
+  x += 5;  // x is now 15, same as x = x + 5
+  x -= 3;  // x is now 12, same as x = x - 3
+  x *= 2;  // x is now 24, same as x = x * 2
+  x++;     // x is now 25, same as x = x + 1
+  x--;     // x is now 24, same as x = x - 1
+  print(x); // 24
+}
+```
+
+`x++` and `x--` are the shortest form. They add or subtract exactly one.
+
+## Summary
+
+| Operator family | Symbols | Result |
+|---|---|---|
+| Arithmetic | `+` `-` `*` `/` `~/` `%` | A number |
+| Comparison | `==` `!=` `<` `>` `<=` `>=` | `bool` |
+| Logical | `&&` `||` `!` | `bool` |
+| Compound assignment | `+=` `-=` `*=` `++` `--` | Updates a variable in place |
