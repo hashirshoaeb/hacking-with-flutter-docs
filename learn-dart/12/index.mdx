@@ -1,0 +1,121 @@
+---
+title: "Enums"
+description: "Learn how to use enums in Dart to represent a fixed set of values and write safer, more readable code."
+---
+
+A traffic light is red, yellow, or green.
+
+Nothing else.
+
+Store that as a `String` and a typo like `'rd'` compiles fine. Your program starts. And somewhere, silently, it breaks.
+
+An `enum` makes that mistake impossible.
+
+## Defining an enum
+
+| `enum` | Noun. A type that can only hold one of a fixed set of named values. |
+|---|---|
+
+Here is a traffic light as an enum:
+
+```dart
+enum TrafficLight {
+  red,
+  yellow,
+  green,
+}
+```
+
+`TrafficLight` can only ever be `red`, `yellow`, or `green`. Nothing else compiles.
+
+To use a value, write the enum name, a dot, then the value name:
+
+```dart
+void main() {
+  TrafficLight light = TrafficLight.red;
+  print(light); // TrafficLight.red
+}
+```
+
+## Why not a String?
+
+Here is the same thing done with a `String`:
+
+```dart
+void main() {
+  String light = 'red';
+
+  if (light == 'rd') {   // typo: 'rd' instead of 'red'
+    print('Stop.');
+  }
+}
+```
+
+Dart accepts `'rd'`. It is a valid string. But the condition never matches. No error. Just broken behavior.
+
+With an enum, the same typo fails at compile time:
+
+```dart
+void main() {
+  TrafficLight light = TrafficLight.reed; // Error: The getter 'reed' isn't defined for the type 'TrafficLight'
+}
+```
+
+| Type safety | Noun. The guarantee that Dart rejects invalid values at compile time, before your program runs. |
+|---|---|
+
+The compiler caught it. The program never started with the mistake in it.
+
+## Enums in if
+
+Compare an enum value with `==`:
+
+```dart
+void main() {
+  TrafficLight light = TrafficLight.red;
+
+  if (light == TrafficLight.red) {
+    print('Stop.');
+  } else if (light == TrafficLight.yellow) {
+    print('Slow down.');
+  } else {
+    print('Go.');
+  }
+}
+```
+
+No strings. No typos. If you mistype `TrafficLight.gren`, Dart catches it before the program runs.
+
+## Enums in switch
+
+`switch` is a natural fit for enums. One case per value.
+
+```dart
+void main() {
+  TrafficLight light = TrafficLight.green;
+
+  switch (light) {
+    case TrafficLight.red:
+      print('Stop.');
+      break;
+    case TrafficLight.yellow:
+      print('Slow down.');
+      break;
+    case TrafficLight.green:
+      print('Go.');
+      break;
+  }
+}
+```
+
+Every possible value has a case. Nothing can slip through.
+
+Dart 3 added enhanced enums with fields and methods, and smarter `switch` patterns that work with them. Dart in Depth covers both.
+
+## Summary
+
+| Concept | What it is |
+|---|---|
+| `enum` | A type that can hold only one of a fixed set of named values |
+| Enum value | One named option in the enum, accessed as `EnumName.value` |
+| Type safety | Dart rejects values outside the enum at compile time |
