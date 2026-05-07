@@ -1,0 +1,132 @@
+---
+title: "Functions"
+description: "Learn how to define and call functions in Dart, including parameters, return values, and scope."
+---
+
+You write the same block of code in three places. You find a bug. You fix it in one place. But the other two still have the bug.
+
+Functions solve this. A function gives a block of code a name so you can call it from anywhere.
+
+Think of a function as a machine. Boxes go in; those are the parameters. The machine does its work. A box comes back out; that is the return value. The machine does not care who feeds it. Give it the same inputs and it always produces the same output.
+
+## Defining a function
+
+A function has four parts.
+
+```dart
+int add(int a, int b) {
+  return a + b;
+}
+```
+
+| Part | Example | What it is |
+|---|---|---|
+| Return type | `int` | The type of value the function sends back |
+| Name | `add` | How you call the function |
+| Parameters | `int a, int b` | The inputs |
+| Body | `return a + b;` | What the function does |
+
+## void
+
+Some functions do not send anything back. They just do something.
+
+```dart
+void greet(String name) {
+  print('Hi, $name!');
+}
+
+void main() {
+  greet('Ali'); // Hi, Ali!
+}
+```
+
+`void` means nothing comes out. The machine does the work, but returns no box.
+
+## Return values
+
+The `return` keyword sends a value back to whoever called the function.
+
+```dart
+int square(int n) {
+  return n * n; // sends back the result
+}
+
+void main() {
+  int result = square(4);
+  print(result); // 16
+}
+```
+
+The return type in the definition must match what you actually return. Write `int` and return an `int`. If they do not match, Dart will not compile.
+
+What if you forget `return`? Dart will tell you: `A non-null value must be returned from the function 'square'.`
+
+## Calling a function
+
+Write the function name followed by arguments in parentheses.
+
+```dart
+void main() {
+  int result = add(3, 5); // assign the result to a variable
+  print(result);          // 8
+
+  print(add(10, 20));     // 30
+}
+
+int add(int a, int b) {
+  return a + b;
+}
+```
+
+Notice that `add` is defined after `main` here. Dart reads the whole file before running it. Order does not matter.
+
+## Parameters and arguments
+
+These two words mean different things.
+
+| Term | Where it appears | What it is |
+|---|---|---|
+| Parameter | In the function definition | The placeholder name: `int a` |
+| Argument | In the function call | The actual value: `3` |
+
+In practice, many developers use them interchangeably. But now you know the distinction.
+
+## Scope
+
+A variable declared inside a function only exists inside that function. Try to use it outside and Dart will not find it.
+
+```dart
+void greet() {
+  String message = 'Hi'; // lives inside greet only
+}
+
+void main() {
+  print(message); // Error: Undefined name 'message'.
+}
+```
+
+| Scope | Noun. The region of code where a variable can be accessed. |
+|---|---|
+
+When `greet` finishes, `message` is gone. Nothing outside can reach it.
+
+This is a feature. Each function gets its own private space. They do not interfere with each other.
+
+## main revisited
+
+You have been writing `void main()` since Lesson 1. Now you know exactly what it means.
+
+`main` is a function. `void` means it returns nothing. The empty `()` means it takes no parameters. Dart calls it automatically when your program starts. Every other function, you call yourself.
+
+There is more to functions than this lesson covers. Named parameters, optional parameters, arrow functions, anonymous functions, and functions-as-variables are all in Dart in Depth.
+
+## Summary
+
+| Concept | What it is |
+|---|---|
+| Function | A named block of code you can call from anywhere |
+| `void` | The return type for a function that returns nothing |
+| `return` | Sends a value back to the caller and exits the function |
+| Parameter | A named input in the function definition |
+| Argument | The actual value passed when calling the function |
+| Scope | The region of code where a variable can be accessed |
