@@ -1,0 +1,173 @@
+---
+title: "Null Safety"
+description: "Learn how Dart handles null values and how to write null-safe code using ?, ??, !, and late."
+---
+
+In 1965, a computer scientist named Tony Hoare invented the null reference. He later called it his "billion-dollar mistake."
+
+The problem: in many languages, any variable can be empty at any time. You do not have to say so. Your code compiles fine. Then it crashes at runtime with a null error.
+
+Dart's answer is different. Dart forces you to decide upfront: can this variable be empty, or not?
+
+## null
+
+First, what is `null`?
+
+| `null` | Noun. Dart's value for "no value here." A variable holds `null` when it has not been given anything. |
+|---|---|
+
+```dart
+void main() {
+  print(null); // null
+}
+```
+
+That prints the word `null`. It is not a crash. It is just nothing.
+
+## Non-nullable
+
+By default, every variable in Dart is non-nullable. It must always have a value.
+
+```dart
+void main() {
+  String name = 'Ali';
+  print(name); // Ali
+}
+```
+
+If you try to put `null` into a non-nullable variable, Dart stops you before the program ever runs:
+
+```dart
+void main() {
+  String name = null; // Error: A value of type 'Null' can't be assigned to a variable of type 'String'
+}
+```
+
+That error is at compile time. Before your program even starts, Dart catches it.
+
+## Nullable types
+
+Sometimes a variable really might be empty. That is fine. But you have to say so.
+
+Add `?` after the type:
+
+```dart
+void main() {
+  String? name;     // starts as null
+  print(name);      // null
+  name = 'Ali';
+  print(name);      // Ali
+}
+```
+
+The `?` is a signal. This variable might be empty. Dart knows. You know. Everyone reading the code knows.
+
+Without the `?`, Dart assumes the variable always has a value and holds you to it.
+
+## Assignment rules
+
+Here is where it gets strict.
+
+You cannot assign a nullable value directly to a non-nullable variable:
+
+```dart
+void main() {
+  String? maybeName;
+  String name = maybeName; // Error: A value of type 'String?' can't be assigned to a variable of type 'String'
+}
+```
+
+Dart refuses. `maybeName` might be `null`. `name` cannot be. They are different types.
+
+You need to handle the possible emptiness first. The next two sections show you how.
+
+## ??
+
+The `??` operator gives you a fallback. If the left side is `null`, use the right side instead.
+
+```dart
+void main() {
+  String? maybeName;
+  String greeting = maybeName ?? 'Guest';
+  print(greeting); // Guest
+}
+```
+
+`maybeName` is `null`, so `greeting` becomes `'Guest'`.
+
+If `maybeName` had a value, `??` would use that:
+
+```dart
+void main() {
+  String? maybeName = 'Ali';
+  String greeting = maybeName ?? 'Guest';
+  print(greeting); // Ali
+}
+```
+
+The fallback is only used when there is nothing else.
+
+## !
+
+The `!` operator takes a different approach. Instead of providing a fallback, you assert that the value is definitely not `null`.
+
+```dart
+void main() {
+  String? maybeName = 'Ali';
+  String name = maybeName!;
+  print(name); // Ali
+}
+```
+
+This compiles. It runs. It works.
+
+But if you are wrong, it crashes when the program runs:
+
+```dart
+void main() {
+  String? maybeName;
+  String name = maybeName!; // crashes: Null check operator used on a null value
+}
+```
+
+Use `!` only when you are certain the value is not `null`. If you are not certain, use `??` instead.
+
+## late
+
+Sometimes you cannot assign a value the moment you declare a variable. You know it will have a value eventually, just not yet.
+
+`late` lets you delay the assignment:
+
+```dart
+void main() {
+  late String username;
+  username = 'Ali';
+  print(username); // Ali
+}
+```
+
+`username` is non-nullable. But you did not have to give it a value immediately.
+
+What if you read it before assigning? Dart throws a runtime error:
+
+```dart
+void main() {
+  late String username;
+  print(username); // crashes: LateInitializationError: Field 'username' has not been initialized.
+}
+```
+
+`late` is a promise. You are telling Dart: "I will set this before I use it." If you break the promise, Dart tells you.
+
+There is one more null safety operator: `?.`. It lets you safely call a method on a nullable value. We will cover it in Lesson 13 once classes are introduced.
+
+## Summary
+
+| Concept | What it does |
+|---|---|
+| `null` | Dart's value for "no value here" |
+| Non-nullable (default) | A variable that must always hold a value; Dart enforces this at compile time |
+| Nullable (`?`) | A variable allowed to be `null`; must be declared with `?` |
+| `??` | Returns the left value if it is not `null`; otherwise returns the right value |
+| `!` | Asserts a nullable value is not `null`; crashes at runtime if it is |
+| `late` | Declares a non-nullable variable without an immediate value; must be assigned before first use |
