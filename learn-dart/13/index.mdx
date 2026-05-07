@@ -1,0 +1,184 @@
+---
+title: "Classes"
+description: "Learn how to define and use classes in Dart, including fields, methods, the dot syntax, and null-safe class instances."
+---
+
+Up to now, data and behavior lived separately. Variables held values. Functions did the work. `print` showed the result.
+
+A class brings them together.
+
+Think of a cabin at a summer camp. Inside are labeled boxes: the campers' belongings. And there are shared tools: a coffee maker, a repair kit. The cabin groups everything under one name. Know the cabin, and you can reach anything inside it.
+
+A Dart class works the same way. It groups data (called fields) and the things that act on that data (called methods) under one name.
+
+## The smallest possible class
+
+```dart
+class Person {
+  String name = 'Hashir'; // field: holds data
+
+  void greet() {          // method: does something
+    print('Hi, I am $name.');
+  }
+}
+```
+
+| Class | Noun. A blueprint that groups fields and methods under one name. |
+|---|---|
+
+`name` is a field. It holds data, like the labeled boxes from Lesson 2.
+
+`greet` is a method. It does something, like the machines from Lesson 10.
+
+The class bundles them together under the name `Person`.
+
+## Creating an instance
+
+A class is just a blueprint. To use it, you create an instance.
+
+| Instance | Noun. One object created from a class blueprint. |
+|---|---|
+
+```dart
+void main() {
+  final p = Person();
+  p.greet();     // Hi, I am Hashir.
+}
+```
+
+`Person()` creates a new instance. `p` holds it.
+
+`p.greet()` calls the method on that instance. The dot is how you reach inside.
+
+You can read a field the same way:
+
+```dart
+void main() {
+  final p = Person();
+  print(p.name); // Hashir
+}
+```
+
+## Class vs instance
+
+What is the difference between the class and the instance?
+
+Think of the class as a cookie cutter. Each instance is a cookie. The cutter defines the shape, but every cookie is its own separate thing.
+
+```dart
+void main() {
+  final p1 = Person();
+  final p2 = Person();
+
+  p1.greet(); // Hi, I am Hashir.
+  p2.greet(); // Hi, I am Hashir.
+}
+```
+
+Same shape. Two separate objects.
+
+## Fields and methods
+
+| Term | What it is |
+|---|---|
+| Field | A variable that belongs to an instance. Holds data. |
+| Method | A function that belongs to an instance. Does something. |
+| Dot syntax | How you access a field or call a method: `p.name`, `p.greet()`. |
+
+## Why this unlocks the rest of the language
+
+Since Lesson 4, you have seen things like `name.toUpperCase()` and `list.add('item')` mentioned and immediately deferred.
+
+Now they make sense.
+
+Every value in Dart is an object. A `String` is an object with methods. A `List` is an object with methods. A `Map` is an object with methods. The dot syntax works the same way for all of them.
+
+You can explore those methods now. The Dart documentation lists them all.
+
+## Null safety with classes
+
+Back in Lesson 9, we deferred one operator: `?.`. Now you have classes, so it finally makes sense.
+
+A class instance can be nullable:
+
+```dart
+Person? maybePerson; // might be null
+```
+
+A class field can be nullable too:
+
+```dart
+class Person {
+  String? nickname;  // might be null
+
+  void greet() {
+    print('Hi.');
+  }
+}
+```
+
+### ?.
+
+Use `?.` to safely call a method on a nullable instance. If the instance is `null`, nothing happens.
+
+```dart
+void main() {
+  Person? maybePerson;
+  maybePerson?.greet(); // does nothing: maybePerson is null
+}
+```
+
+But if you call without `?.`, Dart stops you:
+
+```dart
+void main() {
+  Person? maybePerson;
+  maybePerson.greet(); // Error: the receiver can be 'null'
+}
+```
+
+`maybePerson` might be `null`. Dart will not let you call a method on it without handling that possibility.
+
+### ! with a method
+
+`!` works here the same way it did in Lesson 9. You assert the instance is not `null`.
+
+```dart
+void main() {
+  Person? maybePerson = Person();
+  maybePerson!.greet(); // Hi. (crashes at runtime if maybePerson is null)
+}
+```
+
+Use it only when you are certain.
+
+### Chaining ?.
+
+`?.` short-circuits at the first `null`. Nothing after it runs.
+
+```dart
+void main() {
+  Person? maybePerson;
+  String? nick = maybePerson?.nickname; // null: maybePerson is null
+}
+```
+
+If `maybePerson` is `null`, `nick` becomes `null`. No crash.
+
+---
+
+This is the last lesson in the Dart Basics course. You can now read and write a real Dart program.
+
+The full OOP course is what comes next. It goes deep on constructors, encapsulation, inheritance, polymorphism, and mixins. In that course, you will see the cookie cutter image again, applied more deeply. Both views of a class matter. Start the OOP course next.
+
+## Summary
+
+| Concept | What it is |
+|---|---|
+| Class | A blueprint that groups fields and methods under one name |
+| Instance | One object created from a class blueprint |
+| Field | A variable that belongs to an instance |
+| Method | A function that belongs to an instance |
+| Dot syntax | How you access a field or call a method on an instance |
+| `?.` | Safely calls a method or reads a field on a nullable instance; does nothing if null |
+| `!` with methods | Asserts the instance is not null before calling; crashes at runtime if it is |
