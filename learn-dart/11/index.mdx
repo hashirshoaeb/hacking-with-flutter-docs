@@ -1,0 +1,94 @@
+---
+title: "final and const"
+description: "Learn how to declare immutable values in Dart using final and const, and understand the difference between compile time and runtime."
+---
+
+Up to now, every variable you have declared can be changed. Set it, then set it again. No problem.
+
+Sometimes you do not want that. You set a value once. You do not want anyone, including future you, changing it later.
+
+Dart has two keywords for that: `final` and `const`.
+
+They look similar. They are not the same.
+
+The difference comes down to one question: when does Dart know the value?
+
+## Compile time and runtime
+
+Before you can use `final` and `const` well, you need two terms.
+
+| Compile time | Noun. When Dart reads and checks your source code, before the program ever starts running. |
+|---|---|
+
+| Runtime | Noun. When your program is actually executing: functions are being called, values are being computed. |
+|---|---|
+
+A compile-time constant is a value Dart can see just by reading your code. Like `3.14159`. Or `'hello'`. The value is written right there in the source.
+
+A runtime value is one Dart can only figure out while the program runs. Like the result of a function call.
+
+## final
+
+A `final` variable can only be set once. After that, it cannot be reassigned.
+
+```dart
+String getName() {
+  return 'Ali';
+}
+
+void main() {
+  final name = getName();  // set once, accepts a runtime value
+  print(name);             // Ali
+
+  // name = 'Sara';        // Error: the final variable 'name' can only be set once
+}
+```
+
+`final` accepts runtime values. It does not need to know the value before the program runs. It just says: set it once, and it stays.
+
+## const
+
+`const` is stricter. The value must be a compile-time constant. Dart has to know it before the program ever starts.
+
+```dart
+void main() {
+  const pi = 3.14159;  // Dart knows this before the program runs
+  print(pi);           // 3.14159
+
+  // pi = 3.14;        // Error: constant variables can't be assigned a value
+}
+```
+
+`3.14159` is written right there. No function call, no computation. Dart knows it at compile time.
+
+But `const` will not accept a runtime value:
+
+```dart
+String getName() {
+  return 'Ali';
+}
+
+void main() {
+  final goodName = getName();    // OK: final accepts runtime values
+  // const badName = getName();  // Error: must be a constant expression
+}
+```
+
+`getName()` is a function call. Dart can only know its result at runtime. `const` refuses.
+
+## When to use which
+
+Prefer `const` when the value is a fixed literal: a number, a string, something written directly in the code.
+
+Use `final` when the value is computed at runtime: a function result, or anything that has to run to produce a value.
+
+If you are not sure, try `const` first. If Dart rejects it, use `final`.
+
+## Summary
+
+| Concept | What it means |
+|---|---|
+| Compile time | When Dart reads and checks your code, before the program starts |
+| Runtime | When your program is actually executing |
+| `final` | Set once, never reassigned; accepts compile-time or runtime values |
+| `const` | Set once, never reassigned; value must be known at compile time |
