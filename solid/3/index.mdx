@@ -1,0 +1,167 @@
+---
+title: "Single Responsibility Principle"
+description: "SRP is not about doing one thing. It is about answering to one actor. Here is the difference, and why it matters."
+---
+
+You are in a `switch` statement. You add a new `case` because one particular screen needs different behavior from this same method. The other callers do not need it — just this one.
+
+You commit it and move on.
+
+But that `if` or that new `case` is a signal. Something is asking to be separated, and you just delayed the conversation.
+
+## The misconception
+
+Most people hear "Single Responsibility Principle" and think it means a class should do one thing.
+
+That is not the SRP.
+
+"Do one thing" is a rule for *functions*. A function should do one thing well. But a class is larger than a function. A class that only ever had one method would barely be worth calling a class.
+
+SRP is about something different. It is about *who* demands a change — not how many things the class does.
+
+## What it actually means
+
+A class should be responsible to one **actor**.
+
+| Actor
+| Noun — A group of people with a shared reason to demand a change. Not a user. Not a role. A *group of stakeholders* who all want the same kind of thing from the code.
+
+In a typical Flutter app, you have at least three actors:
+
+- The **backend team** — they own the API. When the API changes, they are the ones asking you to update the data layer.
+- The **product owner** — they own the business rules and the formatting. When the date display format changes, they are the ones asking.
+- The **UI team** (or designer) — they own the look and feel. When the screen gets redesigned, they are the ones asking.
+
+Now look at the `ProfileScreen` from Lesson 0 again. Three different actors all have reason to reach into `_ProfileScreenState`. The backend team, because the API call lives there. The product owner, because the date formatting lives there. The UI team, because the widget tree lives there.
+
+Three actors. One class.
+
+That is an SRP violation.
+
+## The smell
+
+The most reliable signal is the `if` that changes behavior for a specific caller.
+
+```dart
+String formatDate(DateTime date, {bool isAdminView = false}) {
+  if (isAdminView) {
+    // Admin wants ISO format
+    return date.toIso8601String();
+  }
+  // Everyone else wants this format
+  return '${date.day}/${date.month}/${date.year}';
+}
+```
+
+Two callers with different formatting needs inside the same method. Two actors. One method is now serving both. When the admin format changes, you open this file. When the user format changes, you also open this file. Those changes come from different people with different reasons.
+
+SRP is begging you to split.
+
+## What the fix looks like
+
+Go back to `ProfileScreen`. Ask: which actor owns each part?
+
+```dart
+// Before: one class, three actors mixed together
+class _ProfileScreenState extends State<ProfileScreen> {
+  void initState() {
+    http.get(...)        // backend team owns this
+      .then((res) {
+        formatDate(...)  // product team owns this
+        setState(...)    // UI team owns this
+      });
+  }
+}
+```
+
+Now pull each concern out to where it belongs.
+
+```dart
+// The backend team owns this
+class UserRepository {
+  Future<User> fetchUser(String id) async {
+    final res = await http.get(Uri.parse('https://api.example.com/user/$id'));
+    return User.fromJson(jsonDecode(res.body));
+  }
+}
+```
+
+```dart
+// The product team owns this
+class UserPresenter {
+  String formatJoinDate(DateTime date) =>
+      '${date.day}/${date.month}/${date.year}';
+}
+```
+
+```dart
+// The UI team owns this
+class ProfileScreen extends StatelessWidget {
+  final User user;
+  final UserPresenter presenter;
+
+  const ProfileScreen({
+    super.key,
+    required this.user,
+    required this.presenter,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(user.name),
+        Text('Joined: ${presenter.formatJoinDate(user.joinedAt)}'),
+      ],
+    );
+  }
+}
+```
+
+Three classes. Three actors. Each one has only one reason to change.
+
+## Why it is better
+
+When the backend team renames `joinedAt` to `createdAt`, you open `UserRepository`. Only `UserRepository`. The presenter and screen do not move.
+
+When product wants ISO date format, you open `UserPresenter`. Only `UserPresenter`.
+
+When the designer hands you a new layout, you open `ProfileScreen`. Only `ProfileScreen`.
+
+Each change has its own blast radius, and none of them overlap.
+
+Before, any change meant opening the same file and hoping you did not disturb the other two concerns. Now, changes stay where they belong.
+
+## The diagram
+
+```text
+[ Backend team ]  ──asks to change──►  UserRepository
+[ Product team ]  ──asks to change──►  UserPresenter
+[ UI team      ]  ──asks to change──►  ProfileScreen
+```
+
+One arrow per actor. No actor reaches across to another class.
+
+## When not to apply it
+
+A throwaway script. A one-screen prototype. A utility that only one person will ever call.
+
+SRP costs files and indirection. It splits code across multiple places, which means more to navigate. Pay that cost only when more than one actor has a real stake in the code — when changes from different people are genuinely going to collide.
+
+A date formatter used in one screen by one team does not need an actor analysis. The friction is not there yet.
+
+Wait for the friction. Then apply the principle.
+
+## Common mistakes
+
+- Splitting by *layer* instead of by *actor*. A "service" class and a "repository" class that are both changed only by the backend team is two files, not one responsibility each. You added indirection without reducing the blast radius.
+- Splitting until every class has one method. That is fragmentation, not SRP. A `UserRepository` with `fetchUser`, `saveUser`, and `deleteUser` is fine if all three are changed by the same team for the same reasons.
+- Treating "the class is big" as the signal. A big class with one actor is cohesive. A small class with two actors is an SRP violation. Size is not the metric.
+
+## Summary
+
+| Concept | What it means | The smell that calls for it |
+|---|---|---|
+| Single Responsibility Principle | A class should be responsible to one actor — one group of people with a shared reason to demand a change | Multiple teams or concerns reaching into the same file for different reasons |
+| Actor | A group of stakeholders who want the same kind of change | When you find an `if` that changes behavior for one caller and not others |
+| Blast radius | The set of files a single change touches | When one change from one person forces edits across unrelated parts of the codebase |
