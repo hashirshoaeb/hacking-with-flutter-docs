@@ -1,0 +1,208 @@
+---
+title: "Dependency Inversion Principle"
+description: "The architectural foundation of SOLID. When the arrows point the right way, everything else follows."
+---
+
+Your `OrderService` places orders. It needs to save them somewhere, so you reach for the tool you are already using: Firebase.
+
+```dart
+class OrderService {
+  Future<void> placeOrder(Order order) async {
+    final db = FirebaseFirestore.instance;
+    await db.collection('orders').add(order.toJson());
+  }
+}
+```
+
+It works. But something quiet has gone wrong.
+
+Your business logic — the code that decides *what* happens — now depends on Firebase, which is the code that decides *how* it happens. Swap Firebase for a REST API and you are rewriting `OrderService`. Write a test without a Firebase project and you are stuck.
+
+All of that comes from one wrong dependency arrow.
+
+## Two things to separate before we start
+
+DIP and DI look similar. They are not the same thing.
+
+| DIP (Dependency Inversion Principle)
+| Noun — A design principle. A rule about which *direction* source-code dependencies should point: toward high-level policy, not toward low-level details.
+
+| DI (Dependency Injection)
+| Noun — A technique. A way of *supplying* dependencies from outside a class instead of letting the class build them itself.
+
+You can do DI without DIP. Passing a concrete `FirebaseOrderRepository` into a constructor is dependency injection — but the source code still points from policy to detail. The arrow is still wrong.
+
+DIP is the principle. DI is one technique for achieving it.
+
+## High-level and low-level
+
+| High-level module
+| Noun — Code that expresses what the application *does*. Business rules, use cases, domain logic. The reason the software exists.
+
+| Low-level module
+| Noun — Code that handles *how* things happen. HTTP clients, databases, Firebase, SharedPreferences, device sensors. The machinery that makes the high-level stuff possible.
+
+`OrderService` is high-level. It knows the rules: an order must be validated, then saved, then a confirmation triggered.
+
+`FirebaseFirestore` is low-level. It is the mechanism for saving.
+
+The principle says: **high-level modules should not depend on low-level modules. Both should depend on abstractions.**
+
+## The problem with the wrong arrow
+
+Draw the dependency in the original code:
+
+```text
+OrderService ─────────► FirebaseFirestore
+(high-level)               (low-level)
+```
+
+The business logic points at the infrastructure. This means:
+
+- Test `OrderService` and you need Firebase. No getting around it.
+- Swap Firebase for a REST API and you edit `OrderService`. Business logic changes because infrastructure changed.
+- The company decides to go offline-first. `OrderService` needs to know about `SQLite`. More low-level details leaking into business logic.
+
+Each change to infrastructure ripples upward into policy. The arrow is in the wrong direction.
+
+## Inverting the arrow
+
+Introduce an abstraction between them. The abstraction belongs to the high-level side — it defines what the business logic needs, in the business logic's own terms.
+
+```dart
+// Owned by the business logic layer — defines what it needs
+abstract class OrderRepository {
+  Future<void> save(Order order);
+}
+```
+
+```dart
+// OrderService depends on the abstraction, not on Firebase
+class OrderService {
+  final OrderRepository _repository;
+
+  OrderService(this._repository); // injected from outside
+
+  Future<void> placeOrder(Order order) async {
+    // business rules here
+    await _repository.save(order);
+  }
+}
+```
+
+```dart
+// The low-level detail implements the abstraction
+class FirebaseOrderRepository implements OrderRepository {
+  @override
+  Future<void> save(Order order) async {
+    final db = FirebaseFirestore.instance;
+    await db.collection('orders').add(order.toJson());
+  }
+}
+```
+
+Now draw the arrows again:
+
+```text
+BEFORE:
+   OrderService ──────────────► FirebaseFirestore
+   (high-level)                   (low-level)
+
+AFTER:
+   OrderService ──► OrderRepository ◄── FirebaseOrderRepository
+   (high-level)      (abstraction)        (low-level)
+```
+
+Both the service and the Firebase implementation point at the abstraction. The abstraction lives in the high-level layer. The low-level detail points *toward* policy instead of policy pointing *toward* detail.
+
+The arrow is inverted.
+
+## The testability payoff
+
+Now `OrderService` depends only on `OrderRepository`. To test it, you pass a fake.
+
+```dart
+class FakeOrderRepository implements OrderRepository {
+  final List<Order> savedOrders = [];
+
+  @override
+  Future<void> save(Order order) async {
+    savedOrders.add(order); // just track it, no network, no Firebase
+  }
+}
+```
+
+```dart
+void main() {
+  test('placeOrder saves the order', () async {
+    final fakeRepo = FakeOrderRepository();
+    final service = OrderService(fakeRepo);
+
+    await service.placeOrder(Order(id: '1', total: 99.0));
+
+    expect(fakeRepo.savedOrders.length, 1);
+  });
+}
+```
+
+No Firebase project. No network. No test helpers for Firestore. Just a class and a fake, and a test that runs in milliseconds.
+
+## How to wire it in Flutter
+
+Somebody has to put the real `FirebaseOrderRepository` into `OrderService`. That work belongs at the **composition root** — the place in your app where concrete implementations are assembled.
+
+In Flutter, that is usually `main.dart` or a setup function it calls.
+
+```dart
+void main() {
+  final orderRepository = FirebaseOrderRepository();
+  final orderService = OrderService(orderRepository);
+
+  runApp(MyApp(orderService: orderService));
+}
+```
+
+Tools like `get_it` and `provider` help manage this wiring across a large app. But the principle is the same wherever you use them: concrete implementations are assembled at the boundary, and everything inside depends only on abstractions.
+
+We will cover dependency injection patterns in depth in the Clean Architecture course.
+
+## Why the other principles follow from this one
+
+Look back at the previous four lessons through the lens of DIP.
+
+**SRP.** When dependencies are inverted, each layer has its own abstraction boundary. Changes to one actor stop bleeding into other layers — the seams are structural, not just logical.
+
+**OCP.** When `OrderService` depends on `OrderRepository` instead of `FirebaseOrderRepository`, you can swap the implementation without touching the service. That is exactly what OCP describes: open to a new implementation, closed to modification.
+
+**LSP.** Every `FirebaseOrderRepository` that claims to implement `OrderRepository` must honor the contract. DIP makes the contract real and the stakes high — if an implementation violates LSP, the tests against the fake will catch it.
+
+**ISP.** When you own the abstraction on the high-level side, you define exactly what you need — nothing more. Fat interfaces tend not to survive DIP because the high-level code refuses to depend on methods it does not use.
+
+DIP is not just another principle. It is the structural foundation that the other four build on.
+
+## When not to apply it
+
+When the low-level detail will never change and never needs to be tested in isolation.
+
+A utility function that formats a `DateTime` to a `String` does not need an injected `DateFormatter` interface. A widget that renders a color from a theme does not need an injected `ColorProvider`.
+
+DIP pays for itself when the detail might vary — different backends, different storage strategies, test fakes — and when the cost of testing through the real implementation is too high.
+
+If the cost is low and the variation is zero, the interface is ceremony.
+
+## Common mistakes
+
+- Doing DI without DIP: injecting a concrete `FirebaseOrderRepository` through the constructor. The class still depends on Firebase — the arrow still points the wrong way.
+- Putting the abstraction in the wrong layer. If `OrderRepository` lives inside the Firebase package, next to its implementation, nothing is actually inverted. The high-level module is still importing from the low-level layer.
+- Inventing abstractions for things that will never vary. A `StringFormatter` interface with one implementation and no test need is a tax, not an investment.
+
+## Summary
+
+| Concept | What it means | The smell that calls for it |
+|---|---|---|
+| Dependency Inversion Principle | High-level modules should not depend on low-level modules; both should depend on abstractions | Business logic that imports Firebase, SQLite, or other infrastructure directly |
+| High-level module | Code that expresses what the application does — business rules and use cases | `OrderService`, `ProfileViewModel`, `CheckoutController` |
+| Low-level module | Code that handles how things happen — storage, network, device APIs | `FirebaseFirestore`, `http.Client`, `SharedPreferences` |
+| DIP vs DI | DIP is the principle (which direction the arrow points); DI is the technique (constructor injection, service locator) | Injecting a concrete class by constructor is DI — but if the arrow still points to a low-level detail, it is not DIP |
+| Composition root | The place in the app where concrete implementations are assembled and injected | `main.dart`, or a setup function it calls before `runApp` |
+| Inverted arrow | The abstraction is owned by the high-level side; the low-level detail depends on it, not the other way around | When `FirebaseOrderRepository` imports `OrderRepository` — not the other way around |
