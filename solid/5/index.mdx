@@ -1,0 +1,204 @@
+---
+title: "Liskov Substitution Principle"
+description: "If callers have to check what kind of object they received before using it, the abstraction is broken."
+---
+
+You have an abstract class. You implement it. But one of the methods does not make sense for your implementation, so you throw `UnimplementedError` and move on.
+
+It works. The compiler is happy.
+
+But somewhere in the codebase, a caller is about to receive your object through that interface — trusting that it behaves like the contract says it does. And it will not.
+
+That is an LSP violation.
+
+## The misconception
+
+The Liskov Substitution Principle is almost always taught as an inheritance rule: "if `B extends A`, you should be able to use `B` wherever `A` is expected."
+
+That is true. But it is only half of it.
+
+LSP applies to **any subtype** — and in Dart, every class that `implements` an abstract class is a subtype of it. You do not need `extends` to violate LSP. Every time you write `class Foo implements Bar`, you are making a promise: "anywhere a `Bar` is expected, my `Foo` will work."
+
+If it does not work, you have broken the promise. That is LSP.
+
+## The principle
+
+A program that uses an interface must not be confused by any implementation of that interface.
+
+More precisely: subtypes must honor the full contract of the type they stand in for — not just its method signatures, but its *behavior*.
+
+| Subtype
+| Noun — Any class that can be used where a given type is expected. In Dart, this includes both subclasses (extends) and implementations (implements).
+
+| Contract
+| Noun — The behavioral promise an interface makes to its callers. Not just "this method exists" but "this method does what callers expect."
+
+The signature is the easy part. The behavior is the real promise.
+
+## A quick warm-up: Square and Rectangle
+
+You may have seen this example before. A `Square` extends a `Rectangle`. Makes sense — every square is a rectangle.
+
+But a `Rectangle` lets you set its width and height independently. If you set `width = 5` on a rectangle, the height stays the same.
+
+A `Square` cannot do that. If its sides must always be equal, setting the width also changes the height. Code that expects a `Rectangle` and receives a `Square` will be surprised.
+
+The inheritance looked right. The behavior did not hold.
+
+We are going to move past this example because it is contrived. The violations you will hit in Flutter are more direct.
+
+## The violation you will actually write
+
+Here is a real one.
+
+```dart
+abstract class MediaPlayer {
+  void play();
+  void pause();
+  void seekTo(Duration position);
+}
+```
+
+You implement a player that only handles audio. It can play and pause, but it cannot seek — there is no timeline, no scrubbing.
+
+```dart
+class AudioOnlyPlayer implements MediaPlayer {
+  @override
+  void play()  { /* starts playback */ }
+
+  @override
+  void pause() { /* pauses playback */ }
+
+  @override
+  void seekTo(Duration position) {
+    throw UnimplementedError(); // not supported
+  }
+}
+```
+
+The compiler asks for `seekTo`. You provide it. But it throws at runtime.
+
+Now look at what happens to callers.
+
+```dart
+void startMedia(MediaPlayer player) {
+  player.play();
+}
+
+void jumpToTimestamp(MediaPlayer player, Duration position) {
+  player.seekTo(position); // will this blow up?
+}
+```
+
+The second function cannot know if the player it receives supports `seekTo`. If it receives an `AudioOnlyPlayer`, it crashes.
+
+So callers start doing this:
+
+```dart
+void jumpToTimestamp(MediaPlayer player, Duration position) {
+  if (player is AudioOnlyPlayer) {
+    return; // silently give up
+  }
+  player.seekTo(position);
+}
+```
+
+That `if (player is AudioOnlyPlayer)` check is the LSP violation in action. The caller no longer trusts the interface. It has to inspect the object before using it.
+
+## The smell
+
+Type-inspection in callers.
+
+```dart
+if (player is AudioOnlyPlayer) { ... }
+if (repository is ReadOnlyCache) { ... }
+if (formatter is LegacyFormatter) { ... }
+```
+
+Every `is` check like this is a caller saying: "I cannot trust this contract. I need to know what it really is before I use it." The abstraction has failed.
+
+## The fix
+
+If `AudioOnlyPlayer` cannot honor `seekTo`, it should not implement an interface that requires it.
+
+The solution here is to split the interface — which you will learn properly in Lesson 5. But the principle is simple: do not promise what you cannot deliver.
+
+```dart
+// The shared contract — both players can do this
+abstract class MediaPlayer {
+  void play();
+  void pause();
+}
+
+// Only some players can seek — that is a separate contract
+abstract class SeekableMediaPlayer implements MediaPlayer {
+  void seekTo(Duration position);
+}
+```
+
+```dart
+class AudioOnlyPlayer implements MediaPlayer {
+  @override
+  void play()  { /* plays */ }
+
+  @override
+  void pause() { /* pauses */ }
+  // seekTo does not exist here — and that is honest
+}
+
+class VideoPlayer implements SeekableMediaPlayer {
+  @override
+  void play()  { /* plays */ }
+
+  @override
+  void pause() { /* pauses */ }
+
+  @override
+  void seekTo(Duration position) { /* seeks */ }
+}
+```
+
+Now callers that need seeking ask for a `SeekableMediaPlayer`. Callers that just need play and pause ask for a `MediaPlayer`. No guessing. No type checks. No surprises.
+
+```text
+MediaPlayer (play, pause — always honored)
+     ▲            ▲
+     │            │
+AudioOnlyPlayer   VideoPlayer  ← also implements SeekableMediaPlayer
+```
+
+## The deeper rule
+
+It is not just about throwing errors. LSP violations happen whenever a subtype weakens the promise of its parent:
+
+**Strengthening a precondition.** The parent accepts any integer. The child only accepts positive integers. Code that passes `-1` to the parent will break if it gets the child instead.
+
+**Weakening a postcondition.** The parent guarantees a non-null return. The child returns null when the data is missing. Code that uses the return value without a null check will crash.
+
+**Raising unexpected errors.** The parent's contract implies success. The child throws on some inputs. Callers do not catch it.
+
+In every case, the subtype is surprising callers who expected the parent's behavior.
+
+## When not to apply it
+
+There is no caveat here.
+
+If a subtype cannot stand in for its parent without surprising callers, the design is wrong. Every time. LSP is the one principle with no "but only when it makes sense."
+
+The good news: once you are in the habit of asking "can I honestly implement this entire interface?" before writing `implements`, violations stop happening.
+
+## Common mistakes
+
+- Throwing `UnimplementedError` to make the compiler stop complaining. This is exactly the violation LSP describes.
+- Assuming LSP only applies to `extends`. Every `implements` is a subtype relationship. The principle applies to all of them.
+- Misreading it as "all subtypes must be identical." Subtypes can and should add behavior. LSP only requires that they do not *remove* or *break* the behavior the parent promised.
+
+## Summary
+
+| Concept | What it means | The smell that calls for it |
+|---|---|---|
+| Liskov Substitution Principle | Subtypes must honor the full behavioral contract of the type they stand in for | Type-inspection checks in callers: `if (x is SomeConcreteClass)` |
+| Subtype | Any class that can be used where a given type is expected — via extends or implements | Any class that throws `UnimplementedError` for methods it "supports" |
+| Contract | The behavioral promise an interface makes — not just signatures but what the methods actually do | Methods that return wrong values, throw unexpectedly, or silently do nothing |
+| Strengthened precondition | A subtype that accepts fewer inputs than its parent | The parent accepts any value; the child rejects some at runtime |
+| Weakened postcondition | A subtype that delivers weaker guarantees than its parent | The parent returns non-null; the child sometimes returns null |
