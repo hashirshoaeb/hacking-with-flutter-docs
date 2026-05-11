@@ -1,0 +1,91 @@
+---
+title: "Where This Leads Next"
+description: "SOLID gives you principles. Clean Architecture gives them a home. Here is what to learn next, and why."
+---
+
+You now have five principles and the judgment to use them.
+
+You know that SRP is about actors, not about methods per class. You know that OCP means plugging in new behavior, not annotating old functions. You know that LSP violations show up as type checks in callers. You know that ISP is about clients, not implementors. And you know that DIP is about which direction the arrows point — not just about passing things into constructors.
+
+That is already more than most teams have.
+
+But there is a question that these principles do not answer: **where do the pieces live?**
+
+## The principles point at a structure
+
+Look at what each one implies.
+
+**SRP** says to separate concerns by actor. In a real app, actors tend to organize around layers: the UI team owns the screens, the product team owns the business logic, the backend team owns the data layer. Each actor has a layer.
+
+**OCP and LSP** say to hide implementations behind stable abstractions. Those abstractions need to live somewhere — somewhere that does not change when the implementations do.
+
+**ISP** says each client should depend only on what it uses. That means the contracts need to be scoped to the clients — which tends to mean scoping to layers.
+
+**DIP** says the high-level side should own the abstraction and the low-level side should point toward it. When you draw that out across a whole app, you get a structure where one layer never imports from a layer "below" it.
+
+These hints are not random. They all point at the same shape: **Clean Architecture**.
+
+## What Clean Architecture adds
+
+Clean Architecture takes the dependency rule — abstractions owned by policy, details pointing inward — and extends it across an entire app.
+
+It gives you three layers:
+
+**Presentation** — widgets, controllers, view models. Knows about Flutter. Renders state.
+
+**Domain** — entities, use cases, repository interfaces. Pure Dart. Knows nothing about Flutter, HTTP, or Firebase. This is your business logic.
+
+**Data** — repository implementations, API clients, local storage. Knows about the outside world.
+
+The rule: **arrows point inward**. Presentation depends on domain. Data depends on domain. Domain depends on nothing.
+
+```text
+   Presentation ──────► Domain ◄────── Data
+   (Flutter)            (Pure Dart)     (Firebase, HTTP)
+```
+
+That dependency rule is DIP applied at the architectural scale. The abstractions — the repository interfaces — live in the domain. The implementations live in the data layer and point back toward those abstractions. The presentation layer depends on use cases in the domain, not on Firebase.
+
+Every SOLID principle you learned in this course has a home in that structure.
+
+## You do not need it yet
+
+Clean Architecture is not a prerequisite for writing better code starting tomorrow.
+
+Take what you learned in this course and apply it inside whatever architecture you already use. A `ProfileScreen` that gets a `UserPresenter` instead of doing its own formatting is better than one that does not — regardless of whether you have three folders or thirty.
+
+SOLID improves the code you write. Clean Architecture improves the structure you put it in. One follows from the other, but you do not have to do both at once.
+
+## What comes next
+
+If you want to go further, the next course in this series — **Clean Architecture in Flutter** — takes this course as its prerequisite and walks through:
+
+- The three layers in detail, with folder structures and file conventions
+- Where entities live vs. where models live, and why they are different
+- How to wire up repository implementations to domain interfaces using dependency injection
+- State management in the presentation layer (Riverpod and BLoC, one each)
+- Writing tests that run without Flutter, without Firebase, and without a phone
+
+For now, a few things worth reading:
+
+- *Clean Architecture* by Robert C. Martin — the source material. Dense but worth it.
+- *A Philosophy of Software Design* by John Ousterhout — a different angle on the same problems, with the best explanation of shallow vs. deep modules you will find anywhere.
+- The official Flutter docs on state management and project structure — grounded, practical, and free.
+
+## The takeaway
+
+SOLID gave you five handles on one idea: low coupling and high cohesion.
+
+Once you see that, the letters are not a checklist. They are a vocabulary for conversations you were already having — "this class knows too much," "every new feature edits the same file," "I cannot test this without Firebase" — now with precise names and precise fixes.
+
+Write that code. Ship it. Then come back for the architecture.
+
+## Summary
+
+| Principle | Hints at | Lives in (Clean Architecture) |
+|---|---|---|
+| Single Responsibility | Separate concerns by actor — actors tend to match layers | Each layer has its own actor: UI team owns presentation, product owns domain, backend owns data |
+| Open/Closed | Stable abstractions with swappable implementations | Repository interfaces in the domain layer; implementations in the data layer |
+| Liskov Substitution | Honest contracts — every implementation must deliver what the interface promises | Data-layer implementations that fully honor domain interfaces |
+| Interface Segregation | Narrow contracts scoped to what each client actually uses | Domain interfaces scoped to specific use cases, not fat repositories |
+| Dependency Inversion | Arrows point toward high-level policy | The entire dependency rule: presentation and data both point inward toward domain |
