@@ -1,0 +1,122 @@
+---
+title: "The Cost of Messy Code"
+description: "Why SOLID exists — the pain of code that fights every change you try to make."
+---
+
+You have built a profile screen. It works. It shows the user's name and join date. The API call happens in `initState`, the date gets formatted right there in `build`, and a "last visited" timestamp gets saved to local storage while the data loads. It is all in one place. Easy to find, easy to read.
+
+Then product asks for a change.
+
+```dart
+class ProfileScreen extends StatefulWidget {
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  Map<String, dynamic>? _user;
+
+  @override
+  void initState() {
+    super.initState();
+    // Fetch user data
+    http.get(Uri.parse('https://api.example.com/user/42')).then((res) {
+      setState(() => _user = jsonDecode(res.body));
+      // Save a "last visited" timestamp
+      SharedPreferences.getInstance().then((prefs) {
+        prefs.setString('lastVisited', DateTime.now().toIso8601String());
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_user == null) return const CircularProgressIndicator();
+    // Format the join date inline
+    final joined = DateTime.parse(_user!['joinedAt']);
+    final label = '${joined.day}/${joined.month}/${joined.year}';
+    return Column(
+      children: [
+        Text(_user!['name']),
+        Text('Joined: $label'),
+      ],
+    );
+  }
+}
+```
+
+One class. One file. Two hundred lines, eventually. And everything — the network call, the formatting, the persistence, the widget tree — all of it lives inside `_ProfileScreenState`.
+
+## What happens when something needs to change
+
+Here is where it starts to hurt.
+
+**The backend team renames a field.** They change `joinedAt` to `createdAt`. You open `_ProfileScreenState`, find the line that reads `_user!['joinedAt']`, fix it, and ship. Fine. But while you were in there, you accidentally broke the `label` formatter one line below. The screen now shows "Joined: 1/1/1970" for every user. It slips past review because the PR was only two lines.
+
+**Product wants a different date format.** They want "January 1, 2022" instead of "1/1/2022". You open the same file. You find the format logic buried between the `SharedPreferences` call and the `Column`. You fix it. While you are in there, you notice the `http` call looks wrong and you fix that too. Now the PR touches three concerns. Your reviewer has no idea what to focus on.
+
+**The designer wants to redesign the screen.** She hands you a new layout. You open the file. It is three hundred lines now. The widget tree is somewhere between the data parsing and the `initState`. You spend twenty minutes finding where the `Column` starts before you can write a single line of new UI code.
+
+None of these changes are complicated. But every one of them forces you into the same place. And every time you touch one thing, you risk breaking the other two.
+
+That is not a complexity problem. That is a structure problem.
+
+## A vocabulary for the smell
+
+Before we talk about the solution, it helps to name what you are looking at.
+
+Code that is hard to change usually has one or more of these traits. Together, they spell **STUPID**.
+
+| S — Singleton invasion
+| Noun — Global state that anything in the codebase can read or write. It hides dependencies and makes code unpredictable.
+
+| T — Tight coupling
+| Noun — When one class knows too much about another. Change one, and you are forced to change the other.
+
+| U — Untestability
+| Noun — Code that cannot be tested in isolation because its dependencies are baked in, not passed in.
+
+| P — Premature optimization
+| Noun — Complexity added for performance before there is evidence it is needed.
+
+| I — Indescriptive naming
+| Noun — Names that reveal nothing about intent. `data`, `helper`, `manager` — nobody knows what they actually do.
+
+| D — Duplication
+| Noun — The same logic copied across multiple places. Fix it in one spot and miss it in three others.
+
+The `ProfileScreen` above hits three of these. There is tight coupling — the widget is glued to `http`, `SharedPreferences`, and date formatting. There is untestability — you cannot test the formatting logic without starting a widget, wiring a mock HTTP client, and faking a `SharedPreferences` instance. And there is no clear name for anything, because everything is just *in the widget*.
+
+But tight coupling is the root cause. The others tend to follow from it.
+
+## The real problem
+
+Here is the line worth remembering.
+
+The problem is not that the class is long. The problem is that it is impossible to change one part without risking the others.
+
+If the API call, the formatting logic, and the widget tree are all tangled together, a change to any one of them is a change to all of them. The seams between them are invisible. There is nowhere to cut.
+
+SOLID is a set of principles for putting seams back in.
+
+Not every principle applies to every class. Not every class needs splitting. But when you feel the friction — when a small change opens a big file and you hold your breath before hitting save — that is the signal that something is wrong with the structure.
+
+## What comes next
+
+In the next lesson, we will introduce the two ideas that every SOLID principle is built on: **coupling** and **cohesion**. You have already seen both in action. We are just going to name them precisely so you can recognize them on sight.
+
+From there, we will go through each of the five SOLID principles one at a time. Each lesson will show you the pain first — code that has the problem — then the fix, then the payoff.
+
+By the end, you will be able to look at a class like `ProfileScreen` and immediately see where the seams should go.
+
+## Summary
+
+| Concept | What it is | Why it hurts you |
+|---|---|---|
+| Tight coupling | When one class knows too much about another | Change one, and you are forced to change the other — often in ways you did not expect |
+| STUPID | A set of code smells: Singleton, Tight coupling, Untestability, Premature optimization, Indescriptive naming, Duplication | Gives you a vocabulary to diagnose why a codebase pushes back |
+| Singleton invasion | Global state that any class can read or write | Hides dependencies, makes behavior unpredictable |
+| Untestability | Code that cannot be tested in isolation | Forces you to test everything together, so you end up testing nothing |
+| Premature optimization | Complexity added before there is evidence it is needed | Adds friction for no real gain |
+| Indescriptive naming | Names that reveal nothing about intent | Slows every future reader, including you in three months |
+| Duplication | The same logic in multiple places | Fix it once, miss it everywhere else |
