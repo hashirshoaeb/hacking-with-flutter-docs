@@ -1,0 +1,133 @@
+---
+title: "Coupling and Cohesion"
+description: "The two ideas every SOLID principle is trying to optimize. Learn them first, and the rest will click."
+---
+
+Before you learn SOLID, learn the two words SOLID is trying to optimize for.
+
+If you only ever remember these two, you will already write better code than most developers who know all five letters by heart.
+
+The two words are **coupling** and **cohesion**.
+
+## Coupling
+
+Think about two boxes connected by wires.
+
+If they share one wire, you can move one box without much trouble. You just unplug it. But if they share twelve wires — power, data, control signals, audio, USB, and six others you have forgotten about — moving one box means untangling all twelve. And if you accidentally cut the wrong wire, both boxes stop working.
+
+That is coupling.
+
+| Coupling
+| Noun — The degree to which one module depends on another. If changing module A forces you to change module B, they are tightly coupled.
+
+Here is what tight coupling looks like in Flutter:
+
+```dart
+class CartScreen extends StatefulWidget {
+  @override
+  State<CartScreen> createState() => _CartScreenState();
+}
+
+class _CartScreenState extends State<CartScreen> {
+  late final ApiClient _api;     // wire 1
+  late final LocalStorage _db;   // wire 2
+  late final PriceFormatter _formatter; // wire 3
+
+  @override
+  void initState() {
+    super.initState();
+    _api = ApiClient();           // constructed here, inside the widget
+    _db = LocalStorage();
+    _formatter = PriceFormatter();
+  }
+
+  // ...
+}
+```
+
+`CartScreen` is connected to `ApiClient`, `LocalStorage`, and `PriceFormatter` by hardwiring them in `initState`. It creates them itself. It decides their shape. If you want to test `CartScreen`, you need all three. If `ApiClient` changes its constructor signature, `CartScreen` breaks. If `LocalStorage` moves to a different package, `CartScreen` needs updating.
+
+Three wires. Three reasons things can break.
+
+The goal is fewer wires. Pass what a class needs in from outside instead of letting it build its own dependencies.
+
+## Cohesion
+
+Now think about a kitchen drawer.
+
+A well-organized kitchen has a drawer for cooking utensils — spatulas, ladles, tongs. Another for cutlery. Another for batteries, rubber bands, and the takeaway menu you keep meaning to throw away.
+
+That last drawer. Everybody has one. Nothing in it belongs with anything else. You put things in because you have nowhere else to put them.
+
+That is low cohesion.
+
+| Cohesion
+| Noun — The degree to which the elements inside a module belong together. A class where every method and field serves the same purpose is cohesive. A class where the methods share no fields and no purpose is not.
+
+Here is what low cohesion looks like:
+
+```dart
+class Utils {
+  static String formatDate(DateTime date) { ... }   // date formatting
+  static bool validateEmail(String email) { ... }   // form validation
+  static double parseCurrency(String text) { ... }  // number parsing
+  static Future<void> httpRetry(Uri url) { ... }    // network logic
+}
+```
+
+`Utils` is the junk drawer class. It exists because you needed somewhere to put things. `formatDate` has nothing to do with `httpRetry`. `validateEmail` has nothing to do with `parseCurrency`. They share a file but not a purpose.
+
+The problem with low cohesion is not that the class is messy. The problem is that it cannot have a name that means anything. When everything is in `Utils`, nobody knows where to look when something goes wrong. And when the class grows, it just keeps growing — because "utility" will always accept one more thing.
+
+The goal is high cohesion. Every piece of a module should belong to the same story.
+
+## The rule of thumb
+
+Put both ideas together and you get one rule:
+
+**High cohesion within a module. Low coupling between modules.**
+
+Everything inside a class should belong together. But classes should not know too much about each other.
+
+A `DateFormatter` class has high cohesion — all of its methods are about formatting dates. It has low coupling to the rest of the app — it receives a `DateTime` and returns a `String`. Nothing else.
+
+A `ProfileScreen` that fetches data, formats it, saves a timestamp, and renders the UI has low cohesion — the concerns do not belong together. And it has high coupling — it is glued to HTTP, SharedPreferences, and the date formatting logic all at once.
+
+## What these two ideas explain
+
+Every SOLID principle in this course is a strategy for moving code toward that rule.
+
+- **Single Responsibility** is about cohesion. It asks: who has reason to change this class? If the answer is "multiple teams for multiple reasons," the cohesion is low.
+- **Open/Closed** is about coupling. It asks: does adding a new behavior force you to edit existing code? If yes, you are coupled to the implementation instead of the abstraction.
+- **Liskov Substitution** is about coupling. It asks: can callers trust a contract, or do they have to inspect the type before using it?
+- **Interface Segregation** is about cohesion. It asks: is the interface honest about what each client actually uses?
+- **Dependency Inversion** is about both. It inverts the coupling so that high-level policy does not depend on low-level detail, and groups the abstraction with the code that should own it.
+
+You do not need to understand any of that yet. Just notice the pattern: **all roads lead back to coupling and cohesion.**
+
+Once you see that, the five letters become five handles on the same idea instead of five separate rules to memorize.
+
+## What the smells look like
+
+Coupling is too high when:
+
+- A change in one file forces a change in three others you did not expect to touch.
+- You cannot test a class without spinning up its dependencies.
+- The class creates its own dependencies with `ClassName()` inside the constructor or `initState`.
+
+Cohesion is too low when:
+
+- The class has a vague name: `Manager`, `Handler`, `Utils`, `Helper`, `Service`.
+- The methods share no fields with each other.
+- You open the class and feel like you have opened the wrong file.
+
+Neither is subtle once you know what you are looking for.
+
+## Summary
+
+| Term | What it means | High or low — which is better | How to spot a violation |
+|---|---|---|---|
+| Coupling | How much one module depends on another | Low coupling is better | A change in one file forces changes in others |
+| Cohesion | How well the elements inside a module belong together | High cohesion is better | The class has no clear purpose, or a vague name like `Utils` |
+| Tight coupling | When a class builds or controls its own dependencies | — | `ApiClient()` or `SharedPreferences.getInstance()` called inside the class itself |
+| Low cohesion | When a class contains elements that share no purpose | — | A class with methods that have nothing to do with each other |
