@@ -1,0 +1,167 @@
+---
+title: "Interface Segregation Principle"
+description: "Small, focused interfaces keep implementations honest. But splitting for its own sake just moves the problem."
+---
+
+You have an abstract class for a user repository. It has twelve methods. `getUser`, `getAllUsers`, `saveUser`, `deleteUser`, `updateEmail`, `updatePassword`, `searchByName`, `getByRole`, and four others.
+
+You need to write a read-only cache. It loads user data at startup and returns it. It never writes anything.
+
+But it still has to implement all twelve methods.
+
+```dart
+class UserCache implements UserRepository {
+  @override
+  Future<User> getUser(String id) async { /* returns from cache */ }
+
+  @override
+  Future<void> saveUser(User user) async {
+    throw UnimplementedError(); // doesn't write
+  }
+
+  @override
+  Future<void> deleteUser(String id) async {
+    throw UnimplementedError(); // doesn't delete either
+  }
+
+  // ... nine more methods that all throw
+}
+```
+
+You have just written an LSP violation caused by an ISP violation. The interface asked for too much. The implementation could not honestly deliver it.
+
+## The principle
+
+Clients should not be forced to depend on methods they do not use.
+
+| Client
+| Noun — The code that uses an interface. Not the implementor — the caller. ISP is about what callers need, not about what implementors find convenient.
+
+A fat interface burdens every implementor equally, regardless of how much of it they actually need. That burden is not abstract — it produces empty methods, `throw UnimplementedError()` calls, and then the LSP violations that follow.
+
+## The analogy
+
+Think about a TV remote with sixty buttons.
+
+You use four of them: power, volume up, volume down, and the input switcher. The other fifty-six are there for cable boxes, smart TV features, and modes you have never enabled. They make the remote harder to hold, harder to navigate in the dark, and harder to hand to someone who just wants to turn it on.
+
+Now imagine designing a new smart speaker remote. It cannot change channels. It cannot adjust picture quality. If you try to design it using the original sixty-button layout as your interface contract, most of the surface area is lies.
+
+Split the interface into what each client actually uses.
+
+## What the fat interface looks like
+
+```dart
+abstract class UserRepository {
+  Future<User> getUser(String id);
+  Future<List<User>> getAllUsers();
+  Future<void> saveUser(User user);
+  Future<void> deleteUser(String id);
+  Future<void> updateEmail(String id, String email);
+  // ...
+}
+```
+
+Three kinds of clients use this:
+
+- **`ProfileScreen`** — only ever calls `getUser`. It never writes.
+- **`AdminPanel`** — calls `saveUser`, `deleteUser`, and `updateEmail`. It writes but rarely reads.
+- **`UserRepositoryImpl`** — the full implementation. It does everything.
+
+`ProfileScreen` is forced to depend on `saveUser` and `deleteUser` even though it will never call them. If those methods change their signatures, `ProfileScreen` has to update — even though `ProfileScreen` never called them.
+
+That is the coupling ISP is trying to cut.
+
+## The fix
+
+Split the interface along the lines of what each client actually uses.
+
+```dart
+// ProfileScreen uses this
+abstract class UserReader {
+  Future<User> getUser(String id);
+}
+
+// AdminPanel uses this
+abstract class UserWriter {
+  Future<void> saveUser(User user);
+  Future<void> deleteUser(String id);
+  Future<void> updateEmail(String id, String email);
+}
+```
+
+```dart
+// The full implementation honors both
+class UserRepositoryImpl implements UserReader, UserWriter {
+  @override
+  Future<User> getUser(String id) async { /* ... */ }
+
+  @override
+  Future<void> saveUser(User user) async { /* ... */ }
+
+  @override
+  Future<void> deleteUser(String id) async { /* ... */ }
+
+  @override
+  Future<void> updateEmail(String id, String email) async { /* ... */ }
+}
+
+// The cache only honors what it actually does
+class UserCache implements UserReader {
+  @override
+  Future<User> getUser(String id) async { /* returns from cache */ }
+  // No fake methods. No throws. Just what it can do.
+}
+```
+
+```text
+                  UserReader            UserWriter
+                       ▲                      ▲
+                       │                      │
+        ┌──────────────┴──────────┐    ┌──────┴─────────────┐
+        │                         │    │                    │
+   UserCache             UserRepositoryImpl            AdminPanel
+   (reads only)          (reads + writes)              (writes only)
+```
+
+`ProfileScreen` depends only on `UserReader`. A change to the write methods in `UserWriter` does not touch it. The blast radius of each contract is exactly as wide as it needs to be.
+
+## Why it is better
+
+Each implementor carries only the weight it can honestly lift. The cache no longer has to lie. The admin panel does not need to know how to read. The blast radius of each contract stops at its boundary.
+
+More concretely: when you write a test fake, it is smaller. A `FakeUserReader` has one method. A `FakeUserWriter` has three. You are not writing empty `throw UnimplementedError()` stubs just to satisfy the compiler.
+
+## The honest caveat
+
+ISP can be over-applied.
+
+If you split every interface into one-method contracts, you end up with code that is technically segregated but practically useless. Every caller has to import five tiny interfaces. Coordination that used to be handled by one clear contract is now scattered across six files.
+
+| Shallow module
+| Noun — A module whose interface is almost as complex as its implementation. You have to learn a lot to gain a little. Splitting interfaces too aggressively creates them.
+
+A `UserRepository` split into `UserGetterByIdReader`, `UserListReader`, `UserSaveWriter`, `UserDeleteWriter`, and `UserEmailUpdater` is not better. You now have five things to name, five things to import, and five things to pass around instead of one or two. The complexity was not eliminated — it was spread across more files and put back onto every caller.
+
+Apply ISP when there is a clear, real mismatch between what an interface requires and what at least one of its clients needs. Not to make the design look tidy.
+
+## When not to apply it
+
+When all clients need all the methods. If `ProfileScreen` genuinely uses `getUser`, `saveUser`, and `getAllUsers`, then splitting `UserRepository` into three contracts just makes three things to pass instead of one.
+
+When the split would create interfaces with no meaningful name. If you cannot name the smaller interface better than "the part of `UserRepository` that doesn't include `deleteUser`," the split is not revealing a real boundary.
+
+## Common mistakes
+
+- Splitting every interface into one method to show you know ISP. The result is an API that is harder to use than the original fat interface.
+- Splitting along *type* lines (Reader/Writer) without checking whether any client actually wants only one. ISP is about clients, not about taxonomy.
+- Forgetting that an interface exists to serve callers. If no caller benefits from the smaller version, there is no reason to create it.
+
+## Summary
+
+| Concept | What it means | The smell that calls for it |
+|---|---|---|
+| Interface Segregation Principle | Clients should not depend on methods they do not use | An implementor with `throw UnimplementedError()` for methods it cannot support |
+| Fat interface | An abstract class that requires more than any single client uses | Every implementor of the interface ends up throwing for several methods |
+| Shallow module | A module whose interface is nearly as complex as its implementation | One-method interfaces that force every caller to import five files instead of one |
+| Client (ISP) | The code that uses an interface — the caller, not the implementor | ISP is driven by what callers actually call, not what implementors find convenient |
