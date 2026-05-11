@@ -1,0 +1,150 @@
+---
+title: "Open/Closed Principle"
+description: "Add new behavior by adding new code, not by editing the code that already works."
+---
+
+There is a `switch` statement in your codebase. It handles three cases today. You need to add a fourth.
+
+You open the file. You add the case. You run the tests, hoping the first three still pass.
+
+Most of the time they do. But every time you touch that file, you are playing the same game. Open. Edit. Hope. The file keeps growing. The risk stays constant.
+
+There is a better game to play.
+
+## The principle
+
+A module should be **open for extension** and **closed for modification**.
+
+| Open for extension
+| Adjective — New behavior can be added to the module without changing its existing code.
+
+| Closed for modification
+| Adjective — Once a piece of code is working, you do not need to edit it to make the system do something new.
+
+Open and closed at the same time sounds like a contradiction. But think about a power strip.
+
+You add a new device by plugging it in. You do not unscrew the wall socket to rewire it. The socket is closed — it is finished, it works, you do not touch it. But it is open — anything with the right plug can connect to it.
+
+That is the OCP. You define a socket. New behavior plugs in.
+
+## The problem with `switch`
+
+Here is a discount calculator:
+
+```dart
+double calculateDiscount(String type, double price) {
+  switch (type) {
+    case 'student':
+      return price * 0.2;
+    case 'senior':
+      return price * 0.15;
+    default:
+      return 0;
+  }
+}
+```
+
+It works. Now the product team wants a `veteran` discount. You open this file and add a case.
+
+Next month they want a `loyalty` discount. You open this file again.
+
+The month after, a `staff` discount. Same file.
+
+Every new discount type is a change to the same function. The function touches live, working logic every time it grows. And every time you touch it, you risk breaking `student` and `senior` — the cases that were already right.
+
+The problem is that the variation is baked *in*. There is no socket. There is just a function that has to know about every discount that will ever exist.
+
+## The fix
+
+Extract the varying behavior into an interface. Each discount type becomes its own class. The orchestrating function stays exactly as it is.
+
+```dart
+// The socket — defined once, never changes
+abstract class DiscountStrategy {
+  double apply(double price);
+}
+```
+
+```dart
+// The plugs — one class per discount type
+class StudentDiscount implements DiscountStrategy {
+  @override
+  double apply(double price) => price * 0.2;
+}
+
+class SeniorDiscount implements DiscountStrategy {
+  @override
+  double apply(double price) => price * 0.15;
+}
+```
+
+```dart
+// The orchestrator — never changes, no matter how many discounts are added
+double calculateDiscount(DiscountStrategy strategy, double price) {
+  return strategy.apply(price);
+}
+```
+
+Adding a `VeteranDiscount` next month means writing a new class. That is all. The orchestrator does not change. The existing discount classes do not change. The new code is the only code that moves.
+
+```text
+              ┌──────────────────────┐
+              │ calculateDiscount()  │  ← closed, never changes
+              └──────────┬───────────┘
+                         │ depends on
+                         ▼
+                ┌──────────────────┐
+                │ DiscountStrategy │  ← the socket
+                └──────────────────┘
+                  ▲      ▲      ▲
+                  │      │      │
+            Student   Senior   Veteran  ← open, plug in more anytime
+```
+
+## Why it is better
+
+The right code stays right. When `StudentDiscount` is correct, it stays correct — nobody touches it when `VeteranDiscount` is added. When the orchestrator is correct, it stays correct forever.
+
+The blast radius of each new requirement shrinks to exactly one new file.
+
+This is what "adding behavior by adding code" means in practice. The system grows, but the existing code does not change.
+
+## Where this shows up in Flutter
+
+You have seen this pattern before, even if you did not have a name for it.
+
+**Form validation.** A `Validator` abstract class with an `validate(String value)` method. Each rule — `RequiredValidator`, `EmailValidator`, `MinLengthValidator` — is its own class. Adding a new rule means adding a new class, not editing the validator chain.
+
+**Analytics events.** A `AnalyticsHandler` interface. `FirebaseAnalyticsHandler`, `MixpanelHandler`, and `ConsoleHandler` each implement it. Swapping or adding a new analytics provider means a new class — the call sites never change.
+
+**Theme variations.** A `ButtonStyle` that comes from a factory. Each theme variant is its own object. The widget that uses the button never knows which theme it is in.
+
+The shape is the same in each case: define the socket, plug in the behavior.
+
+## When not to apply it
+
+When variation is hypothetical.
+
+One discount type does not need an interface. Two discount types probably do not either. Wait until you can see the pattern clearly — until you have written the switch statement and felt the friction of editing it twice. Then extract the abstraction.
+
+This is the **rule of three**: wait until the third case before abstracting. The first case is a coincidence. The second is a hint. The third is the pattern.
+
+Extracting an interface for a single implementation adds indirection with no benefit. You end up with a `DiscountStrategy` abstract class with exactly one subclass, and nothing has improved except the line count.
+
+We will come back to this judgment in Lesson 7.
+
+## Common mistakes
+
+- Extracting an interface before there is more than one implementation. The abstraction does not earn its cost until something actually varies.
+- The orchestrator still imports concrete types by name. If `calculateDiscount` has an `import 'student_discount.dart'` somewhere, it is not really closed — it still knows about every plug.
+- Confusing OCP with "never edit code." You will edit code. Every bug fix is an edit. OCP is about *where* you add new behavior: in new files, not in old functions.
+
+## Summary
+
+| Concept | What it means | The smell that calls for it |
+|---|---|---|
+| Open/Closed Principle | A module should be open for extension and closed for modification | Every new requirement edits the same existing function or class |
+| Open for extension | New behavior can be added without changing existing code | There is nowhere to "plug in" new behavior — it has to be baked into the function |
+| Closed for modification | Once code works, it does not need to change for new requirements | The same file appears in the diff every time a new feature is added |
+| The socket | An abstract class or interface that defines the contract | The switch statement — each `case` is a hard-coded plug instead of a real one |
+| Rule of three | Wait for the third variation before abstracting | One or two cases do not justify the cost of an interface |
