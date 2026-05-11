@@ -1,0 +1,180 @@
+---
+title: "Putting It Together — and When Not to Bother"
+description: "The five principles are five strategies for one goal. Here is the goal, and here is when to ignore the strategies."
+---
+
+You have learned five principles. Before you go apply them, learn the one idea they are all pointed at — and learn when to put the whole toolkit down.
+
+## The five principles, one goal
+
+Every SOLID principle is a specific strategy for the same thing: **low coupling and high cohesion**.
+
+That is the actual goal. Not SOLID. Not clean code. Not architecture. Low coupling between modules. High cohesion within them.
+
+```text
+Single Responsibility ──┐
+Open/Closed ────────────┤
+Liskov Substitution ────┼──► Low coupling + high cohesion
+Interface Segregation ──┤
+Dependency Inversion ───┘
+```
+
+SRP asks: who has reason to change this? Split along actor lines when the answer involves more than one group. That keeps each module cohesive.
+
+OCP asks: does adding behavior require editing working code? Extract an abstraction when the answer is yes. That reduces coupling to the variation.
+
+LSP asks: can callers trust any implementation? Fix it when the answer is sometimes. That keeps the interface coupling honest.
+
+ISP asks: does this client need all of these methods? Split when the answer is no. That keeps each client coupled only to what it uses.
+
+DIP asks: which direction does this dependency point? Invert it when it points from high-level policy to low-level detail. That decouples the business logic from the infrastructure.
+
+Once you can see the coupling and cohesion being improved — or not — you no longer need to ask which letter applies. You are reading code, not filling out a checklist.
+
+## What it looks like when the principles work together
+
+Here is a small checkout feature. Each piece is kept deliberately minimal.
+
+**The entity — just data, no dependencies.**
+
+```dart
+class Order {
+  final String id;
+  final double total;
+
+  Order({required this.id, required this.total});
+}
+```
+
+**The abstraction — owned by the business logic layer.**
+
+```dart
+// DIP: the high-level side defines what it needs
+abstract class OrderRepository {
+  Future<void> save(Order order);
+}
+```
+
+**The service — business logic only, no infrastructure.**
+
+```dart
+// SRP: one actor (product team) owns this
+// DIP: depends on the abstraction, not the implementation
+class OrderService {
+  final OrderRepository _repository;
+  OrderService(this._repository);
+
+  Future<void> placeOrder(Order order) async {
+    if (order.total <= 0) throw ArgumentError('Invalid total');
+    await _repository.save(order);
+  }
+}
+```
+
+**The implementation — plugs into the abstraction.**
+
+```dart
+// OCP: adding a new backend means a new class like this, not editing OrderService
+// LSP: honors the full contract of OrderRepository
+class ApiOrderRepository implements OrderRepository {
+  @override
+  Future<void> save(Order order) async {
+    await http.post(
+      Uri.parse('https://api.example.com/orders'),
+      body: jsonEncode({'id': order.id, 'total': order.total}),
+    );
+  }
+}
+```
+
+**The widget — only renders.**
+
+```dart
+// SRP: UI team owns this; it never touches business logic
+class CheckoutScreen extends StatelessWidget {
+  final OrderService service;
+  const CheckoutScreen({super.key, required this.service});
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: () => service.placeOrder(Order(id: '42', total: 129.0)),
+      child: const Text('Place Order'),
+    );
+  }
+}
+```
+
+Five classes. Each one has one reason to change. The widget does not know about Firebase. The service does not know about the widget. Adding a new repository implementation means adding a file. Nothing existing needs to move.
+
+The principles are all present. But you would not say "I applied SRP to the widget." You would say "I pulled the rendering apart from the business logic because the UI team and the product team are different actors." The principle gave you the vocabulary; the judgment told you where to apply it.
+
+## The failure mode: enterprise fizzbuzz
+
+Here is the same feature, over-engineered.
+
+```dart
+abstract class OrderIdGenerator { String generate(); }
+abstract class OrderValidator { bool isValid(Order order); }
+abstract class OrderSaver { Future<void> save(Order order); }
+abstract class OrderEventEmitter { void emit(OrderEvent event); }
+abstract class OrderLogger { void log(String message); }
+abstract class OrderFactory { Order create(String id, double total); }
+
+class DefaultOrderIdGenerator implements OrderIdGenerator { ... }
+class DefaultOrderValidator implements OrderValidator { ... }
+class DefaultOrderSaver implements OrderSaver { ... }
+// ... six more files
+```
+
+Each of these abstractions might feel principled in isolation. But together, they produce a feature that takes twelve files to place an order, where a concrete class never exists without a corresponding interface, and where nothing can be read without jumping between eight files.
+
+This is sometimes called **enterprise fizzbuzz**. The principles were applied. The judgment was not.
+
+Abstractions that exist to satisfy a checklist are not the goal. The goal is code you can change without fear. When the abstraction adds friction instead of removing it, you have gone too far.
+
+## The rule of three
+
+A practical check before you extract an abstraction:
+
+Does this vary in more than two ways yet?
+
+One discount type does not need an interface. One repository implementation does not need inverting. Wait until variation is real — until you have felt the friction of editing the same code twice for unrelated reasons. Wait until you can see the shape clearly enough to name the abstraction well.
+
+The first case is a coincidence. The second is a hint. The third is a pattern.
+
+## What simple code looks like
+
+A utility function that formats a price does not need an actor analysis. It has one caller. It does one thing. It has never been a problem.
+
+```dart
+String formatPrice(double price) => '\$${price.toStringAsFixed(2)}';
+```
+
+Three lines. No interface. No injection. No layer. Just a function that does what it says.
+
+If this function grows to serve two different formatting rules for two different teams, that is when SRP applies. If its behavior needs to vary by context, that is when OCP applies. Right now it does not need either.
+
+SOLID is a set of tools for managing complexity. If the complexity is not there, put the tools down.
+
+## The honest truth
+
+SOLID is not the destination.
+
+Coupling and cohesion are the destination. SOLID is the structured path you take while you are still learning to see them. The five letters are handles on an idea that is older than any of them.
+
+Once you can look at a class and immediately see where the wires are and whether the things inside it belong together, you are no longer following SOLID. You have internalized it. The labels become scaffolding you do not need anymore.
+
+That is the goal.
+
+## Summary
+
+| Principle | What it optimizes for | The smell it targets | The fix |
+|---|---|---|---|
+| Single Responsibility | Cohesion within a module | Multiple actors reaching into the same class for different reasons | Split the class along actor lines |
+| Open/Closed | Coupling to variation | Every new requirement edits the same function | Extract the variation into an interface |
+| Liskov Substitution | Coupling honesty | Type-inspection checks in callers: `if (x is Concrete)` | Honor the full contract, or split the interface |
+| Interface Segregation | Cohesion of contracts | Implementors forced to `throw UnimplementedError` for methods they do not support | Split interfaces along client-use lines |
+| Dependency Inversion | Coupling direction | Business logic that imports infrastructure | Introduce an abstraction owned by the high-level side |
+| Enterprise fizzbuzz | — | Abstractions applied mechanically with no real benefit | Apply a principle only when the benefit is clear |
+| Rule of three | — | Premature abstractions created for hypothetical variation | Wait for the third case before extracting an abstraction |
